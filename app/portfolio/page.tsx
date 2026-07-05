@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Trash2 } from "lucide-react";
+import { PieChart, Trash2 } from "lucide-react";
 import { deleteHolding } from "@/app/portfolio/actions";
 import { ChangeChip } from "@/components/change-chip";
 import { AddHoldingDialog, EditHoldingDialog } from "@/components/holding-dialogs";
@@ -68,7 +68,15 @@ export default async function PortfolioPage() {
             Positions, cost basis, and current market value.
           </p>
         </div>
-        <AddHoldingDialog />
+        <div className="flex flex-wrap gap-2">
+          <Button asChild variant="outline" className="rounded-full">
+            <Link href="/portfolio/allocation">
+              <PieChart className="h-4 w-4" />
+              Allocation
+            </Link>
+          </Button>
+          <AddHoldingDialog />
+        </div>
       </div>
 
       <section className="grid gap-3 md:grid-cols-4">
