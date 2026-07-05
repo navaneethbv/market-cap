@@ -58,3 +58,15 @@ export interface Candle {
 }
 
 export type ChartRange = "1D" | "1W" | "1M" | "6M" | "1Y" | "5Y";
+
+export interface InsiderTransaction {
+  symbol: string;
+  name: string;
+  share: number;
+  change: number;
+  price: number;
+  date: string;
+  filingDate: string;
+  transactionCode: string;
+  isDirectShare: boolean;
+}
