@@ -267,7 +267,19 @@ Done this session:
 - `new-changes.zip` still sits untracked at repo root (user may delete);
   extracted folder was moved to session scratchpad.
 
-## IN PROGRESS: Stripe billing (branch `feature/stripe-billing`, off main)
+## DONE: Stripe billing (branch `feature/stripe-billing`, PR #2)
+
+Status update: everything in the plan below was implemented, verified end
+to end in Stripe sandbox (gate blocked a free user, 4242 checkout
+completed, success page verified, watchlist save then worked), and pushed
+as PR #2. The `create_stripe_customers` migration is applied remotely.
+104 tests, lint, and build pass. The test account
+marketcap.test.user1@gmail.com now has an active sandbox Pro subscription
+and AAPL saved in its watchlist. Remaining follow-ups live in
+docs/PAYMENTS.md "Production notes" (webhooks + service role table,
+billing portal, live keys).
+
+## Original billing plan (for reference)
 
 User request: pricing page with Free plan and Pro plan at $20/month
 (recurring), Stripe sandbox, dummy page good enough to test payment, and a
