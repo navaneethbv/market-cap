@@ -5,6 +5,7 @@ import type {
   NewsArticle,
   Quote,
   SymbolSearchResult,
+  InsiderTransaction,
 } from "./types";
 import type { RawEarningsEvent } from "@/lib/calendar";
 
@@ -154,4 +155,35 @@ export async function getEarningsCalendar(
   }>("/calendar/earnings", { from, to }, 3600);
 
   return raw.earningsCalendar ?? [];
+}
+
+export async function getInsiderTransactions(
+  symbol: string
+): Promise<InsiderTransaction[]> {
+  const raw = await finnhub<{
+    symbol: string;
+    data?: {
+      symbol: string;
+      name: string;
+      share: number;
+      change: number;
+      transactionPrice: number;
+      transactionDate: string;
+      filingDate: string;
+      transactionCode: string;
+      isDirectShare: boolean;
+    }[];
+  }>("/stock/insider-transactions", { symbol }, 3600);
+
+  return (raw.data ?? []).map((t) => ({
+    symbol: t.symbol,
+    name: t.name,
+    share: t.share,
+    change: t.change,
+    price: t.transactionPrice,
+    date: t.transactionDate,
+    filingDate: t.filingDate,
+    transactionCode: t.transactionCode,
+    isDirectShare: !!t.isDirectShare,
+  }));
 }

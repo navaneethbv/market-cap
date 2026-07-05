@@ -84,22 +84,29 @@ export default async function RiskDiagnosticsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-2">
-        <Button asChild variant="ghost" size="icon-sm" className="rounded-full">
-          <Link href="/portfolio">
-            <ArrowLeft className="h-4 w-4" />
+      <div className="flex items-center justify-between flex-wrap gap-4">
+        <div className="flex items-center gap-2">
+          <Button asChild variant="ghost" size="icon-sm" className="rounded-full">
+            <Link href="/portfolio">
+              <ArrowLeft className="h-4 w-4" />
+            </Link>
+          </Button>
+          <div>
+            <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2">
+              <ShieldAlert className="h-6 w-6 text-primary" />
+              Risk Diagnostics
+            </h1>
+            <p className="text-sm text-muted-foreground mt-0.5">
+              Portfolio beta and concentration for your holdings, weighted by
+              position value.
+            </p>
+          </div>
+        </div>
+        <Button asChild className="rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold shadow-sm transition-all">
+          <Link href="/portfolio/risk/simulations">
+            Monte Carlo Simulator
           </Link>
         </Button>
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2">
-            <ShieldAlert className="h-6 w-6 text-primary" />
-            Risk Diagnostics
-          </h1>
-          <p className="text-sm text-muted-foreground mt-0.5">
-            Portfolio beta and concentration for your holdings, weighted by
-            position value.
-          </p>
-        </div>
       </div>
 
       {assets.length === 0 ? (
