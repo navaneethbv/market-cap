@@ -63,11 +63,13 @@ signed-in user; everything else is public.
    ```bash
    NEXT_PUBLIC_SUPABASE_URL=...
    NEXT_PUBLIC_SUPABASE_ANON_KEY=...
+   SUPABASE_SERVICE_ROLE_KEY=...     # server-only, used for locked paper-trading writes
    FINNHUB_API_KEY=...
    NEXT_PUBLIC_FINNHUB_API_KEY=...   # same Finnhub key, used by the client websocket
    TWELVEDATA_API_KEY=...
    STRIPE_SECRET_KEY=sk_test_...     # Stripe sandbox key for the Pro plan
    NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_...
+   APP_URL=http://localhost:3000      # or your deployed origin for Stripe redirects
    ```
 
 3. Apply the SQL migrations in `supabase/migrations/` to your Supabase
@@ -113,5 +115,6 @@ GitHub Actions (`.github/workflows/ci.yml`) runs lint, tests, and build on
 pushes and pull requests to `main`. A final "Run smoke" step boots the
 production server and checks it serves `/login`; it is skipped until the
 repo secrets `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`,
-`FINNHUB_API_KEY`, `NEXT_PUBLIC_FINNHUB_API_KEY`, and `TWELVEDATA_API_KEY`
-are configured (Settings -> Secrets and variables -> Actions).
+`SUPABASE_SERVICE_ROLE_KEY`, `FINNHUB_API_KEY`,
+`NEXT_PUBLIC_FINNHUB_API_KEY`, and `TWELVEDATA_API_KEY` are configured
+(Settings -> Secrets and variables -> Actions).

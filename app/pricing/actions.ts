@@ -2,6 +2,7 @@
 
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { getAppOrigin } from "@/lib/app-url";
 import { createClient } from "@/lib/supabase/server";
 import { getBillingState } from "@/lib/billing";
 import { getOrCreateProPriceId, getStripe } from "@/lib/stripe";
@@ -70,7 +71,7 @@ export async function startProCheckout() {
     }
   }
 
-  const origin = (await headers()).get("origin") ?? "http://localhost:3000";
+  const origin = getAppOrigin((await headers()).get("origin"));
   const session = await stripe.checkout.sessions.create({
     mode: "subscription",
     customer: customerId,
