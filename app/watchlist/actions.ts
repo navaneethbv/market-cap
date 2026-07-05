@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { getBillingState } from "@/lib/billing";
 import {
   getSafeWatchlistNextPath,
   isWatchlistSymbol,
@@ -48,6 +49,12 @@ export async function toggleWatchlistItem(formData: FormData) {
       throw new Error(error.message);
     }
   } else {
+    // Saving to the watchlist is a Pro feature; removing is always allowed
+    const billing = await getBillingState(user.id);
+    if (!billing.isPro) {
+      redirect("/pricing?reason=watchlist");
+    }
+
     const { error } = await supabase
       .from("watchlist_items")
       .insert({ user_id: user.id, symbol });

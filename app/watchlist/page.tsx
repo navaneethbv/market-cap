@@ -13,6 +13,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { formatPrice } from "@/lib/format";
+import { getBillingState } from "@/lib/billing";
 import { getQuote } from "@/lib/market/finnhub";
 import { createClient } from "@/lib/supabase/server";
 import { buildWatchlistRows, type WatchlistItem } from "@/lib/watchlist";
@@ -39,9 +40,10 @@ export default async function WatchlistPage() {
   }
 
   const items = (data ?? []) as WatchlistItem[];
-  const quoteResults = await Promise.allSettled(
-    items.map((item) => getQuote(item.symbol))
-  );
+  const [billing, quoteResults] = await Promise.all([
+    getBillingState(user.id),
+    Promise.allSettled(items.map((item) => getQuote(item.symbol))),
+  ]);
   const rows = buildWatchlistRows(items, quoteResults);
 
   return (
@@ -55,12 +57,20 @@ export default async function WatchlistPage() {
 
       {rows.length === 0 ? (
         <section className="rounded-2xl border bg-card p-8 text-center shadow-sm">
-          <h2 className="text-base font-semibold">No symbols yet</h2>
+          <h2 className="text-base font-semibold">
+            {billing.isPro ? "No symbols yet" : "Watchlist saving is a Pro feature"}
+          </h2>
           <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
-            Search for a stock, open its detail page, and add it here.
+            {billing.isPro
+              ? "Search for a stock, open its detail page, and add it here."
+              : "Upgrade to Pro ($20/month) to save stocks and see them here with live prices."}
           </p>
           <Button asChild className="mt-5 rounded-full">
-            <Link href="/stock/AAPL">Open Apple</Link>
+            {billing.isPro ? (
+              <Link href="/stock/AAPL">Open Apple</Link>
+            ) : (
+              <Link href="/pricing?reason=watchlist">See pricing</Link>
+            )}
           </Button>
         </section>
       ) : (
