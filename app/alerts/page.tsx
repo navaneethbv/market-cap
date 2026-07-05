@@ -23,6 +23,7 @@ import {
 import { formatNumber, formatPrice } from "@/lib/format";
 import { getQuote } from "@/lib/market/finnhub";
 import { createClient } from "@/lib/supabase/server";
+import { executeAlertTrigger } from "@/lib/alerts-trigger";
 
 const STATUS_LABELS: Record<AlertStatus, string> = {
   watching: "Watching",
@@ -72,7 +73,7 @@ export default async function AlertsPage() {
 
   const { data, error } = await supabase
     .from("price_alerts")
-    .select("id,symbol,direction,target_price,active,triggered_at,created_at")
+    .select("id,symbol,direction,target_price,active,triggered_at,created_at,notify_email,webhook_url")
     .eq("user_id", user.id)
     .order("created_at", { ascending: false });
 
@@ -88,6 +89,27 @@ export default async function AlertsPage() {
     alerts.map((alert) => getQuote(alert.symbol))
   );
   const rows = buildAlertRows(alerts, quoteResults);
+
+  const newlyTriggered = rows.filter((row) => row.active && row.status === "triggered");
+  if (newlyTriggered.length > 0) {
+    await Promise.allSettled(
+      newlyTriggered.map((row) =>
+        executeAlertTrigger(
+          supabase,
+          user.email || "",
+          row.id,
+          row.quote ? row.quote.price : row.targetPrice
+        )
+      )
+    );
+    for (const row of rows) {
+      if (row.active && row.status === "triggered") {
+        row.active = false;
+        row.triggeredAt = new Date().toISOString();
+      }
+    }
+  }
+
   const summary = calculateAlertSummary(rows);
 
   return (

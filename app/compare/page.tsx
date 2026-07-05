@@ -99,6 +99,12 @@ export default async function ComparePage({ searchParams }: ComparePageProps) {
               </Button>
             )}
             <Button asChild variant="outline" className="rounded-full">
+              <Link href="/compare/correlation">Correlation heatmap</Link>
+            </Button>
+            <Button asChild variant="outline" className="rounded-full">
+              <Link href="/compare/matrix">Matrix view</Link>
+            </Button>
+            <Button asChild variant="outline" className="rounded-full">
               <Link href="/compare/saved">Saved sets</Link>
             </Button>
           </div>

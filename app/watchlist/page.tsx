@@ -16,6 +16,7 @@ import { formatPrice } from "@/lib/format";
 import { getQuote } from "@/lib/market/finnhub";
 import { createClient } from "@/lib/supabase/server";
 import { buildWatchlistRows, type WatchlistItem } from "@/lib/watchlist";
+import { WatchlistSparkline } from "@/components/watchlist-sparkline";
 
 export default async function WatchlistPage() {
   const supabase = await createClient();
@@ -70,6 +71,7 @@ export default async function WatchlistPage() {
                 <TableHead>Symbol</TableHead>
                 <TableHead className="text-right">Price</TableHead>
                 <TableHead>Change</TableHead>
+                <TableHead className="w-28">7D Trend</TableHead>
                 <TableHead className="hidden text-right sm:table-cell">
                   Day range
                 </TableHead>
@@ -101,6 +103,9 @@ export default async function WatchlistPage() {
                     ) : (
                       <span className="text-sm text-muted-foreground">-</span>
                     )}
+                  </TableCell>
+                  <TableCell>
+                    <WatchlistSparkline symbol={row.symbol} changePercent={row.quote?.changePercent} />
                   </TableCell>
                   <TableCell className="hidden text-right text-sm tabular-nums text-muted-foreground sm:table-cell">
                     {row.quote

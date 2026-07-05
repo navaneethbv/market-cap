@@ -1,23 +1,14 @@
 import Link from "next/link";
-import { CalendarDays } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import {
   buildEarningsRows,
   type EarningsRow,
   getMarketHolidays,
   getNextMarketEvents,
 } from "@/lib/calendar";
-import { formatNumber } from "@/lib/format";
 import { getEarningsCalendar } from "@/lib/market/finnhub";
+import { createClient } from "@/lib/supabase/server";
+import { CalendarDashboard } from "@/components/calendar-dashboard";
 
 function addDays(date: Date, days: number) {
   const next = new Date(date);
@@ -46,6 +37,21 @@ export default async function MarketCalendarPage() {
       err instanceof Error ? err.message : "Earnings calendar unavailable";
   }
 
+  // Retrieve user watchlist symbols for client-side filtering option
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  let watchlistSymbols: string[] = [];
+  if (user) {
+    const { data: wData } = await supabase
+      .from("watchlist")
+      .select("symbol")
+      .eq("user_id", user.id);
+    watchlistSymbols = (wData ?? []).map((w) => w.symbol);
+  }
+
   return (
     <div className="space-y-6">
       <section className="rounded-3xl border bg-card p-5 shadow-sm sm:p-6">
@@ -58,8 +64,7 @@ export default async function MarketCalendarPage() {
               Upcoming market dates
             </h1>
             <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
-              Track US market holidays and upcoming earnings in one planning
-              view.
+              Track US market holidays, earnings announcements, and dividend ex-dates in one planning view.
             </p>
           </div>
           <Button asChild variant="outline" className="rounded-full">
@@ -77,7 +82,7 @@ export default async function MarketCalendarPage() {
           <p className="text-xs font-medium text-muted-foreground">
             Next holiday
           </p>
-          <p className="mt-2 text-lg font-semibold">
+          <p className="mt-2 text-lg font-semibold truncate">
             {upcomingHolidays[0]?.name ?? "-"}
           </p>
           <p className="mt-1 text-xs text-muted-foreground">
@@ -97,78 +102,17 @@ export default async function MarketCalendarPage() {
         </div>
       </section>
 
-      <section className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
-        <div className="rounded-2xl border bg-card p-5 shadow-sm">
-          <div className="mb-4 flex items-center gap-2">
-            <CalendarDays className="h-4 w-4 text-primary" />
-            <h2 className="text-base font-semibold">Market holidays</h2>
-          </div>
-          <div className="space-y-3">
-            {upcomingHolidays.map((holiday) => (
-              <div
-                key={holiday.date}
-                className="flex items-center justify-between gap-3 rounded-xl border p-3"
-              >
-                <div>
-                  <p className="text-sm font-semibold">{holiday.name}</p>
-                  <p className="text-xs text-muted-foreground">{holiday.date}</p>
-                </div>
-                <Badge variant="outline">Closed</Badge>
-              </div>
-            ))}
-          </div>
-        </div>
+      {earningsError && (
+        <p className="text-xs text-red-600 dark:text-red-400 font-semibold bg-red-500/10 p-2 rounded-lg border border-red-500/20 max-w-md">
+          Warning: {earningsError}
+        </p>
+      )}
 
-        <div className="overflow-hidden rounded-2xl border bg-card shadow-sm">
-          <div className="border-b p-5">
-            <h2 className="text-base font-semibold">Upcoming earnings</h2>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Finnhub calendar events for the next 21 days.
-            </p>
-          </div>
-          {earningsError ? (
-            <div className="p-5 text-sm text-muted-foreground">
-              {earningsError}
-            </div>
-          ) : earnings.length === 0 ? (
-            <div className="p-5 text-sm text-muted-foreground">
-              No earnings events available for this window.
-            </div>
-          ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Symbol</TableHead>
-                  <TableHead>Date</TableHead>
-                  <TableHead>Session</TableHead>
-                  <TableHead className="text-right">EPS est.</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {earnings.map((event) => (
-                  <TableRow key={`${event.symbol}-${event.date}`}>
-                    <TableCell>
-                      <Link
-                        href={`/stock/${event.symbol}`}
-                        className="font-semibold text-foreground hover:text-primary"
-                      >
-                        {event.symbol}
-                      </Link>
-                    </TableCell>
-                    <TableCell>{event.date}</TableCell>
-                    <TableCell>{event.session}</TableCell>
-                    <TableCell className="text-right tabular-nums">
-                      {event.epsEstimate === null
-                        ? "-"
-                        : formatNumber(event.epsEstimate, 2)}
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          )}
-        </div>
-      </section>
+      <CalendarDashboard
+        earnings={earnings}
+        upcomingHolidays={upcomingHolidays}
+        watchlistSymbols={watchlistSymbols}
+      />
     </div>
   );
 }

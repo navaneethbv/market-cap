@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "node --experimental-strip-types --no-warnings --test \"lib/**/*.test.mjs\""
+    "test": "node --conditions=react-server --experimental-strip-types --no-warnings --test \"lib/**/*.test.mjs\""
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.0",

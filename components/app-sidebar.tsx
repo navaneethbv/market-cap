@@ -10,6 +10,7 @@ import {
   CalendarDays,
   LayoutGrid,
   Newspaper,
+  Search,
   Star,
   TrendingUp,
 } from "lucide-react";
@@ -20,6 +21,7 @@ const NAV_ITEMS = [
   { href: "/", label: "Overview", icon: LayoutGrid },
   { href: "/watchlist", label: "Watchlist", icon: Star },
   { href: "/portfolio", label: "Portfolio", icon: Briefcase },
+  { href: "/screener", label: "Screener", icon: Search },
   { href: "/alerts", label: "Alerts", icon: Bell },
   { href: "/compare", label: "Compare", icon: ArrowRightLeft },
   { href: "/movers", label: "Movers", icon: Activity },

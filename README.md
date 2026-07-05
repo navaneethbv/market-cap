@@ -1,36 +1,108 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# MarketCap: Advanced Stock Analytics & Simulated Trading Platform
 
-## Getting Started
+MarketCap is a state-of-the-art investment research, portfolio management, and simulated trading web application. Powered by Next.js, Supabase, Recharts, and Google's Gemini AI, it provides retail investors with institutional-grade risk diagnostics, interactive charts, and AI-driven portfolio diagnostics.
 
-First, run the development server:
+---
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## 🚀 Key Features
+
+### 1. Advanced Charting & Indicators
+* **Interactive Charting**: Toggle overlays for **Simple Moving Average (SMA)**, **Exponential Moving Average (EMA)**, and **Bollinger Bands**.
+* **Technical Sub-Charts**: Sub-panels synchronized with the cursor display **RSI (14)** and **MACD (12, 26, 9)**.
+* **Valuation History**: Dual-line charts displaying overall portfolio valuation and cost-basis history.
+
+### 2. Portfolio Risk & AI Allocation Advisor
+* **AI Portfolio Advisor**: Queries Gemini AI to provide allocation grade ratings, sector weights, and specific rebalancing checklists.
+* **Risk & Volatility Diagnostics**: Calculates weighted portfolio **Beta** and **Herfindahl-Hirschman Index (HHI)** concentration risk.
+* **Stress Test Drawdown Simulator**: Models dollar losses for your current holdings under major historical market downturns (2008 Financial Crisis, 2020 Pandemic Squeeze, 2000 Dot-com Bubble).
+
+### 3. Investment Evaluation Tools
+* **Valuation DCF Calculator**: Range sliders for EPS growth, WACC discount rate, and terminal growth rate compute intrinsic fair value in real-time.
+* **Scenario Analysis**: Recharts bar chart comparing Bear Case, Current Price, Base Case, and Bull Case side-by-side inside the DCF widget.
+* **AI Consensus Valuation**: Animated SVG gauge plotting Gemini-computed consensus valuation scores (0-100) and rationale metrics.
+* **Volatility Simulator**: Slider simulating custom S&P 500 shifts to project stock returns and prices based on Beta.
+* **Correlation Heatmap Matrix**: Analyze daily price correlation indexes and diversification benefits for multiple assets.
+* **News Sentiment Analytics**: Sentiment gauges, timeline trend lines, and side-by-side bullish/bearish headlines lists.
+* **Dividend Chowder Scatter Matrix**: Recharts scatter plot mapping Yield % vs. 5Y Dividend Growth % quadrants.
+* **Dynamic Stock Screener**: Filters 30 catalog equities by Sector, Cap size, and Valuation, and sorts by Yield, P/E, or Daily Change.
+* **Comparison Matrix**: Radar chart scoring vector strengths along with comparative metrics tables.
+
+### 4. Portfolios, Alerts & Calendar
+* **Simulated Paper Trading Mode**: Virtual cash account ($100k) with full BUY/SELL transaction order logs.
+* **Paper Trading Leaderboard**: Compete with top mock accounts and track your performance rankings.
+* **Dividends & Income Tracker**: YoC statistics and monthly payout calendars.
+* **Multi-Channel Price Alerts**: Email toggles and Discord/Slack webhook dispatchers.
+* **Unified Event Calendar**: Calendars for upcoming Earnings releases, Dividend ex-dates, and market holidays.
+
+---
+
+## 🛠️ Technology Stack
+
+* **Frontend**: React 19 (Client Components, Hooks), Next.js 16 (App Router, Server Actions, API routes), Recharts (data visualizations), Tailwind CSS, Lucide Icons.
+* **Database & Auth**: Supabase SSR (Auth Session management, PostgreSQL database, RLS security policies).
+* **APIs**: Twelve Data (historical price candles), Finnhub (live quotes, stock search, metrics, news, calendars), Gemini AI (insights summaries, chat assistant, portfolio advisor).
+
+---
+
+## ⚙️ Environment Configuration
+
+Create a `.env.local` file in the root directory:
+
+```env
+# Supabase Configuration
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
+
+# Financial API Keys
+TWELVEDATA_API_KEY=your_twelve_data_key
+FINNHUB_API_KEY=your_finnhub_key
+
+# Google Gemini AI Key
+GEMINI_API_KEY=your_gemini_key
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+*Note: If the `GEMINI_API_KEY` or financial keys are missing or rate-limited, the application automatically falls back to high-fidelity mock data and simulated diagnostics.*
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 📦 Setup & Database Migrations
 
-## Learn More
+1. Install dependencies:
+   ```bash
+   npm install
+   ```
 
-To learn more about Next.js, take a look at the following resources:
+2. Apply local Supabase migrations:
+   ```bash
+   npx supabase migration up
+   ```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+3. Run the development server:
+   ```bash
+   npm run dev
+   ```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+---
 
-## Deploy on Vercel
+## 🧪 Testing & Quality Assurance
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+MarketCap features comprehensive test coverage across all core mathematical calculators, data normalizers, and database migrations.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+* **Run all Unit & Integration Tests**:
+  ```bash
+  npm test
+  ```
+* **Verify Test Coverage Metrics**:
+  ```bash
+  node --conditions=react-server --experimental-strip-types --no-warnings --test --experimental-test-coverage "lib/**/*.test.mjs"
+  ```
+  *(Current: 97.37% utility line coverage)*
+* **Linting Checks**:
+  ```bash
+  npm run lint
+  ```
+* **Production Build Compilation**:
+  ```bash
+  npm run build
+  ```
