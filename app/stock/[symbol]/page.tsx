@@ -1,14 +1,12 @@
 /* eslint-disable @next/next/no-img-element */
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ExternalLink, Star, Sparkles } from "lucide-react";
+import { ExternalLink, Star } from "lucide-react";
 import { toggleWatchlistItem } from "@/app/watchlist/actions";
-import { AIAnalyst } from "@/components/ai-analyst";
 import { DCFCalculator } from "@/components/dcf-calculator";
 import { LivePriceDisplay } from "@/components/live-price-display";
 import { NewsTabs } from "@/components/news-tabs";
 import { StockChart } from "@/components/stock-chart";
-import { TradeDialog } from "@/components/trade-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -161,12 +159,14 @@ export default async function StockPage({
                     Volatility Simulator
                   </Link>
                 </Button>
-                <Button asChild variant="outline" size="sm" className="rounded-full">
-                  <Link href={`/stock/${symbol}/consensus`}>
-                    Valuation Consensus
-                  </Link>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="rounded-full"
+                  asChild
+                >
+                  <Link href={`/trading?symbol=${symbol}`}>Trade</Link>
                 </Button>
-                <TradeDialog symbol={symbol} currentPrice={quote.price} />
                 <form action={toggleWatchlistItem}>
                   <input type="hidden" name="symbol" value={symbol} />
                   <input type="hidden" name="next" value={`/stock/${symbol}`} />
@@ -206,21 +206,6 @@ export default async function StockPage({
         currentPrice={quote.price}
         initialEps={metrics.epsTTM || null}
       />
-
-      {user ? (
-        <AIAnalyst symbol={symbol} />
-      ) : (
-        <section className="rounded-2xl border border-dashed bg-card p-6 text-center shadow-sm">
-          <Sparkles className="mx-auto h-6 w-6 text-muted-foreground" />
-          <h3 className="mt-2 text-sm font-semibold">Unlock AI Analyst Insights</h3>
-          <p className="mt-1 text-xs text-muted-foreground">
-            Sign in to get automated consensus ratings, bull/bear cases, and chat with our AI analyst.
-          </p>
-          <Button asChild size="sm" className="mt-4 rounded-full">
-            <Link href={`/login?next=/stock/${symbol}`}>Sign In</Link>
-          </Button>
-        </section>
-      )}
 
       <section className="grid gap-6 lg:grid-cols-[1fr_1.15fr]">
         <div className="rounded-2xl border bg-card p-5 shadow-sm">

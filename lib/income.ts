@@ -14,24 +14,6 @@ export interface IncomeSummary {
   yieldOnCost: number;
 }
 
-const MOCK_DIV_GROWTH: Record<string, number> = {
-  AAPL: 8.2,
-  MSFT: 10.5,
-  NVDA: 15.0,
-  KO: 4.8,
-  WMT: 3.6,
-  JPM: 7.5,
-  XOM: 3.2,
-};
-
-export function getDividendGrowth(symbol: string): number {
-  return MOCK_DIV_GROWTH[symbol.toUpperCase().trim()] ?? 4.5;
-}
-
-export function calculateChowderScore(dividendYield: number, growthRate: number): number {
-  return Math.round((dividendYield + growthRate) * 100) / 100;
-}
-
 export function calculateIncomeSummary(metrics: IncomeMetric[]): IncomeSummary {
   const annualIncome = metrics.reduce(
     (total, h) => total + h.shares * h.price * (h.dividendYield / 100),

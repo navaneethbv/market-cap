@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Area,
   ComposedChart,
@@ -17,6 +17,7 @@ import {
 } from "recharts";
 import { Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { formatPrice } from "@/lib/format";
 import { getChartTone } from "@/lib/stock-display";
 import { calculateIndicators } from "@/lib/market/indicators";
 import type { Candle, ChartRange } from "@/lib/market/types";
@@ -35,15 +36,6 @@ function formatTick(value: string, range: ChartRange): string {
   return date.toLocaleDateString("en-US", {
     month: "short",
     day: "numeric",
-  });
-}
-
-function formatPrice(value: number): string {
-  return value.toLocaleString("en-US", {
-    style: "currency",
-    currency: "USD",
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
   });
 }
 
@@ -105,23 +97,24 @@ export function StockChart({ symbol }: { symbol: string }) {
   const stroke = tone === "up" ? "rgb(16 185 129)" : "rgb(239 68 68)";
   const gradientId = `stock-chart-${tone}`;
 
-  // Calculate indicators
-  const indicators = calculateIndicators(candles);
-
-  // Merge indicator outputs with candles for Recharts
-  const chartData = candles.map((candle, idx) => ({
-    ...candle,
-    sma50: indicators.sma50[idx],
-    sma200: indicators.sma200[idx],
-    ema20: indicators.ema20[idx],
-    bbUpper: indicators.bollinger.upper[idx],
-    bbMiddle: indicators.bollinger.middle[idx],
-    bbLower: indicators.bollinger.lower[idx],
-    rsi: indicators.rsi[idx],
-    macdLine: indicators.macd.macdLine[idx],
-    signalLine: indicators.macd.signalLine[idx],
-    macdHist: indicators.macd.histogram[idx],
-  }));
+  // Merge indicator outputs with candles for Recharts. Memoized so overlay
+  // toggles and tooltip hovers do not recompute every indicator each render.
+  const chartData = useMemo(() => {
+    const indicators = calculateIndicators(candles);
+    return candles.map((candle, idx) => ({
+      ...candle,
+      sma50: indicators.sma50[idx],
+      sma200: indicators.sma200[idx],
+      ema20: indicators.ema20[idx],
+      bbUpper: indicators.bollinger.upper[idx],
+      bbMiddle: indicators.bollinger.middle[idx],
+      bbLower: indicators.bollinger.lower[idx],
+      rsi: indicators.rsi[idx],
+      macdLine: indicators.macd.macdLine[idx],
+      signalLine: indicators.macd.signalLine[idx],
+      macdHist: indicators.macd.histogram[idx],
+    }));
+  }, [candles]);
 
   return (
     <section className="rounded-2xl border bg-card p-4 shadow-sm sm:p-5 space-y-4">

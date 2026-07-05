@@ -29,8 +29,10 @@ export function SearchBox() {
         });
         if (!res.ok) throw new Error("search failed");
         const data = (await res.json()) as { results: SymbolSearchResult[] };
-        setResults(data.results);
-        setOpen(true);
+        if (active) {
+          setResults(data.results);
+          setOpen(true);
+        }
       } catch {
         // aborted or failed; keep previous results
       } finally {

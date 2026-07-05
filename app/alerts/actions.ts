@@ -32,8 +32,6 @@ export async function createAlert(formData: FormData) {
     symbol: String(formData.get("symbol") ?? ""),
     direction: String(formData.get("direction") ?? ""),
     targetPrice: String(formData.get("targetPrice") ?? ""),
-    notifyEmail: formData.get("notifyEmail") === "on",
-    webhookUrl: String(formData.get("webhookUrl") ?? ""),
   });
 
   const { error } = await supabase.from("price_alerts").insert({
@@ -41,8 +39,6 @@ export async function createAlert(formData: FormData) {
     symbol: input.symbol,
     direction: input.direction,
     target_price: input.targetPrice,
-    notify_email: input.notifyEmail,
-    webhook_url: input.webhookUrl,
   });
 
   if (error) {
@@ -59,8 +55,6 @@ export async function updateAlert(formData: FormData) {
     symbol: String(formData.get("symbol") ?? ""),
     direction: String(formData.get("direction") ?? ""),
     targetPrice: String(formData.get("targetPrice") ?? ""),
-    notifyEmail: formData.get("notifyEmail") === "on",
-    webhookUrl: String(formData.get("webhookUrl") ?? ""),
   });
 
   const { error } = await supabase
@@ -69,8 +63,6 @@ export async function updateAlert(formData: FormData) {
       symbol: input.symbol,
       direction: input.direction,
       target_price: input.targetPrice,
-      notify_email: input.notifyEmail,
-      webhook_url: input.webhookUrl,
       triggered_at: null,
       updated_at: new Date().toISOString(),
     })

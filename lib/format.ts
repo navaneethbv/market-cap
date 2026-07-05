@@ -7,6 +7,12 @@ export function formatPrice(value: number): string {
   });
 }
 
+/** Like formatPrice, but renders "-" for zero or non-finite values. */
+export function formatPriceOrDash(value: number): string {
+  if (!Number.isFinite(value) || value === 0) return "-";
+  return formatPrice(value);
+}
+
 /** Compact dollar amounts: 3.42T, 187.5B, 42.1M */
 export function formatCompact(value: number): string {
   if (!Number.isFinite(value) || value === 0) return "-";

@@ -1,4 +1,5 @@
 const MAX_SYMBOLS = 5;
+export const MAX_COMPARISON_NAME_LENGTH = 60;
 const SYMBOL_PATTERN = /^[A-Z0-9.^-]{1,12}$/;
 const RESERVED_WORDS = new Set([
   "DELETE",
@@ -26,6 +27,11 @@ export function normalizeSavedComparisonInput(
   const name = input.name.trim().replace(/\s+/g, " ");
   if (!name) {
     throw new Error("Name is required");
+  }
+  if (name.length > MAX_COMPARISON_NAME_LENGTH) {
+    throw new Error(
+      `Name must be ${MAX_COMPARISON_NAME_LENGTH} characters or fewer`
+    );
   }
 
   const symbolsInput = Array.isArray(input.symbols)

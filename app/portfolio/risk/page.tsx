@@ -1,65 +1,85 @@
-"use client";
-
-import { useEffect, useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, Loader2, ShieldAlert, AlertTriangle } from "lucide-react";
+import { redirect } from "next/navigation";
+import { ArrowLeft, ShieldAlert } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   calculateWeightedBeta,
   calculateHHI,
   getHHILabel,
-  simulateStressScenarios,
   type RiskAsset,
 } from "@/lib/risk";
 import { formatPrice } from "@/lib/format";
 import { cn } from "@/lib/utils";
+import { getQuote, getKeyMetrics } from "@/lib/market/finnhub";
+import { type Holding } from "@/lib/portfolio";
+import { createClient } from "@/lib/supabase/server";
 
-export default function RiskDiagnosticsPage() {
-  const [portfolioType, setPortfolioType] = useState<"real" | "paper">("real");
-  const [loading, setLoading] = useState(true);
-  const [assets, setAssets] = useState<RiskAsset[]>([]);
-  const [errorMsg, setErrorMsg] = useState("");
+function getBetaTone(beta: number) {
+  if (beta < 0.8)
+    return { label: "Defensive / Conservative", color: "text-emerald-600 dark:text-emerald-400" };
+  if (beta <= 1.2)
+    return { label: "Market Matching Risk", color: "text-blue-600 dark:text-blue-400" };
+  return { label: "High Volatility / Aggressive", color: "text-red-600 dark:text-red-400" };
+}
 
-  useEffect(() => {
-    Promise.resolve().then(() => {
-      setLoading(true);
-      setErrorMsg("");
-    });
+export default async function RiskDiagnosticsPage() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
-    fetch("/api/portfolio/advisor", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ goal: "Balanced", portfolioType }),
-    })
-      .then((res) => {
-        if (!res.ok) throw new Error();
-        return res.json();
-      })
-      .then((data) => {
-        if (data.holdings) {
-          setAssets(data.holdings);
-        } else {
-          setAssets([]);
-        }
-      })
-      .catch(() => {
-        setErrorMsg("Failed to load portfolio metrics. Ensure you have active holdings.");
-      })
-      .finally(() => setLoading(false));
-  }, [portfolioType]);
+  if (!user) {
+    redirect("/login?next=/portfolio/risk");
+  }
+
+  const { data, error } = await supabase
+    .from("holdings")
+    .select("id,symbol,shares,avg_cost,purchased_at,created_at")
+    .eq("user_id", user.id)
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  const holdings = (data ?? []).map((h) => ({
+    ...h,
+    shares: Number(h.shares),
+    avg_cost: Number(h.avg_cost),
+  })) as Holding[];
+
+  const [quoteResults, metricsResults] = await Promise.all([
+    Promise.allSettled(holdings.map((h) => getQuote(h.symbol))),
+    Promise.allSettled(holdings.map((h) => getKeyMetrics(h.symbol))),
+  ]);
+
+  // Only assets with both a live quote and a reported beta enter the analysis,
+  // so a quote outage or missing beta cannot silently skew the risk numbers.
+  const assets: RiskAsset[] = [];
+  const unpriced: string[] = [];
+  holdings.forEach((h, idx) => {
+    const quoteResult = quoteResults[idx];
+    const metricsResult = metricsResults[idx];
+    const price =
+      quoteResult.status === "fulfilled" ? quoteResult.value.price : null;
+    const beta =
+      metricsResult.status === "fulfilled" &&
+      metricsResult.value.beta !== null &&
+      Number.isFinite(metricsResult.value.beta)
+        ? metricsResult.value.beta
+        : null;
+
+    if (price === null || beta === null) {
+      unpriced.push(h.symbol);
+      return;
+    }
+    assets.push({ symbol: h.symbol, value: h.shares * price, beta });
+  });
 
   const weightedBeta = calculateWeightedBeta(assets);
   const hhi = calculateHHI(assets);
   const hhiInfo = getHHILabel(hhi);
-  const stressResults = simulateStressScenarios(assets);
   const totalValue = assets.reduce((sum, a) => sum + a.value, 0);
-
-  function getBetaTone(beta: number) {
-    if (beta < 0.8) return { label: "Defensive / Conservative", color: "text-emerald-600 dark:text-emerald-400" };
-    if (beta <= 1.2) return { label: "Market Matching Risk", color: "text-blue-600 dark:text-blue-400" };
-    return { label: "High Volatility / Aggressive", color: "text-red-600 dark:text-red-400" };
-  }
-
   const betaTone = getBetaTone(weightedBeta);
 
   return (
@@ -76,61 +96,31 @@ export default function RiskDiagnosticsPage() {
             Risk Diagnostics
           </h1>
           <p className="text-sm text-muted-foreground mt-0.5">
-            Analyze asset concentration weights, portfolio beta risk factors, and run stress tests.
+            Portfolio beta and concentration for your holdings, weighted by
+            position value.
           </p>
         </div>
       </div>
 
-      {/* Selector Control */}
-      <section className="rounded-2xl border bg-card p-4.5 shadow-sm max-w-sm">
-        <div className="grid grid-cols-2 gap-1 rounded-xl bg-muted p-1 text-xs font-semibold">
-          <button
-            onClick={() => setPortfolioType("real")}
-            className={cn(
-              "rounded-lg py-1.5 transition-all",
-              portfolioType === "real" ? "bg-background text-foreground shadow-xs" : "text-muted-foreground hover:text-foreground"
-            )}
-          >
-            Real Portfolio
-          </button>
-          <button
-            onClick={() => setPortfolioType("paper")}
-            className={cn(
-              "rounded-lg py-1.5 transition-all",
-              portfolioType === "paper" ? "bg-background text-foreground shadow-xs" : "text-muted-foreground hover:text-foreground"
-            )}
-          >
-            Paper Trading
-          </button>
-        </div>
-      </section>
-
-      {errorMsg && (
-        <p className="text-xs text-red-600 dark:text-red-400 font-semibold bg-red-500/10 p-2 rounded-lg border border-red-500/20 max-w-md flex items-center gap-1.5">
-          <AlertTriangle className="h-3.5 w-3.5" />
-          {errorMsg}
-        </p>
-      )}
-
-      {loading ? (
-        <div className="flex items-center justify-center py-24">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        </div>
-      ) : assets.length === 0 ? (
+      {assets.length === 0 ? (
         <div className="rounded-2xl border bg-card p-12 text-center shadow-sm">
           <p className="text-sm text-muted-foreground font-semibold">
-            No active positions found. Add holdings to start analyzing risk factors.
+            {holdings.length === 0
+              ? "No holdings yet. Add positions on the portfolio page to analyze risk."
+              : "Live quotes or beta data are unavailable for your holdings right now. Try again shortly."}
           </p>
         </div>
       ) : (
         <div className="grid gap-6 md:grid-cols-3">
-          {/* Risk Factors Column */}
           <div className="space-y-6 md:col-span-1">
-            {/* Beta Card */}
             <div className="rounded-2xl border bg-card p-5 shadow-sm space-y-4 text-center">
               <div>
-                <h3 className="text-xs font-bold text-muted-foreground uppercase">Volatility Index (Beta)</h3>
-                <p className="text-[10px] text-muted-foreground mt-0.5">Weighted average relative to S&P 500 (1.0)</p>
+                <h3 className="text-xs font-bold text-muted-foreground uppercase">
+                  Volatility Index (Beta)
+                </h3>
+                <p className="text-[10px] text-muted-foreground mt-0.5">
+                  Weighted average relative to S&amp;P 500 (1.0)
+                </p>
               </div>
               <div className={cn("text-4xl font-extrabold tabular-nums", betaTone.color)}>
                 {weightedBeta.toFixed(2)}
@@ -140,11 +130,14 @@ export default function RiskDiagnosticsPage() {
               </span>
             </div>
 
-            {/* HHI Concentration Card */}
             <div className="rounded-2xl border bg-card p-5 shadow-sm space-y-4 text-center">
               <div>
-                <h3 className="text-xs font-bold text-muted-foreground uppercase">Concentration Index (HHI)</h3>
-                <p className="text-[10px] text-muted-foreground mt-0.5">Diversification scoring (lower is safer)</p>
+                <h3 className="text-xs font-bold text-muted-foreground uppercase">
+                  Concentration Index (HHI)
+                </h3>
+                <p className="text-[10px] text-muted-foreground mt-0.5">
+                  Diversification scoring (lower is safer)
+                </p>
               </div>
               <div className="text-4xl font-extrabold tabular-nums">
                 {Math.round(hhi)}
@@ -158,50 +151,12 @@ export default function RiskDiagnosticsPage() {
             </div>
           </div>
 
-          {/* Stress Tester / Scenarios */}
           <div className="md:col-span-2 space-y-6">
-            {/* Stress Test Diagnostics */}
-            <section className="rounded-2xl border bg-card p-5 shadow-sm space-y-4">
-              <div>
-                <h2 className="text-base font-semibold">Max Drawdown Stress Test</h2>
-                <p className="text-xs text-muted-foreground">Simulates historical market crashes against your current positions</p>
-              </div>
-              <div className="space-y-4">
-                {stressResults.map((scenario) => {
-                  const pct = scenario.lossPercent;
-                  return (
-                    <div
-                      key={scenario.name}
-                      className="border rounded-xl p-4 bg-muted/10 space-y-2.5"
-                    >
-                      <div className="flex justify-between items-start flex-wrap gap-2">
-                        <div>
-                          <h4 className="text-sm font-bold">{scenario.name}</h4>
-                          <p className="text-xs text-muted-foreground font-semibold max-w-md">
-                            {scenario.description}
-                          </p>
-                        </div>
-                        <div className="text-right">
-                          <span className={cn("text-base font-bold tabular-nums", pct >= 0 ? "text-red-600 dark:text-red-400" : "text-emerald-600 dark:text-emerald-400")}>
-                            {pct >= 0 ? "-" : "+"}
-                            {Math.abs(pct).toFixed(2)}%
-                          </span>
-                          <p className="text-xs text-muted-foreground font-bold tabular-nums mt-0.5">
-                            {pct >= 0 ? "-" : "+"}
-                            {formatPrice(Math.abs(scenario.lossAmount))}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </section>
-
-            {/* Diversification Matrix list */}
             <section className="rounded-2xl border bg-card p-4 shadow-sm overflow-x-auto">
               <div className="mb-4">
-                <h2 className="text-sm font-bold text-foreground">Asset Breakdown & Risk Weight</h2>
+                <h2 className="text-sm font-bold text-foreground">
+                  Asset Breakdown &amp; Risk Weight
+                </h2>
               </div>
               <table className="w-full text-xs border-collapse">
                 <thead>
@@ -226,6 +181,11 @@ export default function RiskDiagnosticsPage() {
                   })}
                 </tbody>
               </table>
+              {unpriced.length > 0 && (
+                <p className="mt-3 text-xs text-muted-foreground">
+                  Excluded (no live quote or beta): {unpriced.join(", ")}
+                </p>
+              )}
             </section>
           </div>
         </div>

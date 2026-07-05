@@ -105,7 +105,7 @@ export default async function WatchlistPage() {
                     )}
                   </TableCell>
                   <TableCell>
-                    <WatchlistSparkline symbol={row.symbol} changePercent={row.quote?.changePercent} />
+                    <WatchlistSparkline symbol={row.symbol} />
                   </TableCell>
                   <TableCell className="hidden text-right text-sm tabular-nums text-muted-foreground sm:table-cell">
                     {row.quote

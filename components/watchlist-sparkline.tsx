@@ -6,27 +6,13 @@ import { Loader2 } from "lucide-react";
 
 interface SparklineProps {
   symbol: string;
-  changePercent?: number;
 }
 
 interface CandlePoint {
   close: number;
 }
 
-function generateMockSparkline(chg: number): CandlePoint[] {
-  const points = [100];
-  const isUp = chg >= 0;
-
-  for (let i = 1; i < 7; i++) {
-    const noise = (Math.random() - 0.48) * 1.5;
-    const trend = isUp ? 0.6 : -0.6;
-    points.push(points[i - 1] + trend + noise);
-  }
-
-  return points.map((p) => ({ close: p }));
-}
-
-export function WatchlistSparkline({ symbol, changePercent = 0 }: SparklineProps) {
+export function WatchlistSparkline({ symbol }: SparklineProps) {
   const [data, setData] = useState<CandlePoint[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -40,19 +26,13 @@ export function WatchlistSparkline({ symbol, changePercent = 0 }: SparklineProps
         return res.json();
       })
       .then((resData) => {
-        if (active) {
-          if (resData.candles && resData.candles.length > 0) {
-            setData(resData.candles.map((c: { close: number }) => ({ close: c.close })));
-          } else {
-            // Simulated fallback based on day change
-            setData(generateMockSparkline(changePercent));
-          }
+        if (active && resData.candles) {
+          setData(resData.candles.map((c: { close: number }) => ({ close: c.close })));
         }
       })
       .catch(() => {
-        if (active) {
-          setData(generateMockSparkline(changePercent));
-        }
+        // Leave data empty; the chart is not drawn on failure rather than
+        // showing fabricated movement
       })
       .finally(() => {
         if (active) setLoading(false);
@@ -61,7 +41,7 @@ export function WatchlistSparkline({ symbol, changePercent = 0 }: SparklineProps
     return () => {
       active = false;
     };
-  }, [symbol, changePercent]);
+  }, [symbol]);
 
   if (loading) {
     return (
@@ -71,7 +51,15 @@ export function WatchlistSparkline({ symbol, changePercent = 0 }: SparklineProps
     );
   }
 
-  const isPositive = data.length > 1 ? data[data.length - 1].close >= data[0].close : changePercent >= 0;
+  if (data.length < 2) {
+    return (
+      <div className="flex h-7 w-24 items-center justify-center text-xs text-muted-foreground">
+        -
+      </div>
+    );
+  }
+
+  const isPositive = data[data.length - 1].close >= data[0].close;
   const strokeColor = isPositive ? "#10B981" : "#EF4444"; // Green vs Red
 
   return (

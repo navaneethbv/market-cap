@@ -8,6 +8,7 @@ import {
   Bell,
   Briefcase,
   CalendarDays,
+  CandlestickChart,
   LayoutGrid,
   Newspaper,
   Search,
@@ -21,6 +22,7 @@ const NAV_ITEMS = [
   { href: "/", label: "Overview", icon: LayoutGrid },
   { href: "/watchlist", label: "Watchlist", icon: Star },
   { href: "/portfolio", label: "Portfolio", icon: Briefcase },
+  { href: "/trading", label: "Trading", icon: CandlestickChart },
   { href: "/screener", label: "Screener", icon: Search },
   { href: "/alerts", label: "Alerts", icon: Bell },
   { href: "/compare", label: "Compare", icon: ArrowRightLeft },
@@ -77,7 +79,7 @@ export function MobileNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-50 flex border-t bg-card/95 backdrop-blur md:hidden">
+    <nav className="fixed inset-x-0 bottom-0 z-50 flex overflow-x-auto border-t bg-card/95 backdrop-blur md:hidden">
       {NAV_ITEMS.map(({ href, label, icon: Icon }) => {
         const active =
           href === "/" ? pathname === "/" : pathname.startsWith(href);
@@ -86,7 +88,7 @@ export function MobileNav() {
             key={href}
             href={href}
             className={cn(
-              "flex flex-1 flex-col items-center gap-1 py-2.5 text-[11px] font-medium",
+              "flex min-w-[4.5rem] shrink-0 flex-col items-center gap-1 py-2.5 text-[11px] font-medium",
               active ? "text-primary" : "text-muted-foreground"
             )}
           >

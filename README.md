@@ -1,116 +1,106 @@
-# MarketCap: Advanced Stock Analytics & Simulated Trading Platform
+# MarketCap
 
-MarketCap is a state-of-the-art investment research, portfolio management, and simulated trading web application. Powered by Next.js, Supabase, Recharts, and Google's Gemini AI, it provides retail investors with institutional-grade risk diagnostics, interactive charts, and AI-driven portfolio diagnostics.
+A Google Finance style stock market web app. Live prices, charts, market news,
+watchlists, portfolio tracking, price alerts, stock comparison, market movers,
+and a market calendar for US stocks.
 
----
+## Features
 
-## 🚀 Key Features
+- **Dashboard** (`/`): SPY/QQQ/DIA index cards, watchlist preview, market news
+- **Stock detail** (`/stock/[symbol]`): live price (Finnhub websocket with
+  polling fallback), range chart with SMA/EMA/Bollinger/RSI/MACD overlays,
+  key stats, company news, a DCF calculator, and a beta-based volatility
+  simulator (`/stock/[symbol]/volatility`); Watch and Trade buttons
+- **Watchlist** (`/watchlist`): saved symbols with live quotes and 7-day
+  sparklines
+- **Portfolio** (`/portfolio`): holdings with cost basis, market value, and
+  P/L, a value-over-time chart, and a dividend-income tab; **Allocation**
+  (`/portfolio/allocation`) adds position weights and concentration;
+  **Risk Diagnostics** (`/portfolio/risk`) shows weighted beta and HHI
+- **Paper trading** (`/trading`): $100k virtual account, market-order buys
+  and sells filled at live quotes, ledger-derived positions and P&L, equity
+  curve at `/trading/history`, one-click account reset
+- **Price alerts** (`/alerts`): above/below target rules with pause/resume,
+  evaluated against the latest quote
+- **Compare** (`/compare`): rank 2 to 5 symbols by daily move; save reusable
+  symbol sets at `/compare/saved`; side-by-side fundamentals at
+  `/compare/matrix`
+- **Screener** (`/screener`): filter a curated catalog by sector, market cap,
+  and valuation
+- **Movers** (`/movers`): curated baskets (Mega Cap, AI, Finance, ETFs) with
+  top gainers and losers
+- **News** (`/news`): general market feed with deterministic sentiment
+  filters (bullish/bearish/neutral)
+- **Calendar** (`/calendar`): US market holidays plus the Finnhub earnings
+  calendar for the next 21 days, with symbol and watchlist filters
 
-### 1. Advanced Charting & Indicators
-* **Interactive Charting**: Toggle overlays for **Simple Moving Average (SMA)**, **Exponential Moving Average (EMA)**, and **Bollinger Bands**.
-* **Technical Sub-Charts**: Sub-panels synchronized with the cursor display **RSI (14)** and **MACD (12, 26, 9)**.
-* **Valuation History**: Dual-line charts displaying overall portfolio valuation and cost-basis history.
+Watchlist, portfolio, paper trading, alerts, and saved comparisons require a
+signed-in user; everything else is public.
 
-### 2. Portfolio Risk & AI Allocation Advisor
-* **AI Portfolio Advisor**: Queries Gemini AI to provide allocation grade ratings, sector weights, and specific rebalancing checklists.
-* **Risk & Volatility Diagnostics**: Calculates weighted portfolio **Beta** and **Herfindahl-Hirschman Index (HHI)** concentration risk.
-* **Stress Test Drawdown Simulator**: Models dollar losses for your current holdings under major historical market downturns (2008 Financial Crisis, 2020 Pandemic Squeeze, 2000 Dot-com Bubble).
+## Stack
 
-### 3. Investment Evaluation Tools
-* **Valuation DCF Calculator**: Range sliders for EPS growth, WACC discount rate, and terminal growth rate compute intrinsic fair value in real-time.
-* **Scenario Analysis**: Recharts bar chart comparing Bear Case, Current Price, Base Case, and Bull Case side-by-side inside the DCF widget.
-* **AI Consensus Valuation**: Animated SVG gauge plotting Gemini-computed consensus valuation scores (0-100) and rationale metrics.
-* **Volatility Simulator**: Slider simulating custom S&P 500 shifts to project stock returns and prices based on Beta.
-* **Correlation Heatmap Matrix**: Analyze daily price correlation indexes and diversification benefits for multiple assets.
-* **News Sentiment Analytics**: Sentiment gauges, timeline trend lines, and side-by-side bullish/bearish headlines lists.
-* **Dividend Chowder Scatter Matrix**: Recharts scatter plot mapping Yield % vs. 5Y Dividend Growth % quadrants.
-* **Dynamic Stock Screener**: Filters 30 catalog equities by Sector, Cap size, and Valuation, and sorts by Yield, P/E, or Daily Change.
-* **Comparison Matrix**: Radar chart scoring vector strengths along with comparative metrics tables.
+- Next.js 16 (App Router, TypeScript) deployed to Vercel
+- Tailwind CSS v4 + shadcn/ui, Recharts for charts
+- Supabase for auth (email/password) and Postgres with row level security
+- Market data: Finnhub (quotes, search, profiles, news, earnings calendar,
+  websocket) and Twelve Data (chart candles), both on free tiers
 
-### 4. Portfolios, Alerts & Calendar
-* **Simulated Paper Trading Mode**: Virtual cash account ($100k) with full BUY/SELL transaction order logs.
-* **Paper Trading Leaderboard**: Compete with top mock accounts and track your performance rankings.
-* **Dividends & Income Tracker**: YoC statistics and monthly payout calendars.
-* **Multi-Channel Price Alerts**: Email toggles and Discord/Slack webhook dispatchers.
-* **Unified Event Calendar**: Calendars for upcoming Earnings releases, Dividend ex-dates, and market holidays.
-
----
-
-## 🛠️ Technology Stack
-
-* **Frontend**: React 19 (Client Components, Hooks), Next.js 16 (App Router, Server Actions, API routes), Recharts (data visualizations), Tailwind CSS, Lucide Icons.
-* **Database & Auth**: Supabase SSR (Auth Session management, PostgreSQL database, RLS security policies).
-* **APIs**: Twelve Data (historical price candles), Finnhub (live quotes, stock search, metrics, news, calendars), Gemini AI (insights summaries, chat assistant, portfolio advisor).
-
----
-
-## ⚙️ Environment Configuration
-
-Create a `.env.local` file in the root directory:
-
-```env
-# Supabase Configuration
-NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
-SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
-
-# Financial API Keys
-TWELVEDATA_API_KEY=your_twelve_data_key
-FINNHUB_API_KEY=your_finnhub_key
-
-# Google Gemini AI Key
-GEMINI_API_KEY=your_gemini_key
-```
-
-*Note: If the `GEMINI_API_KEY` or financial keys are missing or rate-limited, the application automatically falls back to high-fidelity mock data and simulated diagnostics.*
-
----
-
-## 📦 Setup & Database Migrations
+## Getting started
 
 1. Install dependencies:
+
    ```bash
    npm install
    ```
 
-2. Apply local Supabase migrations:
+2. Create `.env.local` with:
+
    ```bash
-   npx supabase migration up
+   NEXT_PUBLIC_SUPABASE_URL=...
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=...
+   FINNHUB_API_KEY=...
+   NEXT_PUBLIC_FINNHUB_API_KEY=...   # same Finnhub key, used by the client websocket
+   TWELVEDATA_API_KEY=...
    ```
 
-3. Run the development server:
+3. Apply the SQL migrations in `supabase/migrations/` to your Supabase
+   project (in filename order). Tables: `watchlist_items`, `holdings`,
+   `price_alerts`, `saved_comparisons`, `paper_accounts`, `paper_trades`,
+   `paper_equity_snapshots`, all with RLS.
+
+4. Run the dev server:
+
    ```bash
    npm run dev
    ```
 
----
+## Scripts
 
-## 🧪 Testing & Quality Assurance
+| Command | Purpose |
+|---|---|
+| `npm run dev` | Start the dev server |
+| `npm run build` | Production build |
+| `npm run lint` | ESLint |
+| `npm test` | Unit tests (node test runner over `lib/**/*.test.mjs`) |
 
-MarketCap features comprehensive test coverage across all core mathematical calculators, data normalizers, and database migrations.
+## Project layout
 
-* **Run all Unit & Integration Tests**:
-  ```bash
-  npm test
-  ```
-* **Verify Test Coverage Metrics**:
-  ```bash
-  node --conditions=react-server --experimental-strip-types --no-warnings --test --experimental-test-coverage "lib/**/*.test.mjs"
-  ```
-  *(Current: 97.37% utility line coverage)*
-* **Linting Checks**:
-  ```bash
-  npm run lint
-  ```
-* **Production Build Compilation**:
-  ```bash
-  npm run build
-  ```
+- `app/` - routes: dashboard (`/`), `/stock/[symbol]` (+ `/volatility`),
+  `/watchlist`, `/portfolio` (+ `/allocation`, `/risk`), `/alerts`,
+  `/compare` (+ `/saved`, `/matrix`), `/screener`, `/trading`
+  (+ `/history`), `/movers`, `/calendar`, `/news`, auth pages, and API
+  routes under `/api` (market-data proxies plus `/api/screener`,
+  `/api/compare/matrix`, `/api/stock/[symbol]/beta`)
+- `components/` - app components plus `components/ui/` (shadcn)
+- `lib/` - pure helpers with unit tests beside them; `lib/market/` wraps the
+  Finnhub and Twelve Data APIs (server only)
+- `hooks/useLivePrice.ts` - Finnhub websocket with polling fallback
+- `proxy.ts` - Next middleware: Supabase session refresh + protected routes
+- `supabase/migrations/` - database schema (RLS on every table)
+- `docs/` - project docs, including the session handoff (`docs/HANDOFF.md`)
+  and feature plans/specs under `docs/superpowers/`
 
----
+## CI
 
-## 🔄 Development Workflow
-
-> [!IMPORTANT]
-> All subsequent code modifications and contributions must be submitted via **pull requests**. Direct pushes or merges to the `main` branch are strictly prohibited.
-
+GitHub Actions (`.github/workflows/ci.yml`) runs lint, tests, and build on
+pushes and pull requests to `main`.

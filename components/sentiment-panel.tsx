@@ -12,9 +12,23 @@ interface SentimentPanelProps {
 }
 
 export function SentimentPanel({ news }: SentimentPanelProps) {
-  const { score, trendData, bullishHeadlines, bearishHeadlines } = useMemo(() => {
+  const {
+    score,
+    trendData,
+    bullishHeadlines,
+    bearishHeadlines,
+    counts,
+    articleCount,
+  } = useMemo(() => {
     if (!news || news.length === 0) {
-      return { score: 50, trendData: [], bullishHeadlines: [], bearishHeadlines: [] };
+      return {
+        score: 50,
+        trendData: [],
+        bullishHeadlines: [],
+        bearishHeadlines: [],
+        counts: { bullish: 0, bearish: 0, neutral: 0 },
+        articleCount: 0,
+      };
     }
 
     const sortedNews = [...news].sort((a, b) => a.datetime - b.datetime);
@@ -55,8 +69,18 @@ export function SentimentPanel({ news }: SentimentPanelProps) {
       trendData,
       bullishHeadlines: bullishHeadlines.slice(0, 3),
       bearishHeadlines: bearishHeadlines.slice(0, 3),
+      counts: { bullish: bullishCount, bearish: bearishCount, neutral: neutralCount },
+      articleCount: finalTotal,
     };
   }, [news]);
+
+  if (!news || news.length === 0) {
+    return (
+      <div className="rounded-2xl border border-dashed bg-card p-8 text-center text-sm text-muted-foreground">
+        No recent articles to score sentiment from.
+      </div>
+    );
+  }
 
   function getSentimentLabel(s: number) {
     if (s >= 70) return { label: "Very Bullish", color: "text-emerald-600 dark:text-emerald-400" };
@@ -87,10 +111,17 @@ export function SentimentPanel({ news }: SentimentPanelProps) {
         <div className="rounded-2xl border bg-card p-4.5 shadow-sm sm:col-span-2 flex flex-col justify-between">
           <h3 className="text-xs font-bold text-muted-foreground uppercase flex items-center gap-1">
             <Sparkles className="h-3.5 w-3.5 text-primary fill-current" />
-            Social Sentiment Summary
+            Coverage Summary
           </h3>
           <p className="text-xs leading-relaxed text-muted-foreground font-semibold mt-1">
-            The media coverage exhibits {sentimentObj.label.toLowerCase()} characteristics. Analysts note positive momentum with strong sector support, balanced by occasional valuation concerns and macroeconomic headwinds.
+            Across {articleCount} recent{" "}
+            {articleCount === 1 ? "article" : "articles"}, keyword scoring reads{" "}
+            <span className={sentimentObj.color}>
+              {sentimentObj.label.toLowerCase()}
+            </span>
+            : {counts.bullish} bullish, {counts.bearish} bearish, and{" "}
+            {counts.neutral} neutral. This is a headline keyword heuristic, not
+            investment advice.
           </p>
         </div>
       </section>
@@ -103,7 +134,7 @@ export function SentimentPanel({ news }: SentimentPanelProps) {
               <TrendingUp className="h-4 w-4 text-primary" />
               Sentiment Trend
             </h2>
-            <p className="text-xs text-muted-foreground">Rolling sentiment score tracking over the last 15 articles</p>
+            <p className="text-xs text-muted-foreground">Rolling sentiment score across {articleCount} recent articles</p>
           </div>
           <div className="h-[200px] w-full">
             <ResponsiveContainer width="100%" height="100%">
