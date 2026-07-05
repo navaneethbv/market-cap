@@ -246,34 +246,104 @@ Record every pushed commit here after each milestone.
   - Added `/calendar`, market holiday helpers, earnings calendar rows, tests,
     Calendar navigation, and a dashboard Calendar shortcut.
 
-## State: NEXT UP
+## Session 2026-07-05 (later): port PR merged, billing IN PROGRESS
 
-Recommended next steps:
+Done this session:
+
+- The `new-changes/` drop was ported on branch
+  `port/paper-trading-reconciliation`, PR #1 was created and MERGED into main
+  (merge commit `569d6f3`). All 29 deletions applied, root `HANDOFF.md`
+  deleted in favor of this file, 95 tests / lint / build verified.
+- Remote Supabase checked via MCP: none of the removed features' migrations
+  were ever applied (no `paper_portfolios`/`stock_ai_summaries` tables, no
+  `notify_email`/`webhook_url` columns on `price_alerts`), so no cleanup was
+  needed. The new `create_paper_trading` migration WAS applied remotely via
+  MCP (old NEXT UP items 5 and 6 are resolved).
+- CI question answered: `.github/workflows/ci.yml` already runs lint, test,
+  and build on PRs and pushes to main. Nothing to add.
+- DB question answered: login + per-user watchlist already fully working.
+  `watchlist_items` has RLS with owner-scoped select/insert/delete; all 7
+  public tables have RLS enabled with owner policies.
+- `new-changes.zip` still sits untracked at repo root (user may delete);
+  extracted folder was moved to session scratchpad.
+
+## IN PROGRESS: Stripe billing (branch `feature/stripe-billing`, off main)
+
+User request: pricing page with Free plan and Pro plan at $20/month
+(recurring), Stripe sandbox, dummy page good enough to test payment, and a
+markdown doc describing it. User chose: watchlist saving is Pro-only (free
+users browse/search but get an upgrade prompt when saving).
+
+Stripe MCP is NOT reachable in this session (connectors disabled); use the
+`stripe` npm SDK directly (already installed). Sandbox keys are in
+`.env.local`: STRIPE_SECRET_KEY (sk_test_...) and
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY (pk_test_...), provided by the user.
+
+Architecture decided (bypass-proof without a service-role key):
+
+- Stripe is the source of truth for entitlement. NO `is_pro` flag in the DB.
+- Tiny table `stripe_customers(user_id uuid pk refs auth.users,
+  stripe_customer_id text not null, created_at, updated_at)` with the
+  standard hardening recipe; authenticated may select/insert/update OWN row
+  only. Row is written by the checkout server action.
+- Checkout: server action creates (or reuses) a Stripe customer with
+  `metadata.supabase_user_id = user.id`, upserts `stripe_customers`, creates
+  a subscription-mode Checkout Session (price via lookup_key
+  `marketcap_pro_monthly`, auto-created product "MarketCap Pro" $20/mo on
+  first use), success_url `/pricing/success?session_id={CHECKOUT_SESSION_ID}`,
+  cancel_url `/pricing`, redirects to session.url.
+- Entitlement check `getSubscriptionStatus(userId)`: read own
+  `stripe_customers` row, `stripe.customers.retrieve`, VERIFY
+  `customer.metadata.supabase_user_id === userId` (this closes the "point at
+  someone else's customer id" hole), list subscriptions with status
+  active/trialing for the pro price, in-memory cache ~60s. A user cannot
+  forge Pro because the server always verifies with Stripe.
+
+Pending todo list (was mid-implementation, nothing written yet beyond
+`npm install stripe`):
+
+1. Add migration `create_stripe_customers` (file + apply via Supabase MCP).
+2. `lib/stripe.ts` (server-only): client init, `getOrCreateProPrice()` using
+   lookup_key `marketcap_pro_monthly`, product "MarketCap Pro", $20/mo
+   recurring USD.
+3. `lib/billing.ts` (server-only): `getSubscriptionStatus`, cache, and a pure
+   `deriveBillingState(customer, subscriptions, userId)` helper split into a
+   testable non-server file (repo convention: pure helpers + `*.test.mjs`,
+   run by `npm test` = node --test).
+4. `app/pricing/page.tsx`: two cards (Free vs Pro $20/mo) in the app's design
+   language; shows current plan when logged in.
+   `app/pricing/actions.ts`: `startProCheckout` server action (login
+   required, else redirect `/login?next=/pricing`).
+   `app/pricing/success/page.tsx`: retrieve session server-side, verify
+   `client_reference_id === user.id` and payment status, bust cache, confirm.
+5. Gate watchlist: in `app/watchlist/actions.ts` `toggleWatchlistItem`, allow
+   REMOVE always but require Pro for ADD (check before insert; on failure
+   redirect to `/pricing?reason=watchlist`). Update the stock page Watch
+   button and `/watchlist` page UI to show an upgrade prompt for non-Pro
+   users. Nav: add Pricing link (sidebar + mobile).
+6. Docs: `docs/PAYMENTS.md` (architecture, env vars, sandbox test steps with
+   card 4242 4242 4242 4242, gating rules, production upgrade path with
+   webhooks and a service role, billing portal) plus a short Billing section
+   in README linking to it.
+7. Tests for the pure billing helper.
+8. E2E sandbox verify with Playwright: log in as test user, confirm gate
+   blocks, run checkout with 4242 card, confirm success page, confirm gate
+   lifts and watchlist add works. `npm test`, lint, build.
+9. Commit, push `feature/stripe-billing`, open PR.
+
+## State: NEXT UP (older items still open)
+
 1. Deploy via Vercel once the project is linked and env vars are synced.
-2. Supabase security advisor still reports leaked password protection disabled:
-   enable it in Auth settings when ready.
-3. Supabase performance advisor may report `holdings_user_id_idx` as unused on
-   the brand-new table; keep it because it backs RLS/user filters and FK
+2. Supabase security advisor still reports leaked password protection
+   disabled: enable it in Auth settings when ready (dashboard-only toggle).
+3. Supabase performance advisor may report `holdings_user_id_idx` as unused
+   on the brand-new table; keep it because it backs RLS/user filters and FK
    cascade paths.
-4. Remove the accidental Supabase Edge Function named `dummy` from the Supabase
-   dashboard. It was created while trying to expose the migration tool; the MCP
-   tools available here can list/deploy functions but do not expose delete.
-   Supabase CLI is now installed, but `supabase functions delete dummy
-   --project-ref ofyyjzjjmopwvfqlhnyc --yes` requires `supabase login` or
-   `SUPABASE_ACCESS_TOKEN`.
-5. Apply `supabase/migrations/20260705120000_create_paper_trading.sql` to the
-   remote Supabase project (ref ofyyjzjjmopwvfqlhnyc). Not applied yet: no
-   Supabase MCP or CLI login in the current session.
-6. IMPORTANT (remote DB cleanup): the removed features' migrations may already
-   have been applied to the remote project before this reconciliation. If so,
-   drop these now-unused objects: tables `paper_portfolios`, `paper_holdings`,
-   `paper_transactions` (their paper trading, migration
-   `20260705000001`), table `stock_ai_summaries` (migration `20260705070000`),
-   and the `notify_email`/`webhook_url` columns on `price_alerts` (migration
-   `20260705000002`). The migration files are deleted from the repo, so a
-   fresh DB will not create them; only an already-migrated remote needs manual
-   cleanup. Verify what is actually present with the Supabase MCP before
-   dropping anything.
+4. Remove the accidental Supabase Edge Function named `dummy` from the
+   Supabase dashboard. MCP tools can list/deploy functions but not delete.
+   Supabase CLI is installed but needs `supabase login` or
+   `SUPABASE_ACCESS_TOKEN` for
+   `supabase functions delete dummy --project-ref ofyyjzjjmopwvfqlhnyc --yes`.
 
 ## Practical notes
 
