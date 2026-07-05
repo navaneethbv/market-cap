@@ -78,6 +78,30 @@ Reference images in `img/` (committed). Blend of two dribbble shots:
   theme-toggle button attribute mismatches. Playwright recheck showed no console
   errors afterward.
 
+## Pushed commit ledger
+
+Record every pushed commit here after each milestone.
+
+- `b19bdff` Phase 3: add stock detail and news pages
+  - Added `/stock/[symbol]`, range chart, reusable news list, and `/news`.
+  - Verified stock detail with real quote, candle, and news data.
+- `72d6422` Add CI workflow
+  - Added GitHub Actions workflow for lint, tests, and build.
+- `8695e5d` Add watchlist portfolio and dashboard phases
+  - Added watchlist, portfolio holdings, live price fallback, dashboard, tests,
+    and Supabase migrations for watchlist and holdings.
+  - Applied remote Supabase migrations through MCP.
+- `3964d38` Update handoff with CLI setup status
+  - Recorded Vercel CLI and Supabase CLI setup state.
+  - Noted Supabase `dummy` Edge Function cleanup blocker.
+- `8dd9878` Document price alerts feature plan
+  - Added price alerts design and implementation plan under `docs/superpowers`.
+- `500ba4b` Add price alerts feature
+  - Added `/alerts`, alert CRUD actions, pause/resume controls, alert helpers,
+    tests, route protection, navigation, and `price_alerts` migration.
+  - Applied remote Supabase `create_price_alerts` migration and smoke-tested
+    authenticated CRUD plus RLS rejection.
+
 ## State: NEXT UP
 
 Recommended next steps:
