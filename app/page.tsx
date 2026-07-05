@@ -1,5 +1,6 @@
 import Link from "next/link";
 import {
+  Activity,
   ArrowRight,
   ArrowRightLeft,
   Briefcase,
@@ -77,6 +78,12 @@ export default async function HomePage() {
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
+            <Button asChild variant="outline" className="rounded-full">
+              <Link href="/movers">
+                <Activity className="h-4 w-4" />
+                Movers
+              </Link>
+            </Button>
             <Button asChild variant="outline" className="rounded-full">
               <Link href="/compare">
                 <ArrowRightLeft className="h-4 w-4" />

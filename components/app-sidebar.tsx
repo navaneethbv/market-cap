@@ -3,9 +3,10 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
+  Activity,
+  ArrowRightLeft,
   Bell,
   Briefcase,
-  ArrowRightLeft,
   LayoutGrid,
   Newspaper,
   Star,
@@ -20,6 +21,7 @@ const NAV_ITEMS = [
   { href: "/portfolio", label: "Portfolio", icon: Briefcase },
   { href: "/alerts", label: "Alerts", icon: Bell },
   { href: "/compare", label: "Compare", icon: ArrowRightLeft },
+  { href: "/movers", label: "Movers", icon: Activity },
   { href: "/news", label: "News", icon: Newspaper },
 ];
 
