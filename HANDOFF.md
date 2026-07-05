@@ -79,10 +79,21 @@ Reference images in `img/` (committed). Blend of two dribbble shots:
   market baskets, top gainers and losers, summary cards, and a full detail
   table. Added Movers navigation and a dashboard shortcut. No new database
   tables were added.
+- Four feature expansion DONE on main:
+  - Portfolio Allocation: authenticated `/portfolio/allocation` with position
+    weights, largest holding, concentration status, and allocation table.
+  - Saved Comparisons: authenticated `/compare/saved`, save form on `/compare`,
+    rename/delete actions, and `saved_comparisons` Supabase table with RLS.
+    Remote Supabase migration applied: `create_saved_comparisons`.
+  - News Sentiment Filter: `/news?sentiment=...` filters with deterministic
+    bullish, bearish, neutral, and unavailable classification badges.
+  - Market Calendar: public `/calendar` with US market holidays and Finnhub
+    earnings calendar rows. Added Calendar navigation and dashboard shortcut.
 - TDD pass added: local tests now cover format helpers, stock display, watchlist
   helpers, migration expectations, portfolio math, live price reducers,
-  dashboard summaries, price alert trigger logic, stock comparison helpers, and
-  market mover helpers.
+  dashboard summaries, price alert trigger logic, stock comparison helpers,
+  market mover helpers, allocation math, saved comparison validation,
+  sentiment classification, and calendar helpers.
 - Fixed an existing next-themes hydration warning by suppressing expected
   theme-toggle button attribute mismatches. Playwright recheck showed no console
   errors afterward.
@@ -131,6 +142,29 @@ Record every pushed commit here after each milestone.
     Movers shortcut.
   - Verified `/movers?basket=ai` returned 200 and rendered Market movers, NVDA,
     AMD, and AVGO.
+- `1893ed8` Update handoff after market movers
+  - Recorded Market Movers status, route smoke, verification notes, and commit
+    ledger entries through `d5ada4f`.
+- `162d728` Document four feature expansion plan
+  - Added the shared design spec for Portfolio Allocation, Saved Comparisons,
+    News Sentiment Filter, and Market Calendar.
+- `1e5d6d1` Plan four feature expansion
+  - Added the TDD implementation plan for the four-feature expansion under
+    `docs/superpowers`.
+- `9a07a80` Add portfolio allocation view
+  - Added `/portfolio/allocation`, allocation helpers, tests, and a Portfolio
+    page shortcut.
+- `4179443` Add saved comparisons
+  - Added `saved_comparisons` migration, helper tests, `/compare/saved`,
+    save/rename/delete actions, and a save form on `/compare`.
+  - Applied remote Supabase `create_saved_comparisons` migration and verified
+    RLS, ownership policies, and authenticated grants through MCP.
+- `359d62b` Add news sentiment filters
+  - Added deterministic sentiment helpers, tests, `/news?sentiment=...`
+    filtering, counts, and sentiment badges on news cards.
+- `93a175e` Add market calendar
+  - Added `/calendar`, market holiday helpers, earnings calendar rows, tests,
+    Calendar navigation, and a dashboard Calendar shortcut.
 
 ## State: NEXT UP
 
@@ -161,7 +195,8 @@ Recommended next steps:
 - Playwright MCP screenshots land in repo root or .playwright-mcp/; delete
   before committing.
 - shadcn CLI is v4-style: `npx shadcn@latest add <component> -y -s`.
-- Verification last run after market movers: `npm test`, `npm run lint`, and
+- Verification last run after four feature expansion: `npm test`,
+  `npm run lint`, and
   `npm run build` passed.
 - Signed-in route smoke last run: inserted temporary MSFT watchlist and holding
   rows under the test account, verified `/watchlist`, `/portfolio`, and `/`
@@ -174,6 +209,15 @@ Recommended next steps:
   and NVDA.
 - Movers route smoke last run: requested `/movers?basket=ai`, verified HTTP 200
   and rendered Market movers, NVDA, AMD, and AVGO.
+- Four feature route smoke last run:
+  - `/calendar` returned HTTP 200 and rendered Market calendar plus Upcoming
+    market dates.
+  - `/news?sentiment=bullish` returned HTTP 200 and rendered Market news plus
+    Bullish.
+  - `/compare/saved` redirected unauthenticated users to
+    `/login?next=/compare/saved`.
+  - `/portfolio/allocation` redirected unauthenticated users to
+    `/login?next=%2Fportfolio%2Fallocation`.
 - Vercel CLI is installed (`54.20.1`) and logged in as `hotshot4ever-2393`.
   The project is not linked yet (`.vercel/` absent). Do not upload `.env.local`
   secrets to Vercel without explicit confirmation.
