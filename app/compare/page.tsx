@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { ArrowRightLeft, Trophy } from "lucide-react";
+import { ArrowRightLeft, Save, Trophy } from "lucide-react";
+import { createSavedComparison } from "@/app/compare/saved/actions";
 import { ChangeChip } from "@/components/change-chip";
 import { Button } from "@/components/ui/button";
 import {
@@ -17,6 +18,7 @@ import {
 } from "@/lib/compare";
 import { formatNumber, formatPrice } from "@/lib/format";
 import { getQuote } from "@/lib/market/finnhub";
+import { createClient } from "@/lib/supabase/server";
 
 type ComparePageProps = {
   searchParams: Promise<{ symbols?: string | string[] }>;
@@ -34,6 +36,10 @@ export default async function ComparePage({ searchParams }: ComparePageProps) {
   );
   const rows = buildComparisonRows(symbols, quoteResults);
   const summary = calculateComparisonSummary(rows);
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   return (
     <div className="space-y-6">
@@ -61,6 +67,41 @@ export default async function ComparePage({ searchParams }: ComparePageProps) {
               Compare
             </Button>
           </form>
+        </div>
+      </section>
+
+      <section className="rounded-2xl border bg-card p-4 shadow-sm">
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+          <div>
+            <p className="text-sm font-semibold">Reusable comparison</p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Save this symbol group or open your saved comparison sets.
+            </p>
+          </div>
+          <div className="flex flex-col gap-2 sm:flex-row">
+            {user ? (
+              <form action={createSavedComparison} className="flex gap-2">
+                <input type="hidden" name="symbols" value={symbols.join(",")} />
+                <input
+                  name="name"
+                  aria-label="Saved comparison name"
+                  className="border-input bg-background ring-offset-background focus-visible:ring-ring h-10 min-w-0 rounded-full border px-4 text-sm shadow-xs focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
+                  placeholder="AI leaders"
+                />
+                <Button type="submit" className="rounded-full">
+                  <Save className="h-4 w-4" />
+                  Save
+                </Button>
+              </form>
+            ) : (
+              <Button asChild variant="outline" className="rounded-full">
+                <Link href="/login?next=/compare">Sign in to save</Link>
+              </Button>
+            )}
+            <Button asChild variant="outline" className="rounded-full">
+              <Link href="/compare/saved">Saved sets</Link>
+            </Button>
+          </div>
         </div>
       </section>
 
