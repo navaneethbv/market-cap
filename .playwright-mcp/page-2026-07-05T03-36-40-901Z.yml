@@ -1,0 +1,35 @@
+- generic [active] [ref=e1]:
+  - banner [ref=e2]:
+    - generic [ref=e3]:
+      - link "MarketCap" [ref=e4] [cursor=pointer]:
+        - /url: /
+        - img [ref=e5]
+        - generic [ref=e8]: MarketCap
+      - navigation [ref=e9]:
+        - link "Home" [ref=e10] [cursor=pointer]:
+          - /url: /
+        - link "Watchlist" [ref=e11] [cursor=pointer]:
+          - /url: /watchlist
+        - link "Portfolio" [ref=e12] [cursor=pointer]:
+          - /url: /portfolio
+      - generic [ref=e13]:
+        - generic [ref=e14]:
+          - img [ref=e15]
+          - textbox "Search stocks" [disabled]:
+            - /placeholder: Search stocks...
+        - link "Log in" [ref=e18] [cursor=pointer]:
+          - /url: /login
+  - main [ref=e19]:
+    - generic [ref=e21]:
+      - generic [ref=e22]:
+        - generic [ref=e23]: Create your MarketCap account
+        - generic [ref=e24]: Save stocks to your watchlist and track your portfolio.
+      - paragraph [ref=e46]:
+        - text: Check your email for a confirmation link, then
+        - link "log in" [ref=e47] [cursor=pointer]:
+          - /url: /login
+        - text: .
+  - region "Notifications alt+T"
+  - button "Open Next.js Dev Tools" [ref=e42] [cursor=pointer]:
+    - img [ref=e43]
+  - alert [ref=e36]

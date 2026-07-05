@@ -41,7 +41,9 @@ function LoginForm() {
       setLoading(false);
       return;
     }
-    router.push(searchParams.get("next") ?? "/");
+    const next = searchParams.get("next") ?? "/";
+    // Only allow same-origin relative paths to prevent open redirects
+    router.push(next.startsWith("/") && !next.startsWith("//") ? next : "/");
     router.refresh();
   }
 
