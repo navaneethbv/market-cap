@@ -52,7 +52,8 @@ export async function toggleWatchlistItem(formData: FormData) {
       .from("watchlist_items")
       .insert({ user_id: user.id, symbol });
 
-    if (error) {
+    // 23505 = unique violation; a concurrent toggle already added the symbol
+    if (error && error.code !== "23505") {
       throw new Error(error.message);
     }
   }

@@ -1,3 +1,6 @@
+// The .ts extension keeps this import resolvable by the node --test runner,
+// which executes these files with type stripping and no bundler resolution
+import { formatCompact, formatPriceOrDash } from "./format.ts";
 import type {
   Candle,
   CompanyProfile,
@@ -11,24 +14,6 @@ export interface StockStat {
 }
 
 export type ChartTone = "up" | "down";
-
-function formatPrice(value: number): string {
-  if (!Number.isFinite(value) || value === 0) return "-";
-  return value.toLocaleString("en-US", {
-    style: "currency",
-    currency: "USD",
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  });
-}
-
-function formatCompact(value: number): string {
-  if (!Number.isFinite(value) || value === 0) return "-";
-  return `$${Intl.NumberFormat("en-US", {
-    notation: "compact",
-    maximumFractionDigits: 2,
-  }).format(value)}`;
-}
 
 function formatMetric(value: number | null, suffix = ""): string {
   if (value === null || !Number.isFinite(value)) return "-";
@@ -48,17 +33,17 @@ export function buildStockStats({
   metrics: KeyMetrics;
 }): StockStat[] {
   return [
-    { label: "Open", value: formatPrice(quote.open) },
-    { label: "Day high", value: formatPrice(quote.high) },
-    { label: "Day low", value: formatPrice(quote.low) },
-    { label: "Prev close", value: formatPrice(quote.prevClose) },
+    { label: "Open", value: formatPriceOrDash(quote.open) },
+    { label: "Day high", value: formatPriceOrDash(quote.high) },
+    { label: "Day low", value: formatPriceOrDash(quote.low) },
+    { label: "Prev close", value: formatPriceOrDash(quote.prevClose) },
     {
       label: "Market cap",
       value: formatCompact(profile.marketCap * 1_000_000),
     },
     { label: "P/E ratio", value: formatMetric(metrics.peRatio) },
-    { label: "52w high", value: formatPrice(metrics.high52 ?? 0) },
-    { label: "52w low", value: formatPrice(metrics.low52 ?? 0) },
+    { label: "52w high", value: formatPriceOrDash(metrics.high52 ?? 0) },
+    { label: "52w low", value: formatPriceOrDash(metrics.low52 ?? 0) },
     {
       label: "Dividend yield",
       value: formatMetric(metrics.dividendYield, "%"),
@@ -66,7 +51,7 @@ export function buildStockStats({
     { label: "Beta", value: formatMetric(metrics.beta) },
     {
       label: "EPS",
-      value: metrics.epsTTM === null ? "-" : formatPrice(metrics.epsTTM),
+      value: metrics.epsTTM === null ? "-" : formatPriceOrDash(metrics.epsTTM),
     },
   ];
 }

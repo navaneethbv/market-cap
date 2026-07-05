@@ -3,6 +3,9 @@
 Continuation notes for resuming work. Read this plus the approved plan at
 `~/.claude/plans/i-want-to-build-hidden-yeti.md` (also summarized below).
 
+This file now lives at `docs/HANDOFF.md` (moved from the repo root during the
+2026-07-04 hardening pass).
+
 ## What this project is
 
 "MarketCap", a Google Finance style web app. Next.js 16.2 (App Router, TS),
@@ -97,6 +100,83 @@ Reference images in `img/` (committed). Blend of two dribbble shots:
 - Fixed an existing next-themes hydration warning by suppressing expected
   theme-toggle button attribute mismatches. Playwright recheck showed no console
   errors afterward.
+- Review and hardening pass DONE in current working tree (2026-07-04):
+  - `hooks/useLivePrice.ts`: dropped `initialQuote` from the effect deps (it
+    is not read inside the effect) so server re-renders such as a Watch
+    toggle no longer tear down and reconnect the Finnhub websocket; wrapped
+    the websocket `JSON.parse` in try/catch so a malformed frame cannot throw
+    an uncaught error.
+  - `components/search-box.tsx`: guarded `setResults`/`setOpen` behind the
+    effect's `active` flag so a slow search response cannot reopen the
+    dropdown after the user clicked away or cleared the query.
+  - `app/watchlist/actions.ts`: a concurrent double toggle could pass the
+    exists check twice and the second insert failed the
+    `unique (user_id, symbol)` constraint with an unhandled 500; unique
+    violations (Postgres 23505) are now treated as success.
+  - Deduplicated formatters: `lib/format.ts` gained `formatPriceOrDash`
+    (zero/non-finite render as "-"); `lib/stock-display.ts` and
+    `components/stock-chart.tsx` now import from `lib/format.ts` instead of
+    carrying private copies of `formatPrice`/`formatCompact`.
+  - Simplified `lib/dashboard.ts`: `TIndex extends { symbol: string }`
+    replaces the unconstrained generic plus runtime type sniffing.
+  - Added `formatPriceOrDash` unit tests in `lib/format.test.mjs`.
+  - Moved `HANDOFF.md` to `docs/HANDOFF.md`; replaced the create-next-app
+    boilerplate `README.md` with real project docs (stack, env vars, setup,
+    scripts, layout).
+- Second hardening pass over the four-feature expansion DONE in current
+  working tree (2026-07-04):
+  - `app/compare/page.tsx`: the save form is only rendered with 2+ symbols
+    (previously a single-symbol URL showed a Save button whose action always
+    threw); the name input gained `required` and `maxLength={60}` so an empty
+    name no longer reaches the server action and surfaces as an error page.
+  - `app/compare/saved/page.tsx`: rename input gained `required` and
+    `maxLength={60}` for the same reason.
+  - `lib/saved-comparisons.ts`: `normalizeSavedComparisonInput` now rejects
+    names over 60 characters (`MAX_COMPARISON_NAME_LENGTH`); previously the
+    only bound was the DB non-empty check. Test added.
+  - `proxy.ts`: added `/compare/saved` to `PROTECTED_PATHS` so the middleware
+    covers it like every other authenticated route (the page still
+    self-redirects as defense in depth).
+- Docs refresh DONE in current working tree (2026-07-04): `README.md` now
+  lists all features and routes including the four-feature expansion;
+  `CLAUDE.md` was expanded from a bare `@AGENTS.md` import into full agent
+  guidance (commands, architecture, server-action pattern, protected-route
+  rule, migration recipe, .ts-extension test import rule, formatter policy,
+  em dash house rule, handoff/ledger conventions). It still imports
+  `@AGENTS.md` at the end for the Next.js 16 version warning.
+- Paper trading feature DONE in current working tree (2026-07-05): three
+  RLS-protected tables (`paper_accounts`, `paper_trades`,
+  `paper_equity_snapshots`) in migration `20260705120000_create_paper_trading`,
+  ledger-derived portfolio math in `lib/paper-trading.ts` with 14 unit tests,
+  paginated trades fetch in `app/trading/data.ts`, `/trading` page (ticket,
+  positions, summary, reset, daily equity snapshot upsert guarded against
+  quote outages), `/trading/history` (equity curve, trade log), Trading nav,
+  middleware protection, and a stock page Trade button. Spec:
+  `docs/superpowers/specs/2026-07-05-paper-trading-design.md`. Built
+  subagent-driven with two-stage review per task.
+- Merge reconciliation DONE in current working tree (2026-07-05): merged the
+  remote 76-file feature commit and reviewed every feature (four parallel
+  review agents). Our ledger-based paper trading takes priority; the other
+  paper trading (`paper_portfolios`/`paper_holdings`/`paper_transactions`,
+  `lib/paper-portfolio`, `trade-dialog`, `paper-actions`) was removed.
+  - REMOVED (unsound): AI advisor/analyst/chat + `stock_ai_summaries` (no
+    GEMINI_API_KEY, world-writable shared cache); alert webhooks/notifications
+    (SSRF via user webhook_url, no server-side price check, tab-only firing);
+    leaderboard (mock competitors; real cross-user board impossible under
+    RLS); correlation heatmap (Pearson over 10 hourly price levels + random
+    fallback data); `todos.md`/`implements.md` stray root docs.
+  - KEPT WITH FIXES: screener and comparison matrix (removed fake fallback
+    tables, allSettled + omit failures), volatility simulator (beta via new
+    `/api/stock/[symbol]/beta`, not the 30-symbol screener), risk diagnostics
+    (reworked to a self-contained server component: real holdings, beta+HHI,
+    dropped invented stress test), dividend income (dropped charCode payout
+    calendar and mock-growth Chowder scatter), news sentiment panel (factual
+    count summary, no fabricated blurb), calendar dashboard (dropped fake
+    dividends tab, kept search/watchlist filter), watchlist sparkline (dash
+    instead of random walk on failure), stock-chart indicators (memoized),
+    mobile nav (scrollable). Indicators/DCF kept as-is (correct, no API cost).
+  - The recurring merge defect was silent fabrication of data on failure;
+    every instance was removed or replaced with an honest empty/dash state.
 
 ## Pushed commit ledger
 
@@ -181,6 +261,19 @@ Recommended next steps:
    Supabase CLI is now installed, but `supabase functions delete dummy
    --project-ref ofyyjzjjmopwvfqlhnyc --yes` requires `supabase login` or
    `SUPABASE_ACCESS_TOKEN`.
+5. Apply `supabase/migrations/20260705120000_create_paper_trading.sql` to the
+   remote Supabase project (ref ofyyjzjjmopwvfqlhnyc). Not applied yet: no
+   Supabase MCP or CLI login in the current session.
+6. IMPORTANT (remote DB cleanup): the removed features' migrations may already
+   have been applied to the remote project before this reconciliation. If so,
+   drop these now-unused objects: tables `paper_portfolios`, `paper_holdings`,
+   `paper_transactions` (their paper trading, migration
+   `20260705000001`), table `stock_ai_summaries` (migration `20260705070000`),
+   and the `notify_email`/`webhook_url` columns on `price_alerts` (migration
+   `20260705000002`). The migration files are deleted from the repo, so a
+   fresh DB will not create them; only an already-migrated remote needs manual
+   cleanup. Verify what is actually present with the Supabase MCP before
+   dropping anything.
 
 ## Practical notes
 

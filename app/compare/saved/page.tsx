@@ -98,6 +98,8 @@ export default async function SavedComparisonsPage() {
                       <input type="hidden" name="id" value={comparison.id} />
                       <input
                         name="name"
+                        required
+                        maxLength={60}
                         defaultValue={comparison.name}
                         aria-label={`Name for ${comparison.name}`}
                         className="border-input bg-background ring-offset-background focus-visible:ring-ring h-9 min-w-0 rounded-full border px-3 text-sm shadow-xs focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"

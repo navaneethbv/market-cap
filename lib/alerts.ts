@@ -11,24 +11,18 @@ export type PriceAlert = {
   active: boolean;
   triggered_at: string | null;
   created_at: string;
-  notify_email: boolean;
-  webhook_url: string | null;
 };
 
 export type AlertInput = {
   symbol: string;
   direction: string;
   targetPrice: string;
-  notifyEmail?: string | boolean;
-  webhookUrl?: string;
 };
 
 export type NormalizedAlertInput = {
   symbol: string;
   direction: AlertDirection;
   targetPrice: number;
-  notifyEmail: boolean;
-  webhookUrl: string | null;
 };
 
 export type AlertEvaluation = {
@@ -46,8 +40,6 @@ export type AlertRow = {
   active: boolean;
   triggeredAt: string | null;
   createdAt: string;
-  notifyEmail: boolean;
-  webhookUrl: string | null;
   quote: Quote | null;
   status: AlertStatus;
   isTriggered: boolean;
@@ -73,21 +65,7 @@ export function normalizeAlertInput(input: AlertInput): NormalizedAlertInput {
     throw new Error("Target price must be greater than zero");
   }
 
-  const notifyEmail = input.notifyEmail !== undefined
-    ? (typeof input.notifyEmail === "boolean"
-      ? input.notifyEmail
-      : String(input.notifyEmail) === "true")
-    : false;
-
-  const webhookUrl = input.webhookUrl?.trim() || null;
-
-  return {
-    symbol,
-    direction: input.direction,
-    targetPrice,
-    notifyEmail,
-    webhookUrl,
-  };
+  return { symbol, direction: input.direction, targetPrice };
 }
 
 export function evaluatePriceAlert(
@@ -149,8 +127,6 @@ export function buildAlertRows(
       active: alert.active,
       triggeredAt: alert.triggered_at,
       createdAt: alert.created_at,
-      notifyEmail: alert.notify_email || false,
-      webhookUrl: alert.webhook_url,
       quote,
       ...evaluation,
       error:
@@ -162,18 +138,18 @@ export function buildAlertRows(
 export function calculateAlertSummary(rows: AlertRow[]) {
   return rows.reduce(
     (summary, row) => {
-      summary.totalCount++;
+      summary.totalCount += 1;
       if (row.active) {
-        summary.activeCount++;
+        summary.activeCount += 1;
       }
       if (row.status === "triggered") {
-        summary.triggeredCount++;
+        summary.triggeredCount += 1;
       }
       if (row.status === "paused") {
-        summary.pausedCount++;
+        summary.pausedCount += 1;
       }
       if (row.status === "unavailable") {
-        summary.unavailableCount++;
+        summary.unavailableCount += 1;
       }
       return summary;
     },

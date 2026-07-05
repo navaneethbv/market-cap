@@ -69,30 +69,6 @@ function AlertFields({ alert }: { alert?: AlertRow }) {
           />
         </div>
       </div>
-      <div className="flex items-center space-x-2 py-1">
-        <input
-          id={alert ? `alert-email-${alert.id}` : "alert-email-new"}
-          name="notifyEmail"
-          type="checkbox"
-          defaultChecked={alert?.notifyEmail ?? false}
-          className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
-        />
-        <Label htmlFor={alert ? `alert-email-${alert.id}` : "alert-email-new"} className="text-xs font-semibold text-muted-foreground">
-          Send Email Notification (Mocked)
-        </Label>
-      </div>
-      <div className="grid gap-2">
-        <Label htmlFor={alert ? `alert-webhook-${alert.id}` : "alert-webhook-new"}>
-          Webhook URL (Discord / Slack)
-        </Label>
-        <Input
-          id={alert ? `alert-webhook-${alert.id}` : "alert-webhook-new"}
-          name="webhookUrl"
-          type="url"
-          defaultValue={alert?.webhookUrl ?? ""}
-          placeholder="https://discord.com/api/webhooks/..."
-        />
-      </div>
     </>
   );
 }

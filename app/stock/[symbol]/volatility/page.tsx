@@ -21,53 +21,39 @@ export default function VolatilitySimulatorPage({ params }: PageProps) {
   const upperSymbol = symbol.toUpperCase();
 
   const [loading, setLoading] = useState(true);
-  const [currentPrice, setCurrentPrice] = useState(100.0);
-  const [beta, setBeta] = useState(1.0);
+  const [currentPrice, setCurrentPrice] = useState(0);
+  const [beta, setBeta] = useState<number | null>(null);
   const [name, setName] = useState(upperSymbol);
   const [marketMove, setMarketMove] = useState(10); // Default 10% move
   const [errorMsg, setErrorMsg] = useState("");
 
   useEffect(() => {
-    // Fetch stock catalog to find Beta, otherwise default to quote
-    fetch("/api/screener")
+    let active = true;
+    fetch(`/api/stock/${upperSymbol}/beta`)
       .then((res) => {
         if (!res.ok) throw new Error();
         return res.json();
       })
       .then((data) => {
-        const stocks = data.stocks || [];
-        const match = stocks.find((s: { symbol: string }) => s.symbol === upperSymbol);
-        if (match) {
-          setCurrentPrice(match.price);
-          setBeta(match.beta || 1.0);
-          setName(match.name);
-          setLoading(false);
-        } else {
-          // Fallback to standalone quote
-          return fetch(`/api/quote?symbol=${upperSymbol}`);
-        }
-      })
-      .then((res) => {
-        if (!res) return; // Already resolved
-        if (!res.ok) throw new Error();
-        return res.json();
-      })
-      .then((data) => {
-        if (!data) return;
-        setCurrentPrice(data.price || 100.0);
-        setBeta(1.0); // Default fallback beta
-        setName(upperSymbol);
+        if (!active) return;
+        setCurrentPrice(data.price ?? 0);
+        setBeta(data.beta ?? null);
+        setName(data.name ?? upperSymbol);
         setLoading(false);
       })
       .catch(() => {
+        if (!active) return;
         setErrorMsg(`Failed to load asset data for ${upperSymbol}`);
         setLoading(false);
       });
+    return () => {
+      active = false;
+    };
   }, [upperSymbol]);
 
-  const projectedMove = calculateProjectedMove(beta, marketMove);
+  const projectedMove = calculateProjectedMove(beta ?? 0, marketMove);
   const projectedPrice = calculateProjectedPrice(currentPrice, projectedMove);
-  const volLabel = getBetaVolatilityLabel(beta);
+  const volLabel = getBetaVolatilityLabel(beta ?? 1);
 
   return (
     <div className="container max-w-4xl mx-auto py-8 px-4 space-y-6">
@@ -93,6 +79,11 @@ export default function VolatilitySimulatorPage({ params }: PageProps) {
       ) : errorMsg ? (
         <div className="bg-destructive/15 text-destructive border border-destructive/20 rounded-lg p-4 text-center">
           {errorMsg}
+        </div>
+      ) : beta === null ? (
+        <div className="rounded-lg border bg-card p-6 text-center text-sm text-muted-foreground">
+          No published beta is available for {upperSymbol}, so a market-relative
+          projection cannot be shown.
         </div>
       ) : (
         <div className="grid gap-6 md:grid-cols-3">

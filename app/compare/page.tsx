@@ -80,27 +80,32 @@ export default async function ComparePage({ searchParams }: ComparePageProps) {
           </div>
           <div className="flex flex-col gap-2 sm:flex-row">
             {user ? (
-              <form action={createSavedComparison} className="flex gap-2">
-                <input type="hidden" name="symbols" value={symbols.join(",")} />
-                <input
-                  name="name"
-                  aria-label="Saved comparison name"
-                  className="border-input bg-background ring-offset-background focus-visible:ring-ring h-10 min-w-0 rounded-full border px-4 text-sm shadow-xs focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
-                  placeholder="AI leaders"
-                />
-                <Button type="submit" className="rounded-full">
-                  <Save className="h-4 w-4" />
-                  Save
-                </Button>
-              </form>
+              symbols.length >= 2 && (
+                <form action={createSavedComparison} className="flex gap-2">
+                  <input
+                    type="hidden"
+                    name="symbols"
+                    value={symbols.join(",")}
+                  />
+                  <input
+                    name="name"
+                    required
+                    maxLength={60}
+                    aria-label="Saved comparison name"
+                    className="border-input bg-background ring-offset-background focus-visible:ring-ring h-10 min-w-0 rounded-full border px-4 text-sm shadow-xs focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
+                    placeholder="AI leaders"
+                  />
+                  <Button type="submit" className="rounded-full">
+                    <Save className="h-4 w-4" />
+                    Save
+                  </Button>
+                </form>
+              )
             ) : (
               <Button asChild variant="outline" className="rounded-full">
                 <Link href="/login?next=/compare">Sign in to save</Link>
               </Button>
             )}
-            <Button asChild variant="outline" className="rounded-full">
-              <Link href="/compare/correlation">Correlation heatmap</Link>
-            </Button>
             <Button asChild variant="outline" className="rounded-full">
               <Link href="/compare/matrix">Matrix view</Link>
             </Button>

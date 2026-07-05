@@ -64,7 +64,7 @@ export default async function MarketCalendarPage() {
               Upcoming market dates
             </h1>
             <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
-              Track US market holidays, earnings announcements, and dividend ex-dates in one planning view.
+              Track US market holidays and upcoming earnings announcements in one planning view.
             </p>
           </div>
           <Button asChild variant="outline" className="rounded-full">
