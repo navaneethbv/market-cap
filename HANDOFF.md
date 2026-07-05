@@ -71,9 +71,13 @@ Reference images in `img/` (committed). Blend of two dribbble shots:
   Supabase migration applied: `create_price_alerts`. Authenticated CRUD,
   cross-user insert rejection, unauthenticated redirect, and signed-in route
   smoke tests were run with the test account.
+- Stock compare feature DONE on main: `/compare` public page compares two to
+  five symbols from the `symbols` query string, ranks quotes by daily percent
+  move, shows best and weakest movers, and adds Compare navigation and a
+  dashboard call-to-action. No new database tables were added.
 - TDD pass added: local tests now cover format helpers, stock display, watchlist
   helpers, migration expectations, portfolio math, live price reducers,
-  dashboard summaries, and price alert trigger logic.
+  dashboard summaries, price alert trigger logic, and stock comparison helpers.
 - Fixed an existing next-themes hydration warning by suppressing expected
   theme-toggle button attribute mismatches. Playwright recheck showed no console
   errors afterward.
@@ -101,6 +105,15 @@ Record every pushed commit here after each milestone.
     tests, route protection, navigation, and `price_alerts` migration.
   - Applied remote Supabase `create_price_alerts` migration and smoke-tested
     authenticated CRUD plus RLS rejection.
+- `0d6f162` Record pushed commits in handoff
+  - Added this pushed commit ledger to `HANDOFF.md`.
+- `ecb1e94` Document stock compare feature plan
+  - Added stock compare design and implementation plan under `docs/superpowers`.
+- `3dc092d` Add stock comparison page
+  - Added `/compare`, comparison helper tests, quote ranking and summary logic,
+    Compare navigation, and a dashboard Compare call-to-action.
+  - Verified `/compare?symbols=AAPL,MSFT,NVDA` returned 200 and rendered the
+    requested symbols.
 
 ## State: NEXT UP
 
@@ -139,6 +152,9 @@ Recommended next steps:
 - Alerts route smoke last run: inserted a temporary AAPL price alert under the
   test account, verified `/alerts` returned 200 and rendered AAPL, then deleted
   the row by inserted ID.
+- Compare route smoke last run: requested
+  `/compare?symbols=AAPL,MSFT,NVDA`, verified HTTP 200 and rendered AAPL, MSFT,
+  and NVDA.
 - Vercel CLI is installed (`54.20.1`) and logged in as `hotshot4ever-2393`.
   The project is not linked yet (`.vercel/` absent). Do not upload `.env.local`
   secrets to Vercel without explicit confirmation.
