@@ -1,13 +1,13 @@
 /* eslint-disable @next/next/no-img-element */
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ExternalLink } from "lucide-react";
-import { ChangeChip } from "@/components/change-chip";
+import { ExternalLink, Star } from "lucide-react";
+import { toggleWatchlistItem } from "@/app/watchlist/actions";
+import { LivePriceDisplay } from "@/components/live-price-display";
 import { NewsList } from "@/components/news-list";
 import { StockChart } from "@/components/stock-chart";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { formatPrice } from "@/lib/format";
 import {
   getCompanyNews,
   getKeyMetrics,
@@ -20,6 +20,7 @@ import type {
   NewsArticle,
 } from "@/lib/market/types";
 import { buildStockStats } from "@/lib/stock-display";
+import { createClient } from "@/lib/supabase/server";
 
 const EMPTY_METRICS: KeyMetrics = {
   high52: null,
@@ -60,6 +61,11 @@ export default async function StockPage({
     notFound();
   }
 
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
   const [profileResult, quoteResult, metricsResult, newsResult] =
     await Promise.allSettled([
       getProfile(symbol),
@@ -81,6 +87,14 @@ export default async function StockPage({
     metricsResult.status === "fulfilled" ? metricsResult.value : EMPTY_METRICS;
   const news: NewsArticle[] =
     newsResult.status === "fulfilled" ? newsResult.value : [];
+  const { data: watchlistItem } = user
+    ? await supabase
+        .from("watchlist_items")
+        .select("id")
+        .eq("user_id", user.id)
+        .eq("symbol", symbol)
+        .maybeSingle()
+    : { data: null };
   const stats = buildStockStats({ quote, profile, metrics });
   const title = profile.name || symbol;
 
@@ -131,17 +145,41 @@ export default async function StockPage({
             </div>
           </div>
 
-          <div className="lg:text-right">
-            <div className="text-4xl font-bold tabular-nums tracking-tight">
-              {formatPrice(quote.price)}
-            </div>
-            <div className="mt-2 flex items-center gap-2 lg:justify-end">
-              <ChangeChip value={quote.changePercent} />
-              <span className="text-sm font-semibold tabular-nums text-muted-foreground">
-                {quote.change >= 0 ? "+" : ""}
-                {formatPrice(quote.change)}
-              </span>
-            </div>
+          <div className="flex flex-col items-start gap-3 lg:items-end lg:text-right">
+            <LivePriceDisplay
+              key={symbol}
+              symbol={symbol}
+              initialQuote={quote}
+            />
+            {user ? (
+              <form action={toggleWatchlistItem}>
+                <input type="hidden" name="symbol" value={symbol} />
+                <input type="hidden" name="next" value={`/stock/${symbol}`} />
+                <Button
+                  type="submit"
+                  variant={watchlistItem ? "secondary" : "outline"}
+                  size="sm"
+                  className="rounded-full"
+                >
+                  <Star
+                    className={watchlistItem ? "fill-current" : undefined}
+                  />
+                  {watchlistItem ? "Watching" : "Watch"}
+                </Button>
+              </form>
+            ) : (
+              <Button
+                variant="outline"
+                size="sm"
+                className="rounded-full"
+                asChild
+              >
+                <Link href={`/login?next=/stock/${symbol}`}>
+                  <Star />
+                  Watch
+                </Link>
+              </Button>
+            )}
           </div>
         </div>
       </section>

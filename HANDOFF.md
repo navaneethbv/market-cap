@@ -48,26 +48,44 @@ Reference images in `img/` (committed). Blend of two dribbble shots:
   reusable news list, and populated `/news` page. Verified `/stock/AAPL` with
   real quote/candle/news data and Chrome headless screenshots in light and dark
   themes.
+- Phase 4 DONE in current working tree: `watchlist_items` migrations, RLS and
+  grants, stock page Watch button, `/watchlist` table page, authenticated
+  add/remove smoke test, and RLS isolation smoke test. Remote Supabase
+  migrations applied: `create_watchlist_items` and
+  `harden_watchlist_item_privileges`.
+- Phase 5 DONE in current working tree: `holdings` table migration with RLS,
+  `/portfolio` page, add/edit/delete holding dialogs, server actions, and P/L
+  math in `lib/portfolio.ts`. Remote Supabase migrations applied:
+  `create_holdings`, `drop_unused_holdings_symbol_idx`, and
+  `default_holdings_purchased_at`. Authenticated CRUD, cross-user insert
+  rejection, and signed-in app route smoke tests were run with the test account.
+- Phase 6 DONE in current working tree: `hooks/useLivePrice.ts` connects to the
+  Finnhub websocket using `NEXT_PUBLIC_FINNHUB_API_KEY`, merges trade ticks into
+  quote state, and falls back to `/api/quote` polling every 15 seconds. Stock
+  detail page now shows the live price status.
+- Phase 7 DONE in current working tree: dashboard home page now shows SPY/QQQ/DIA
+  cards, watchlist summary, and market news using existing market helpers.
+- TDD pass added: local tests now cover format helpers, stock display, watchlist
+  helpers, migration expectations, portfolio math, live price reducers, and
+  dashboard summaries.
+- Fixed an existing next-themes hydration warning by suppressing expected
+  theme-toggle button attribute mismatches. Playwright recheck showed no console
+  errors afterward.
 
 ## State: NEXT UP
 
-Phase 4 Watchlist:
-1. Supabase migration `watchlist_items` (id uuid pk, user_id uuid refs
-   auth.users, symbol text, created_at, unique(user_id, symbol), RLS user_id =
-   auth.uid()) via mcp supabase apply_migration.
-2. Star button on stock page.
-3. `/watchlist` table page with quotes and change chips.
-4. Verify authenticated add/remove and RLS isolation with the test account.
-
-Then:
-- Phase 5 Portfolio: `holdings` table (shares numeric, avg_cost numeric,
-  purchased_at), CRUD dialogs, P/L math, /portfolio page.
-- Phase 6: `hooks/useLivePrice.ts` Finnhub websocket
-  (wss://ws.finnhub.io?token=NEXT_PUBLIC key, subscribe {"type":"subscribe",
-  "symbol":"AAPL"}), merge trades into state, 15s polling fallback via
-  /api/quote when socket down or market closed.
-- Phase 7: dashboard home (index ETF cards SPY/QQQ/DIA, watchlist summary,
-  news), empty/loading states, deploy via Vercel.
+Recommended next steps:
+1. Commit the working milestone.
+2. Deploy via Vercel once CLI is installed and env vars are synced.
+3. Supabase security advisor still reports leaked password protection disabled:
+   enable it in Auth settings when ready.
+4. Supabase performance advisor may report `holdings_user_id_idx` as unused on
+   the brand-new table; keep it because it backs RLS/user filters and FK
+   cascade paths.
+5. Remove the accidental Supabase Edge Function named `dummy` from the Supabase
+   dashboard. It was created while trying to expose the migration tool; the MCP
+   tools available here can list/deploy functions but do not expose delete, and
+   the Supabase CLI is not installed locally.
 
 ## Practical notes
 
@@ -82,3 +100,9 @@ Then:
 - Playwright MCP screenshots land in repo root or .playwright-mcp/; delete
   before committing.
 - shadcn CLI is v4-style: `npx shadcn@latest add <component> -y -s`.
+- Verification last run: `npm test && npm run lint && npm run build` passed.
+- Signed-in route smoke last run: inserted temporary MSFT watchlist and holding
+  rows under the test account, verified `/watchlist`, `/portfolio`, and `/`
+  returned 200 and rendered MSFT, then deleted those rows by inserted IDs.
+- Vercel CLI is not installed. Install with `npm i -g vercel` before using
+  `vercel env pull`, `vercel deploy`, or `vercel logs`.
