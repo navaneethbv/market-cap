@@ -84,8 +84,10 @@ Recommended next steps:
    cascade paths.
 5. Remove the accidental Supabase Edge Function named `dummy` from the Supabase
    dashboard. It was created while trying to expose the migration tool; the MCP
-   tools available here can list/deploy functions but do not expose delete, and
-   the Supabase CLI is not installed locally.
+   tools available here can list/deploy functions but do not expose delete.
+   Supabase CLI is now installed, but `supabase functions delete dummy
+   --project-ref ofyyjzjjmopwvfqlhnyc --yes` requires `supabase login` or
+   `SUPABASE_ACCESS_TOKEN`.
 
 ## Practical notes
 
@@ -104,5 +106,7 @@ Recommended next steps:
 - Signed-in route smoke last run: inserted temporary MSFT watchlist and holding
   rows under the test account, verified `/watchlist`, `/portfolio`, and `/`
   returned 200 and rendered MSFT, then deleted those rows by inserted IDs.
-- Vercel CLI is not installed. Install with `npm i -g vercel` before using
-  `vercel env pull`, `vercel deploy`, or `vercel logs`.
+- Vercel CLI is installed (`54.20.1`) and logged in as `hotshot4ever-2393`.
+  The project is not linked yet (`.vercel/` absent). Do not upload `.env.local`
+  secrets to Vercel without explicit confirmation.
+- Supabase CLI is installed (`2.109.0`), but not logged in.
