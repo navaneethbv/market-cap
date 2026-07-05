@@ -44,29 +44,22 @@ Reference images in `img/` (committed). Blend of two dribbble shots:
   Plus Jakarta Sans. Both themes screenshot-verified.
 - `lib/format.ts` just created (formatPrice, formatCompact, formatNumber,
   timeAgo).
+- Phase 3 DONE: stock detail page at `/stock/[symbol]`, Recharts range chart,
+  reusable news list, and populated `/news` page. Verified `/stock/AAPL` with
+  real quote/candle/news data and Chrome headless screenshots in light and dark
+  themes.
 
-## State: NEXT UP (was mid-Phase 3)
+## State: NEXT UP
 
-Phase 3, stock detail page. Remaining pieces:
-1. `app/stock/[symbol]/page.tsx` (server component): parallel fetch
-   getProfile + getQuote + getKeyMetrics + getCompanyNews. Header: company
-   logo, name, SYMBOL - exchange, big price (tabular-nums), ChangeChip,
-   then chart, key stats grid (open, high, low, prev close, market cap
-   (profile.marketCap is in MILLIONS, multiply by 1e6 for formatCompact),
-   P/E, 52w high/low, div yield, beta, EPS), news list.
-2. `components/stock-chart.tsx` (client): range tabs, fetch /api/candles,
-   Recharts AreaChart, gradient fill, green when last>=first close else red,
-   dark tooltip pill like reference. Skeleton while loading.
-3. `components/news-list.tsx`: article rows (image, source, headline,
-   timeAgo, external link).
-4. Also fill `app/news/page.tsx` (placeholder exists) using getMarketNews.
-5. Verify AAPL page via Playwright screenshots (both themes), commit.
+Phase 4 Watchlist:
+1. Supabase migration `watchlist_items` (id uuid pk, user_id uuid refs
+   auth.users, symbol text, created_at, unique(user_id, symbol), RLS user_id =
+   auth.uid()) via mcp supabase apply_migration.
+2. Star button on stock page.
+3. `/watchlist` table page with quotes and change chips.
+4. Verify authenticated add/remove and RLS isolation with the test account.
 
 Then:
-- Phase 4 Watchlist: Supabase migration `watchlist_items` (id uuid pk,
-  user_id uuid refs auth.users, symbol text, created_at, unique(user_id,
-  symbol), RLS user_id = auth.uid()) via mcp supabase apply_migration.
-  Star button on stock page, /watchlist table page.
 - Phase 5 Portfolio: `holdings` table (shares numeric, avg_cost numeric,
   purchased_at), CRUD dialogs, P/L math, /portfolio page.
 - Phase 6: `hooks/useLivePrice.ts` Finnhub websocket
