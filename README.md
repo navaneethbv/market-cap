@@ -44,6 +44,8 @@ signed-in user; everything else is public.
 - Supabase for auth (email/password) and Postgres with row level security
 - Market data: Finnhub (quotes, search, profiles, news, earnings calendar,
   websocket) and Twelve Data (chart candles), both on free tiers
+- Stripe for the Pro subscription ($20/month); see
+  [docs/PAYMENTS.md](docs/PAYMENTS.md)
 
 ## Getting started
 
@@ -61,12 +63,14 @@ signed-in user; everything else is public.
    FINNHUB_API_KEY=...
    NEXT_PUBLIC_FINNHUB_API_KEY=...   # same Finnhub key, used by the client websocket
    TWELVEDATA_API_KEY=...
+   STRIPE_SECRET_KEY=sk_test_...     # Stripe sandbox key for the Pro plan
+   NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_...
    ```
 
 3. Apply the SQL migrations in `supabase/migrations/` to your Supabase
    project (in filename order). Tables: `watchlist_items`, `holdings`,
    `price_alerts`, `saved_comparisons`, `paper_accounts`, `paper_trades`,
-   `paper_equity_snapshots`, all with RLS.
+   `paper_equity_snapshots`, `stripe_customers`, all with RLS.
 
 4. Run the dev server:
 
