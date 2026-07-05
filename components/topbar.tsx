@@ -12,36 +12,34 @@ import {
 import { CircleUser, TrendingUp } from "lucide-react";
 import { SearchBox } from "@/components/search-box";
 
-export async function Nav() {
+export async function Topbar() {
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
   return (
-    <header className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur">
-      <div className="mx-auto flex h-14 max-w-6xl items-center gap-4 px-4">
-        <Link href="/" className="flex items-center gap-2 font-semibold">
-          <TrendingUp className="h-5 w-5 text-primary" />
-          <span className="hidden sm:inline">MarketCap</span>
+    <header className="sticky top-0 z-40 border-b bg-background/90 backdrop-blur">
+      <div className="flex h-16 items-center gap-3 px-4 md:px-8">
+        <Link href="/" className="flex items-center gap-2 md:hidden">
+          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+            <TrendingUp className="h-4 w-4" />
+          </span>
+          <span className="font-bold">MarketCap</span>
         </Link>
-        <nav className="flex items-center gap-1 text-sm">
-          <Button variant="ghost" size="sm" asChild>
-            <Link href="/">Home</Link>
-          </Button>
-          <Button variant="ghost" size="sm" asChild>
-            <Link href="/watchlist">Watchlist</Link>
-          </Button>
-          <Button variant="ghost" size="sm" asChild>
-            <Link href="/portfolio">Portfolio</Link>
-          </Button>
-        </nav>
-        <div className="ml-auto flex items-center gap-2">
+        <div className="ml-auto flex items-center gap-2 md:ml-0 md:flex-1">
           <SearchBox />
+        </div>
+        <div className="flex items-center gap-2">
           {user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" aria-label="Account">
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="rounded-full"
+                  aria-label="Account"
+                >
                   <CircleUser className="h-5 w-5" />
                 </Button>
               </DropdownMenuTrigger>
@@ -60,7 +58,7 @@ export async function Nav() {
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
-            <Button size="sm" asChild>
+            <Button size="sm" className="rounded-full px-4" asChild>
               <Link href="/login">Log in</Link>
             </Button>
           )}
