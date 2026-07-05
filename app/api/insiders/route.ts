@@ -28,9 +28,8 @@ export async function GET(request: NextRequest) {
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
       }
 
-      // Query watchlist symbols
       const { data: items, error } = await supabase
-        .from("watchlist")
+        .from("watchlist_items")
         .select("symbol")
         .eq("user_id", user.id);
 

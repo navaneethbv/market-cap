@@ -75,6 +75,7 @@ export default function MonteCarloPage() {
     timeHorizonYears: horizon,
     simulationCount: 250,
     targetValue: targetNum,
+    seed: 42,
   });
 
   const finalYearPoint = simulation.points[simulation.points.length - 1];
@@ -172,7 +173,7 @@ export default function MonteCarloPage() {
                   step="50"
                   value={monthlyContribution}
                   onChange={(e) => setMonthlyContribution(e.target.value)}
-                  className="w-full h-1 bg-muted rounded-lg appearance-none cursor-pointeraccent-primary"
+                  className="w-full h-1 bg-muted rounded-lg appearance-none cursor-pointer accent-primary"
                 />
               </div>
 
@@ -188,7 +189,7 @@ export default function MonteCarloPage() {
                   step="1"
                   value={timeHorizon}
                   onChange={(e) => setTimeHorizon(e.target.value)}
-                  className="w-full h-1 bg-muted rounded-lg appearance-none cursor-pointeraccent-primary"
+                  className="w-full h-1 bg-muted rounded-lg appearance-none cursor-pointer accent-primary"
                 />
               </div>
 
@@ -204,7 +205,7 @@ export default function MonteCarloPage() {
                   step="0.5"
                   value={annualReturn}
                   onChange={(e) => setAnnualReturn(e.target.value)}
-                  className="w-full h-1 bg-muted rounded-lg appearance-none cursor-pointeraccent-primary"
+                  className="w-full h-1 bg-muted rounded-lg appearance-none cursor-pointer accent-primary"
                 />
               </div>
 
@@ -220,7 +221,7 @@ export default function MonteCarloPage() {
                   step="0.5"
                   value={annualVolatility}
                   onChange={(e) => setAnnualVolatility(e.target.value)}
-                  className="w-full h-1 bg-muted rounded-lg appearance-none cursor-pointeraccent-primary"
+                  className="w-full h-1 bg-muted rounded-lg appearance-none cursor-pointer accent-primary"
                 />
               </div>
             </div>
@@ -334,7 +335,7 @@ export default function MonteCarloPage() {
             <div className="text-xs text-muted-foreground flex items-start gap-2 bg-muted/20 p-3.5 rounded-xl">
               <HelpCircle className="h-4 w-4 shrink-0 text-blue-400 mt-0.5" />
               <span>
-                Monte Carlo simulations model standard stock volatility risk. The conservative boundary represents a simulated historical downturn sequence, while the median captures average long-term growth.
+                Monte Carlo simulations model standard stock volatility risk from your assumptions. The conservative boundary is the lower simulated outcome range, while the median captures the middle path across all runs.
               </span>
             </div>
           </div>

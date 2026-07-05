@@ -6,6 +6,7 @@ export interface MonteCarloInput {
   timeHorizonYears: number;
   simulationCount?: number; // default 250
   targetValue: number;
+  seed?: number;
 }
 
 export interface MonteCarloYearPoint {
@@ -26,11 +27,24 @@ export interface MonteCarloResult {
  * with mean = 0 and standard deviation = 1.
  */
 export function randomNormal(): number {
+  return randomNormalFrom(Math.random);
+}
+
+function createSeededRandom(seed: number): () => number {
+  let state = Math.trunc(seed) % 2_147_483_647;
+  if (state <= 0) state += 2_147_483_646;
+  return () => {
+    state = (state * 16_807) % 2_147_483_647;
+    return (state - 1) / 2_147_483_646;
+  };
+}
+
+function randomNormalFrom(random: () => number): number {
   let u = 0;
   let v = 0;
   // Box-Muller requires inputs strictly in (0, 1)
-  while (u === 0) u = Math.random();
-  while (v === 0) v = Math.random();
+  while (u === 0) u = random();
+  while (v === 0) v = random();
   return Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
 }
 
@@ -46,11 +60,20 @@ export function runMonteCarloSimulation(input: MonteCarloInput): MonteCarloResul
     timeHorizonYears,
     simulationCount = 250,
     targetValue,
+    seed = 1,
   } = input;
+
+  if (!Number.isInteger(timeHorizonYears) || timeHorizonYears < 1) {
+    throw new Error("time horizon must be at least 1 year");
+  }
+  if (!Number.isInteger(simulationCount) || simulationCount < 1) {
+    throw new Error("simulation count must be at least 1");
+  }
 
   const totalMonths = timeHorizonYears * 12;
   const monthlyMean = annualReturn / 12;
   const monthlyVol = annualVolatility / Math.sqrt(12);
+  const seededRandom = createSeededRandom(seed);
 
   // Store portfolio values for each simulation path.
   // Each path will contain points for Year 0 up to Year N.
@@ -61,7 +84,7 @@ export function runMonteCarloSimulation(input: MonteCarloInput): MonteCarloResul
     let currentVal = initialCapital;
 
     for (let month = 1; month <= totalMonths; month++) {
-      const norm = randomNormal();
+      const norm = randomNormalFrom(seededRandom);
       const returnRate = monthlyMean + monthlyVol * norm;
 
       currentVal = currentVal * (1 + returnRate) + monthlyContribution;
