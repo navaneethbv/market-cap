@@ -65,9 +65,15 @@ Reference images in `img/` (committed). Blend of two dribbble shots:
   detail page now shows the live price status.
 - Phase 7 DONE in current working tree: dashboard home page now shows SPY/QQQ/DIA
   cards, watchlist summary, and market news using existing market helpers.
+- Price alerts feature DONE on main: `price_alerts` migration with RLS and
+  authenticated CRUD grants, `/alerts` page, add/edit/delete/pause/resume
+  actions, Alerts navigation, and quote-based alert status helpers. Remote
+  Supabase migration applied: `create_price_alerts`. Authenticated CRUD,
+  cross-user insert rejection, unauthenticated redirect, and signed-in route
+  smoke tests were run with the test account.
 - TDD pass added: local tests now cover format helpers, stock display, watchlist
-  helpers, migration expectations, portfolio math, live price reducers, and
-  dashboard summaries.
+  helpers, migration expectations, portfolio math, live price reducers,
+  dashboard summaries, and price alert trigger logic.
 - Fixed an existing next-themes hydration warning by suppressing expected
   theme-toggle button attribute mismatches. Playwright recheck showed no console
   errors afterward.
@@ -75,14 +81,13 @@ Reference images in `img/` (committed). Blend of two dribbble shots:
 ## State: NEXT UP
 
 Recommended next steps:
-1. Commit the working milestone.
-2. Deploy via Vercel once CLI is installed and env vars are synced.
-3. Supabase security advisor still reports leaked password protection disabled:
+1. Deploy via Vercel once the project is linked and env vars are synced.
+2. Supabase security advisor still reports leaked password protection disabled:
    enable it in Auth settings when ready.
-4. Supabase performance advisor may report `holdings_user_id_idx` as unused on
+3. Supabase performance advisor may report `holdings_user_id_idx` as unused on
    the brand-new table; keep it because it backs RLS/user filters and FK
    cascade paths.
-5. Remove the accidental Supabase Edge Function named `dummy` from the Supabase
+4. Remove the accidental Supabase Edge Function named `dummy` from the Supabase
    dashboard. It was created while trying to expose the migration tool; the MCP
    tools available here can list/deploy functions but do not expose delete.
    Supabase CLI is now installed, but `supabase functions delete dummy
@@ -102,10 +107,14 @@ Recommended next steps:
 - Playwright MCP screenshots land in repo root or .playwright-mcp/; delete
   before committing.
 - shadcn CLI is v4-style: `npx shadcn@latest add <component> -y -s`.
-- Verification last run: `npm test && npm run lint && npm run build` passed.
+- Verification last run after alerts: `npm test`, `npm run lint`, and
+  `npm run build` passed.
 - Signed-in route smoke last run: inserted temporary MSFT watchlist and holding
   rows under the test account, verified `/watchlist`, `/portfolio`, and `/`
   returned 200 and rendered MSFT, then deleted those rows by inserted IDs.
+- Alerts route smoke last run: inserted a temporary AAPL price alert under the
+  test account, verified `/alerts` returned 200 and rendered AAPL, then deleted
+  the row by inserted ID.
 - Vercel CLI is installed (`54.20.1`) and logged in as `hotshot4ever-2393`.
   The project is not linked yet (`.vercel/` absent). Do not upload `.env.local`
   secrets to Vercel without explicit confirmation.
