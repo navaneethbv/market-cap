@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { getQuote } from "@/lib/market/finnhub";
-import type { Quote } from "@/lib/market/types";
+import { buildQuotePayload } from "@/lib/quote-response";
 
 const MAX_SYMBOLS = 25;
 
@@ -26,12 +26,7 @@ export async function GET(request: NextRequest) {
   }
 
   const settled = await Promise.allSettled(symbols.map((s) => getQuote(s)));
-  const quotes: Record<string, Quote> = {};
-  for (const result of settled) {
-    if (result.status === "fulfilled") {
-      quotes[result.value.symbol] = result.value;
-    }
-  }
+  const payload = buildQuotePayload(settled);
 
-  return NextResponse.json({ quotes });
+  return NextResponse.json(payload.body, { status: payload.status });
 }

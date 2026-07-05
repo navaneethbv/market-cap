@@ -22,6 +22,7 @@ import {
   buildPaperSummary,
   DEFAULT_STARTING_CASH,
 } from "@/lib/paper-trading";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import type { Quote } from "@/lib/market/types";
 
@@ -93,19 +94,19 @@ export default async function TradingPage({ searchParams }: TradingPageProps) {
   // Skip when any quote failed so a cost-basis approximation never
   // overwrites an accurate snapshot for the same day
   if (account && trades.length > 0 && !hasQuoteFailures) {
-    const today = new Date().toISOString().slice(0, 10);
-    const { error: snapshotError } = await supabase
-      .from("paper_equity_snapshots")
-      .upsert(
+    try {
+      const { error: snapshotError } = await createAdminClient().rpc(
+        "upsert_paper_equity_snapshot",
         {
-          user_id: user.id,
-          snapshot_date: today,
-          equity: Math.max(0, summary.equity),
-        },
-        { onConflict: "user_id,snapshot_date" }
+          p_user_id: user.id,
+          p_equity: Math.max(0, summary.equity),
+        }
       );
-    if (snapshotError) {
-      console.error("equity snapshot failed:", snapshotError.message);
+      if (snapshotError) {
+        console.error("equity snapshot failed:", snapshotError.message);
+      }
+    } catch (err) {
+      console.error("equity snapshot failed:", err);
     }
   }
 

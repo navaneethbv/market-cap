@@ -52,10 +52,13 @@ In `.env.local` (gitignored):
 ```
 STRIPE_SECRET_KEY=sk_test_...            # required, server-only
 NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_...  # reserved for future embedded elements
+APP_URL=http://localhost:3000            # trusted app origin for Checkout redirects
 ```
 
 Sandbox keys come from https://dashboard.stripe.com/test/apikeys. With
 `sk_test_` keys everything runs in Stripe's test mode; no real money moves.
+If `APP_URL` is not set, Vercel deployment URL env vars are used when
+available, then localhost is used as the development fallback.
 
 ## Testing the flow in sandbox mode
 
