@@ -1,13 +1,14 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { getCandles } from "@/lib/market/twelvedata";
-import { calculateDailyReturns, calculateCorrelationMatrix } from "@/lib/correlation.ts";
+import {
+  calculateDailyReturns,
+  calculateCorrelationMatrix,
+  normalizeCorrelationSymbols,
+} from "@/lib/correlation.ts";
 
 export async function GET(request: NextRequest) {
   const symbolsParam = request.nextUrl.searchParams.get("symbols") ?? "";
-  const symbols = symbolsParam
-    .split(",")
-    .map((s) => s.trim().toUpperCase())
-    .filter((s) => /^[A-Z0-9.^-]{1,12}$/.test(s));
+  const symbols = normalizeCorrelationSymbols(symbolsParam);
 
   if (symbols.length < 2 || symbols.length > 10) {
     return NextResponse.json(

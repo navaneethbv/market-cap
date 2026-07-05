@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { Fragment, useEffect, useState } from "react";
 import {
   Layers,
   Search,
@@ -168,7 +168,7 @@ export default function CorrelationPage() {
 
                 {/* Grid Rows */}
                 {symbols.map((symbolA) => (
-                  <>
+                  <Fragment key={symbolA}>
                     {/* Vertical Header cell */}
                     <div
                       key={`v-${symbolA}`}
@@ -212,7 +212,7 @@ export default function CorrelationPage() {
                         </button>
                       );
                     })}
-                  </>
+                  </Fragment>
                 ))}
               </div>
             </div>

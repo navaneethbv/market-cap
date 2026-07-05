@@ -41,6 +41,81 @@ export interface BacktestResult {
   tradeCount: number;
 }
 
+export interface NormalizedBacktestOptions {
+  initialCapital: number;
+  smaShort: number;
+  smaLong: number;
+  rsiPeriod: number;
+  rsiOversold: number;
+  rsiOverbought: number;
+}
+
+function parsePositiveNumber(value: string | null, fallback: number, label: string): number {
+  const parsed = value === null ? fallback : Number(value);
+  if (!Number.isFinite(parsed) || parsed <= 0) {
+    throw new Error(`invalid ${label}`);
+  }
+  return parsed;
+}
+
+function parsePositiveInteger(value: string | null, fallback: number, label: string): number {
+  const parsed = parsePositiveNumber(value, fallback, label);
+  if (!Number.isInteger(parsed)) {
+    throw new Error(`invalid ${label}`);
+  }
+  return parsed;
+}
+
+export function normalizeBacktestOptions(input: {
+  strategy: StrategyType;
+  initialCapital: string | null;
+  smaShort: string | null;
+  smaLong: string | null;
+  rsiPeriod: string | null;
+  rsiOversold: string | null;
+  rsiOverbought: string | null;
+}): NormalizedBacktestOptions {
+  const initialCapital = parsePositiveNumber(
+    input.initialCapital,
+    10_000,
+    "initial capital"
+  );
+  const smaShort = parsePositiveInteger(input.smaShort, 20, "short SMA period");
+  const smaLong = parsePositiveInteger(input.smaLong, 50, "long SMA period");
+  if (input.strategy === "sma_crossover" && smaShort >= smaLong) {
+    throw new Error("short SMA period must be less than long SMA period");
+  }
+
+  const rsiPeriod = parsePositiveInteger(input.rsiPeriod, 14, "RSI period");
+  const rsiOversold = parsePositiveInteger(
+    input.rsiOversold,
+    30,
+    "RSI oversold threshold"
+  );
+  const rsiOverbought = parsePositiveInteger(
+    input.rsiOverbought,
+    70,
+    "RSI overbought threshold"
+  );
+  if (
+    input.strategy === "rsi_threshold" &&
+    (rsiOversold >= rsiOverbought ||
+      rsiOversold >= 100 ||
+      rsiOverbought >= 100)
+  ) {
+    throw new Error("RSI oversold threshold must be less than overbought threshold");
+  }
+
+  return {
+    initialCapital,
+    smaShort,
+    smaLong,
+    rsiPeriod,
+    rsiOversold,
+    rsiOverbought,
+  };
+}
+
 export function runBacktest(params: BacktestParams): BacktestResult {
   const {
     candles,

@@ -172,7 +172,7 @@ export default function SnowballPage() {
                   step="50"
                   value={monthlyContribution}
                   onChange={(e) => setMonthlyContribution(e.target.value)}
-                  className="w-full h-1 bg-muted rounded-lg appearance-none cursor-pointeraccent-primary"
+                  className="w-full h-1 bg-muted rounded-lg appearance-none cursor-pointer accent-primary"
                 />
               </div>
 
@@ -188,7 +188,7 @@ export default function SnowballPage() {
                   step="1"
                   value={timeHorizon}
                   onChange={(e) => setTimeHorizon(e.target.value)}
-                  className="w-full h-1 bg-muted rounded-lg appearance-none cursor-pointeraccent-primary"
+                  className="w-full h-1 bg-muted rounded-lg appearance-none cursor-pointer accent-primary"
                 />
               </div>
 
@@ -204,7 +204,7 @@ export default function SnowballPage() {
                   step="0.5"
                   value={dividendGrowthRate}
                   onChange={(e) => setDividendGrowthRate(e.target.value)}
-                  className="w-full h-1 bg-muted rounded-lg appearance-none cursor-pointeraccent-primary"
+                  className="w-full h-1 bg-muted rounded-lg appearance-none cursor-pointer accent-primary"
                 />
               </div>
 
@@ -220,7 +220,7 @@ export default function SnowballPage() {
                   step="0.5"
                   value={priceAppreciation}
                   onChange={(e) => setPriceAppreciation(e.target.value)}
-                  className="w-full h-1 bg-muted rounded-lg appearance-none cursor-pointeraccent-primary"
+                  className="w-full h-1 bg-muted rounded-lg appearance-none cursor-pointer accent-primary"
                 />
               </div>
 
@@ -288,7 +288,7 @@ export default function SnowballPage() {
               <div>
                 <span className="font-semibold text-green-300">Dividend Income Crossover Reached!</span>
                 <p className="mt-0.5 text-xs text-green-400/80">
-                  In **Year {projection.crossoverYear}**, your annual dividend income ({formatPrice(projection.points[projection.crossoverYear].annualDividends)}) will exceed your annual contributions ({formatPrice(annualContributions)}). At this point, the snowball is self-funding!
+                  In Year {projection.crossoverYear}, your annual dividend income ({formatPrice(projection.points[projection.crossoverYear].annualDividends)}) will exceed your annual contributions ({formatPrice(annualContributions)}). At this point, the snowball is self-funding.
                 </p>
               </div>
             </div>

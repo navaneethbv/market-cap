@@ -16,6 +16,19 @@ export interface CorrelationResult {
   overlapCounts: Record<string, Record<string, number>>;
 }
 
+const SYMBOL_PATTERN = /^[A-Z0-9.^-]{1,12}$/;
+
+export function normalizeCorrelationSymbols(value: string): string[] {
+  return [
+    ...new Set(
+      value
+        .split(",")
+        .map((symbol) => symbol.trim().toUpperCase())
+        .filter((symbol) => SYMBOL_PATTERN.test(symbol))
+    ),
+  ].slice(0, 10);
+}
+
 /**
  * Calculates daily percentage returns for a list of candles.
  * Returns map of date (YYYY-MM-DD) -> return rate.
