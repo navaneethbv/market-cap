@@ -17,11 +17,10 @@ export function SearchBox() {
   useEffect(() => {
     const q = query.trim();
     if (q.length < 1) {
-      setResults([]);
-      setOpen(false);
       return;
     }
-    setLoading(true);
+
+    let active = true;
     const controller = new AbortController();
     const timer = setTimeout(async () => {
       try {
@@ -35,14 +34,28 @@ export function SearchBox() {
       } catch {
         // aborted or failed; keep previous results
       } finally {
-        setLoading(false);
+        if (active) {
+          setLoading(false);
+        }
       }
     }, 300);
     return () => {
+      active = false;
       controller.abort();
       clearTimeout(timer);
     };
   }, [query]);
+
+  function updateQuery(value: string) {
+    setQuery(value);
+    if (value.trim().length < 1) {
+      setResults([]);
+      setOpen(false);
+      setLoading(false);
+    } else {
+      setLoading(true);
+    }
+  }
 
   useEffect(() => {
     function onClickOutside(e: MouseEvent) {
@@ -65,7 +78,7 @@ export function SearchBox() {
       <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
       <Input
         value={query}
-        onChange={(e) => setQuery(e.target.value)}
+        onChange={(e) => updateQuery(e.target.value)}
         onFocus={() => results.length > 0 && setOpen(true)}
         onKeyDown={(e) => {
           if (e.key === "Enter" && results[0]) go(results[0].symbol);
