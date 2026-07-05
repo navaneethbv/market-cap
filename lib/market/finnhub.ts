@@ -6,6 +6,7 @@ import type {
   Quote,
   SymbolSearchResult,
 } from "./types";
+import type { RawEarningsEvent } from "@/lib/calendar";
 
 const BASE = "https://finnhub.io/api/v1";
 
@@ -142,4 +143,15 @@ export async function getCompanyNews(symbol: string): Promise<NewsArticle[]> {
 export async function getMarketNews(): Promise<NewsArticle[]> {
   const raw = await finnhub<RawNews[]>("/news", { category: "general" }, 900);
   return (raw ?? []).slice(0, 20);
+}
+
+export async function getEarningsCalendar(
+  from: string,
+  to: string
+): Promise<RawEarningsEvent[]> {
+  const raw = await finnhub<{
+    earningsCalendar?: RawEarningsEvent[];
+  }>("/calendar/earnings", { from, to }, 3600);
+
+  return raw.earningsCalendar ?? [];
 }

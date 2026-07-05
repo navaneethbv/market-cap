@@ -4,6 +4,7 @@ import {
   ArrowRight,
   ArrowRightLeft,
   Briefcase,
+  CalendarDays,
   Newspaper,
   Star,
 } from "lucide-react";
@@ -88,6 +89,12 @@ export default async function HomePage() {
               <Link href="/compare">
                 <ArrowRightLeft className="h-4 w-4" />
                 Compare
+              </Link>
+            </Button>
+            <Button asChild variant="outline" className="rounded-full">
+              <Link href="/calendar">
+                <CalendarDays className="h-4 w-4" />
+                Calendar
               </Link>
             </Button>
             <Button asChild variant="outline" className="rounded-full">

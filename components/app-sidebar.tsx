@@ -7,6 +7,7 @@ import {
   ArrowRightLeft,
   Bell,
   Briefcase,
+  CalendarDays,
   LayoutGrid,
   Newspaper,
   Star,
@@ -22,6 +23,7 @@ const NAV_ITEMS = [
   { href: "/alerts", label: "Alerts", icon: Bell },
   { href: "/compare", label: "Compare", icon: ArrowRightLeft },
   { href: "/movers", label: "Movers", icon: Activity },
+  { href: "/calendar", label: "Calendar", icon: CalendarDays },
   { href: "/news", label: "News", icon: Newspaper },
 ];
 
