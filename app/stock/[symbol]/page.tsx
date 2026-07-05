@@ -1,9 +1,10 @@
 /* eslint-disable @next/next/no-img-element */
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ExternalLink, Star } from "lucide-react";
+import { Briefcase, ExternalLink, Star } from "lucide-react";
 import { toggleWatchlistItem } from "@/app/watchlist/actions";
 import { DCFCalculator } from "@/components/dcf-calculator";
+import { AddHoldingDialog } from "@/components/holding-dialogs";
 import { LivePriceDisplay } from "@/components/live-price-display";
 import { NewsTabs } from "@/components/news-tabs";
 import { StockChart } from "@/components/stock-chart";
@@ -182,6 +183,21 @@ export default async function StockPage({
                     {watchlistItem ? "Watching" : "Watch"}
                   </Button>
                 </form>
+                <AddHoldingDialog
+                  defaultSymbol={symbol}
+                  defaultAvgCost={Number(quote.price.toFixed(2))}
+                  next="/portfolio"
+                  trigger={
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="rounded-full"
+                    >
+                      <Briefcase className="h-4 w-4" />
+                      Add to portfolio
+                    </Button>
+                  }
+                />
               </div>
             ) : (
               <Button

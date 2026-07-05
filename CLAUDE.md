@@ -26,7 +26,9 @@ node --experimental-strip-types --no-warnings --test lib/format.test.mjs
 ```
 
 CI (`.github/workflows/ci.yml`) runs lint, test, and build on Node 24 for
-pushes and PRs to `main`. All three must pass before considering work done.
+pushes and PRs to `main`, plus a "Run smoke" step (boot `npm run start`,
+curl `/login`) that only runs when the data/Supabase repo secrets are
+configured. All must pass before considering work done.
 
 ## Architecture
 
@@ -67,7 +69,9 @@ Supabase          ──lib/supabase/{server,client}.ts──►  pages + server
 - Symbol validation is the shared regex `^[A-Z0-9.^-]{1,12}$` (app code and
   SQL checks); comparison helpers also strip SQL-ish RESERVED_WORDS.
 - Open-redirect guard everywhere a `next` path is honored: only accept
-  values starting with `/` and not `//`.
+  values starting with `/` and not `//` (watchlist toggle, auth confirm,
+  and `createHolding`, whose optional `next` lets the stock page's
+  Add to portfolio dialog land on `/portfolio` after saving).
 
 ## Database (Supabase)
 

@@ -40,6 +40,13 @@ export async function createHolding(formData: FormData) {
   }
 
   revalidatePath("/portfolio");
+
+  // Optional post-save destination (used by the stock page dialog);
+  // same-origin relative paths only to prevent open redirects
+  const next = String(formData.get("next") ?? "");
+  if (next.startsWith("/") && !next.startsWith("//")) {
+    redirect(next);
+  }
 }
 
 export async function updateHolding(formData: FormData) {
