@@ -15,6 +15,8 @@ import {
   Search,
   Star,
   TrendingUp,
+  Play,
+  Layers,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -24,9 +26,11 @@ const NAV_ITEMS = [
   { href: "/watchlist", label: "Watchlist", icon: Star },
   { href: "/portfolio", label: "Portfolio", icon: Briefcase },
   { href: "/trading", label: "Trading", icon: CandlestickChart },
+  { href: "/backtest", label: "Backtest", icon: Play },
   { href: "/screener", label: "Screener", icon: Search },
   { href: "/alerts", label: "Alerts", icon: Bell },
   { href: "/compare", label: "Compare", icon: ArrowRightLeft },
+  { href: "/compare/correlation", label: "Correlation", icon: Layers },
   { href: "/movers", label: "Movers", icon: Activity },
   { href: "/calendar", label: "Calendar", icon: CalendarDays },
   { href: "/news", label: "News", icon: Newspaper },

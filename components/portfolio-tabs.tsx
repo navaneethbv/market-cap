@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Briefcase, DollarSign, Trash2 } from "lucide-react";
+import { Briefcase, DollarSign, Trash2, TrendingUp } from "lucide-react";
 import { ChangeChip } from "@/components/change-chip";
 import { Button } from "@/components/ui/button";
 import {
@@ -71,6 +71,13 @@ export function PortfolioTabs({
             <DollarSign className="h-4 w-4" />
             Dividend Income
           </button>
+          <Link
+            href="/portfolio/snowball"
+            className="flex items-center gap-2 pb-3 text-sm font-semibold border-b-2 border-transparent text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <TrendingUp className="h-4 w-4" />
+            Snowball Planner
+          </Link>
         </div>
 
         {activeTab === "real" && <AddHoldingDialog />}
