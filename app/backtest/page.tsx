@@ -146,7 +146,7 @@ export default function BacktestPage() {
                     step="1"
                     value={smaShort}
                     onChange={(e) => setSmaShort(e.target.value)}
-                    className="w-full h-1 bg-muted rounded-lg appearance-none cursor-pointeraccent-primary"
+                    className="w-full h-1 bg-muted rounded-lg appearance-none cursor-pointer accent-primary"
                   />
                 </div>
 
@@ -162,7 +162,7 @@ export default function BacktestPage() {
                     step="1"
                     value={smaLong}
                     onChange={(e) => setSmaLong(e.target.value)}
-                    className="w-full h-1 bg-muted rounded-lg appearance-none cursor-pointeraccent-primary"
+                    className="w-full h-1 bg-muted rounded-lg appearance-none cursor-pointer accent-primary"
                   />
                 </div>
               </div>
@@ -180,7 +180,7 @@ export default function BacktestPage() {
                     step="1"
                     value={rsiPeriod}
                     onChange={(e) => setRsiPeriod(e.target.value)}
-                    className="w-full h-1 bg-muted rounded-lg appearance-none cursor-pointeraccent-primary"
+                    className="w-full h-1 bg-muted rounded-lg appearance-none cursor-pointer accent-primary"
                   />
                 </div>
 
@@ -196,7 +196,7 @@ export default function BacktestPage() {
                     step="1"
                     value={rsiOversold}
                     onChange={(e) => setRsiOversold(e.target.value)}
-                    className="w-full h-1 bg-muted rounded-lg appearance-none cursor-pointeraccent-primary"
+                    className="w-full h-1 bg-muted rounded-lg appearance-none cursor-pointer accent-primary"
                   />
                 </div>
 
@@ -212,7 +212,7 @@ export default function BacktestPage() {
                     step="1"
                     value={rsiOverbought}
                     onChange={(e) => setRsiOverbought(e.target.value)}
-                    className="w-full h-1 bg-muted rounded-lg appearance-none cursor-pointeraccent-primary"
+                    className="w-full h-1 bg-muted rounded-lg appearance-none cursor-pointer accent-primary"
                   />
                 </div>
               </div>
