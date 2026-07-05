@@ -19,7 +19,15 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import type { HoldingRow } from "@/lib/portfolio";
 
-function HoldingFields({ holding }: { holding?: HoldingRow }) {
+function HoldingFields({
+  holding,
+  defaultSymbol,
+  defaultAvgCost,
+}: {
+  holding?: HoldingRow;
+  defaultSymbol?: string;
+  defaultAvgCost?: number;
+}) {
   const today = new Date().toISOString().slice(0, 10);
   return (
     <>
@@ -33,7 +41,7 @@ function HoldingFields({ holding }: { holding?: HoldingRow }) {
           name="symbol"
           required
           maxLength={12}
-          defaultValue={holding?.symbol ?? ""}
+          defaultValue={holding?.symbol ?? defaultSymbol ?? ""}
           placeholder="AAPL"
         />
       </div>
@@ -63,7 +71,7 @@ function HoldingFields({ holding }: { holding?: HoldingRow }) {
             step="any"
             min="0.01"
             required
-            defaultValue={holding?.avgCost ?? ""}
+            defaultValue={holding?.avgCost ?? defaultAvgCost ?? ""}
           />
         </div>
       </div>
@@ -83,24 +91,44 @@ function HoldingFields({ holding }: { holding?: HoldingRow }) {
   );
 }
 
-export function AddHoldingDialog() {
+export function AddHoldingDialog({
+  defaultSymbol,
+  defaultAvgCost,
+  next,
+  trigger,
+}: {
+  defaultSymbol?: string;
+  defaultAvgCost?: number;
+  /** Same-origin path to land on after saving (e.g. /portfolio) */
+  next?: string;
+  /** Custom trigger button; defaults to the portfolio page's Add holding */
+  trigger?: React.ReactNode;
+} = {}) {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button className="rounded-full">
-          <Plus className="h-4 w-4" />
-          Add holding
-        </Button>
+        {trigger ?? (
+          <Button className="rounded-full">
+            <Plus className="h-4 w-4" />
+            Add holding
+          </Button>
+        )}
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Add holding</DialogTitle>
+          <DialogTitle>
+            {defaultSymbol ? `Add ${defaultSymbol} to portfolio` : "Add holding"}
+          </DialogTitle>
           <DialogDescription>
             Add a stock position to track value and performance.
           </DialogDescription>
         </DialogHeader>
         <form action={createHolding} className="grid gap-4">
-          <HoldingFields />
+          {next && <input type="hidden" name="next" value={next} />}
+          <HoldingFields
+            defaultSymbol={defaultSymbol}
+            defaultAvgCost={defaultAvgCost}
+          />
           <DialogFooter>
             <Button type="submit">Save holding</Button>
           </DialogFooter>

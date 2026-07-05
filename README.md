@@ -10,11 +10,14 @@ and a market calendar for US stocks.
 - **Stock detail** (`/stock/[symbol]`): live price (Finnhub websocket with
   polling fallback), range chart with SMA/EMA/Bollinger/RSI/MACD overlays,
   key stats, company news, a DCF calculator, and a beta-based volatility
-  simulator (`/stock/[symbol]/volatility`); Watch and Trade buttons
+  simulator (`/stock/[symbol]/volatility`); Watch, Trade, and Add to
+  portfolio buttons
 - **Watchlist** (`/watchlist`): saved symbols with live quotes and 7-day
   sparklines
 - **Portfolio** (`/portfolio`): holdings with cost basis, market value, and
-  P/L, a value-over-time chart, and a dividend-income tab; **Allocation**
+  P/L, a value-over-time chart, and a dividend-income tab; holdings can be
+  added from the portfolio page or from any stock page (symbol and current
+  price prefilled); **Allocation**
   (`/portfolio/allocation`) adds position weights and concentration;
   **Risk Diagnostics** (`/portfolio/risk`) shows weighted beta and HHI
 - **Paper trading** (`/trading`): $100k virtual account, market-order buys
@@ -107,4 +110,8 @@ signed-in user; everything else is public.
 ## CI
 
 GitHub Actions (`.github/workflows/ci.yml`) runs lint, tests, and build on
-pushes and pull requests to `main`.
+pushes and pull requests to `main`. A final "Run smoke" step boots the
+production server and checks it serves `/login`; it is skipped until the
+repo secrets `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`,
+`FINNHUB_API_KEY`, `NEXT_PUBLIC_FINNHUB_API_KEY`, and `TWELVEDATA_API_KEY`
+are configured (Settings -> Secrets and variables -> Actions).

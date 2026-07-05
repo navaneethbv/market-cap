@@ -245,6 +245,15 @@ Record every pushed commit here after each milestone.
 - `93a175e` Add market calendar
   - Added `/calendar`, market holiday helpers, earnings calendar rows, tests,
     Calendar navigation, and a dashboard Calendar shortcut.
+- `7c9223b` Add to portfolio from stock pages; CI run smoke step
+  (branch `feature/add-to-portfolio`)
+  - AddHoldingDialog accepts prefilled symbol/avg cost, a custom trigger,
+    and an optional guarded `next`; stock pages gained an Add to portfolio
+    button that prefills symbol and live price and lands on `/portfolio`.
+  - CI gained a secrets-gated Run smoke step (`npm run start` then curl
+    `/login`); add the data/Supabase repo secrets to enable it.
+  - Browser-verified with MSFT (5 shares at the prefilled price); the test
+    row was deleted afterwards. README and CLAUDE.md updated.
 
 ## Session 2026-07-05 (later): port PR merged, billing IN PROGRESS
 

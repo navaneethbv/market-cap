@@ -20,9 +20,16 @@ env:
 
 jobs:
   checks:
-    name: Lint, test, and build
+    name: Lint, test, build, and run
     runs-on: ubuntu-latest
     timeout-minutes: 15
+
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+      FINNHUB_API_KEY: ${{ secrets.FINNHUB_API_KEY }}
+      NEXT_PUBLIC_FINNHUB_API_KEY: ${{ secrets.NEXT_PUBLIC_FINNHUB_API_KEY }}
+      TWELVEDATA_API_KEY: ${{ secrets.TWELVEDATA_API_KEY }}
 
     steps:
       - name: Checkout
@@ -45,3 +52,18 @@ jobs:
 
       - name: Build
         run: npm run build
+
+      # Boots the production server and checks it serves a page. Skipped
+      # until the repo secrets above are configured, because pages talk to
+      # Supabase at request time.
+      - name: Run smoke
+        if: env.NEXT_PUBLIC_SUPABASE_URL != ''
+        run: |
+          npm run start &
+          SERVER_PID=$!
+          for i in $(seq 1 30); do
+            curl -sf -o /dev/null http://localhost:3000/login && break
+            sleep 1
+          done
+          curl -sf -o /dev/null -w "GET /login -> %{http_code}\n" http://localhost:3000/login
+          kill $SERVER_PID
