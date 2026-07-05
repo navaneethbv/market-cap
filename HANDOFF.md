@@ -75,9 +75,14 @@ Reference images in `img/` (committed). Blend of two dribbble shots:
   five symbols from the `symbols` query string, ranks quotes by daily percent
   move, shows best and weakest movers, and adds Compare navigation and a
   dashboard call-to-action. No new database tables were added.
+- Market Movers feature DONE on main: `/movers` public page shows curated
+  market baskets, top gainers and losers, summary cards, and a full detail
+  table. Added Movers navigation and a dashboard shortcut. No new database
+  tables were added.
 - TDD pass added: local tests now cover format helpers, stock display, watchlist
   helpers, migration expectations, portfolio math, live price reducers,
-  dashboard summaries, price alert trigger logic, and stock comparison helpers.
+  dashboard summaries, price alert trigger logic, stock comparison helpers, and
+  market mover helpers.
 - Fixed an existing next-themes hydration warning by suppressing expected
   theme-toggle button attribute mismatches. Playwright recheck showed no console
   errors afterward.
@@ -114,6 +119,18 @@ Record every pushed commit here after each milestone.
     Compare navigation, and a dashboard Compare call-to-action.
   - Verified `/compare?symbols=AAPL,MSFT,NVDA` returned 200 and rendered the
     requested symbols.
+- `badaf5f` Update handoff after stock compare
+  - Recorded the stock compare feature, test coverage, route smoke, and pushed
+    commit ledger entries through `3dc092d`.
+- `80085ad` Document market movers feature plan
+  - Added Market Movers design and implementation plan under
+    `docs/superpowers`.
+- `d5ada4f` Add market movers page
+  - Added `/movers`, curated market baskets, top gainers and losers,
+    market-mover summary helpers, tests, Movers navigation, and a dashboard
+    Movers shortcut.
+  - Verified `/movers?basket=ai` returned 200 and rendered Market movers, NVDA,
+    AMD, and AVGO.
 
 ## State: NEXT UP
 
@@ -144,7 +161,7 @@ Recommended next steps:
 - Playwright MCP screenshots land in repo root or .playwright-mcp/; delete
   before committing.
 - shadcn CLI is v4-style: `npx shadcn@latest add <component> -y -s`.
-- Verification last run after alerts: `npm test`, `npm run lint`, and
+- Verification last run after market movers: `npm test`, `npm run lint`, and
   `npm run build` passed.
 - Signed-in route smoke last run: inserted temporary MSFT watchlist and holding
   rows under the test account, verified `/watchlist`, `/portfolio`, and `/`
@@ -155,6 +172,8 @@ Recommended next steps:
 - Compare route smoke last run: requested
   `/compare?symbols=AAPL,MSFT,NVDA`, verified HTTP 200 and rendered AAPL, MSFT,
   and NVDA.
+- Movers route smoke last run: requested `/movers?basket=ai`, verified HTTP 200
+  and rendered Market movers, NVDA, AMD, and AVGO.
 - Vercel CLI is installed (`54.20.1`) and logged in as `hotshot4ever-2393`.
   The project is not linked yet (`.vercel/` absent). Do not upload `.env.local`
   secrets to Vercel without explicit confirmation.
