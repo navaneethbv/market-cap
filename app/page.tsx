@@ -1,5 +1,11 @@
 import Link from "next/link";
-import { ArrowRight, Briefcase, Newspaper, Star } from "lucide-react";
+import {
+  ArrowRight,
+  ArrowRightLeft,
+  Briefcase,
+  Newspaper,
+  Star,
+} from "lucide-react";
 import { ChangeChip } from "@/components/change-chip";
 import { NewsList } from "@/components/news-list";
 import { Button } from "@/components/ui/button";
@@ -71,6 +77,12 @@ export default async function HomePage() {
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
+            <Button asChild variant="outline" className="rounded-full">
+              <Link href="/compare">
+                <ArrowRightLeft className="h-4 w-4" />
+                Compare
+              </Link>
+            </Button>
             <Button asChild variant="outline" className="rounded-full">
               <Link href="/watchlist">
                 <Star className="h-4 w-4" />

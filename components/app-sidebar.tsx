@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import {
   Bell,
   Briefcase,
+  ArrowRightLeft,
   LayoutGrid,
   Newspaper,
   Star,
@@ -18,6 +19,7 @@ const NAV_ITEMS = [
   { href: "/watchlist", label: "Watchlist", icon: Star },
   { href: "/portfolio", label: "Portfolio", icon: Briefcase },
   { href: "/alerts", label: "Alerts", icon: Bell },
+  { href: "/compare", label: "Compare", icon: ArrowRightLeft },
   { href: "/news", label: "News", icon: Newspaper },
 ];
 
