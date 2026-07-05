@@ -9,6 +9,7 @@ import {
   Briefcase,
   CalendarDays,
   CandlestickChart,
+  Crown,
   LayoutGrid,
   Newspaper,
   Search,
@@ -29,6 +30,7 @@ const NAV_ITEMS = [
   { href: "/movers", label: "Movers", icon: Activity },
   { href: "/calendar", label: "Calendar", icon: CalendarDays },
   { href: "/news", label: "News", icon: Newspaper },
+  { href: "/pricing", label: "Pricing", icon: Crown },
 ];
 
 export function AppSidebar() {
