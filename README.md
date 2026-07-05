@@ -106,3 +106,11 @@ MarketCap features comprehensive test coverage across all core mathematical calc
   ```bash
   npm run build
   ```
+
+---
+
+## 🔄 Development Workflow
+
+> [!IMPORTANT]
+> All subsequent code modifications and contributions must be submitted via **pull requests**. Direct pushes or merges to the `main` branch are strictly prohibited.
+
