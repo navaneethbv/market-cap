@@ -61,12 +61,10 @@ export function calculatePortfolioHistory(
     let totalValue = 0;
     let totalCost = 0;
 
-    const timeDate = new Date(time);
+    const candleDateStr = time.slice(0, 10);
 
     for (const holding of holdings) {
-      const purchaseDate = new Date(holding.purchased_at);
-
-      if (purchaseDate <= timeDate) {
+      if (holding.purchased_at <= candleDateStr) {
         const price = getPriceOnOrBefore(holding.symbol, time);
         totalValue += holding.shares * price;
         totalCost += holding.shares * holding.avg_cost;

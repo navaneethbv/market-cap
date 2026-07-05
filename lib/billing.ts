@@ -1,12 +1,11 @@
 import "server-only";
 import type Stripe from "stripe";
-import { createClient } from "@/lib/supabase/server";
 import {
   deriveBillingState,
   FREE_BILLING_STATE,
   type BillingState,
-} from "@/lib/billing-state";
-import { getOrCreateProPriceId, getStripe } from "@/lib/stripe";
+} from "./billing-state.ts";
+import { getOrCreateProPriceId, getStripe } from "./stripe.ts";
 
 const CACHE_TTL_MS = 60_000;
 // Short TTL after a Stripe failure so an outage neither hammers the API nor
@@ -24,7 +23,8 @@ export function invalidateBillingCache(userId: string) {
  * database only stores the user -> customer id mapping. On any Stripe
  * failure the user is treated as free (deny by default), never Pro.
  */
-export async function getBillingState(userId: string): Promise<BillingState> {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export async function getBillingState(userId: string, supabaseClient?: any): Promise<BillingState> {
   const hit = cache.get(userId);
   if (hit && hit.expires > Date.now()) {
     return hit.state;
@@ -33,7 +33,7 @@ export async function getBillingState(userId: string): Promise<BillingState> {
   let state = FREE_BILLING_STATE;
   let ttl = CACHE_TTL_MS;
   try {
-    state = await fetchBillingState(userId);
+    state = await fetchBillingState(userId, supabaseClient);
   } catch (err) {
     console.error("billing state lookup failed:", err);
     ttl = ERROR_TTL_MS;
@@ -43,8 +43,9 @@ export async function getBillingState(userId: string): Promise<BillingState> {
   return state;
 }
 
-async function fetchBillingState(userId: string): Promise<BillingState> {
-  const supabase = await createClient();
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function fetchBillingState(userId: string, supabaseClient?: any): Promise<BillingState> {
+  const supabase = supabaseClient ?? (await (await import("./supabase/server.ts")).createClient());
   const { data, error } = await supabase
     .from("stripe_customers")
     .select("stripe_customer_id")
