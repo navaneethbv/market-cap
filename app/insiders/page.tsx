@@ -71,6 +71,14 @@ export default function InsidersPage() {
         return { label: "Grant / Award", isBuy: true };
       case "M":
         return { label: "Option Exercise", isBuy: true };
+      case "F":
+        return { label: "Tax Withholding", isBuy: null };
+      case "X":
+        return { label: "Option Exercise", isBuy: true };
+      case "C":
+        return { label: "Conversion", isBuy: null };
+      case "D":
+        return { label: "Disposition to Issuer", isBuy: false };
       default:
         return { label: `Code ${code}`, isBuy: null };
     }
@@ -194,7 +202,7 @@ export default function InsidersPage() {
                       <td className="py-4.5 px-4.5 font-medium">
                         <div>{trade.name}</div>
                         <span className="text-[9.5px] text-muted-foreground font-normal">
-                          {trade.isDirectShare ? "Direct Ownership" : "Indirect Ownership"}
+                          {trade.isDerivative ? "Derivative Security" : "Common Stock"}
                         </span>
                       </td>
                       <td className="py-4.5 px-4.5">

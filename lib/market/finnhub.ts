@@ -171,7 +171,7 @@ export async function getInsiderTransactions(
       transactionDate: string;
       filingDate: string;
       transactionCode: string;
-      isDirectShare: boolean;
+      isDerivative: boolean;
     }[];
   }>("/stock/insider-transactions", { symbol }, 3600);
 
@@ -184,6 +184,6 @@ export async function getInsiderTransactions(
     date: t.transactionDate,
     filingDate: t.filingDate,
     transactionCode: t.transactionCode,
-    isDirectShare: !!t.isDirectShare,
+    isDerivative: !!t.isDerivative,
   }));
 }

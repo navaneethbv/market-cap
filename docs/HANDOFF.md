@@ -403,6 +403,31 @@ it was parked; this is a currency refactor wearing a feature's clothes):
    from US sessions, touching alerts, movers, and live-price status.
 7. The SEC insider tracker has no free Indian equivalent. It stays US-only.
 
+## FIXED 2026-07-12: paper trading was broken in the remote DB
+
+Found during a full Playwright UI sweep. Buying on /trading returned a 500:
+`Could not find the function public.place_paper_trade`. Cause was migration
+drift: the repo had 10 migrations, the remote Supabase had only 9. The
+migration `20260705160717_harden_paper_trading_writes` had never been applied.
+
+Two consequences, both now resolved by applying it via Supabase MCP:
+
+1. The `place_paper_trade`, `reset_paper_account`, and
+   `upsert_paper_equity_snapshot` functions did not exist, so every trade
+   failed. Paper trading was completely non-functional.
+2. Because the migration's `revoke insert, update, delete ... from
+   authenticated` had never run, authenticated users still had direct write
+   access to `paper_accounts`, `paper_trades`, and `paper_equity_snapshots`.
+   That let a user insert trades straight into the ledger, bypassing the cash
+   balance and share count checks that live inside the RPC. RLS still scoped
+   rows by user_id, so it was not a cross-user hole.
+
+Verified after applying: bought 10 MSFT at $385.10, cash moved from
+$100,000.00 to $96,149.00, and the position plus trade ledger both populated.
+
+LESSON: `npm test` does not check that remote migrations are applied. Before
+deploying, diff `supabase/migrations/` against `mcp list_migrations`.
+
 ## State: NEXT UP (older items still open)
 
 1. Deploy via Vercel once the project is linked and env vars are synced.

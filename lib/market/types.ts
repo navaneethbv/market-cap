@@ -68,5 +68,5 @@ export interface InsiderTransaction {
   date: string;
   filingDate: string;
   transactionCode: string;
-  isDirectShare: boolean;
+  isDerivative: boolean;
 }
