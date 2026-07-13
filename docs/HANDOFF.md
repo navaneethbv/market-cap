@@ -352,6 +352,57 @@ Pending todo list (was mid-implementation, nothing written yet beyond
    lifts and watchlist add works. `npm test`, lint, build.
 9. Commit, push `feature/stripe-billing`, open PR.
 
+## PARKED: Indian market support (NSE + BSE), researched 2026-07-12
+
+User asked whether NSE and BSE support is feasible on free API tiers.
+Researched and tested. Decision: PARKED, ship the existing US app first.
+If revived, user wants BOTH exchanges in scope. Findings so the next
+session does not redo this work:
+
+Provider options (all verified 2026-07-12):
+
+- Finnhub: covers NSE/BSE, but international quotes are Premium only.
+  Free tier is US equities. Cannot use our current key.
+- Twelve Data: covers NSE (`XNSE`) and BSE (`XBOM`), and we already have a
+  working client. Requires the Grow+ tier (about $29/month); India is not
+  on the free plan. BSE is END-OF-DAY ONLY, no real-time quotes. NSE can be
+  live. This is the recommended path if we ever pay for data.
+- Yahoo Finance (`yahoo-finance2`): REJECTED. Tested directly and it returns
+  HTTP 429 on the first request, even after the cookie plus crumb handshake.
+  Yahoo blocks shared and datacenter IPs, which is exactly what Vercel
+  serverless runs on. It would appear to work locally and fail in
+  production. Do not use.
+- Alpha Vantage: official and supports `RELIANCE.BSE`, but the free tier is
+  25 requests PER DAY. Unusable for a live app.
+- Broker APIs (Upstox, Angel One SmartAPI, ICICI Breeze): free and truly
+  real-time, but each user must link their own broker account with a daily
+  OAuth login. Only viable if the product pivots to "connect your broker".
+- NSE's own JSON endpoints: need a cookie handshake and block datacenter
+  IPs. Will fail on Vercel.
+- indianapi.in: India-specific, has a free tier, unverified. Would need a
+  signup and a reliability test before trusting it.
+
+Blocking refactors this needs regardless of provider (the real cost, and why
+it was parked; this is a currency refactor wearing a feature's clothes):
+
+1. Symbol regex `^[A-Z0-9.^-]{1,12}$` caps at 12 chars. Common NSE tickers
+   exceed it in suffix form (`BAJFINANCE.NS` and `HINDUNILVR.NS` are 13).
+   Tickers containing `&` (M&M) fail the character class entirely.
+2. Symbol alone stops being a unique key. `INFY` trades on NASDAQ, NSE, and
+   BSE at three different prices in two currencies. `watchlist_items`,
+   `holdings`, and `paper_trades` all key on symbol and would need
+   `(symbol, exchange)` identity, so a migration on every user-data table.
+3. `lib/format.ts` hardcodes `currency: "USD"`. Every price in the app
+   formats as dollars.
+4. Portfolio, paper trading, backtest, and Monte Carlo math would silently
+   mix USD and INR into one P/L number. Needs a currency per holding plus
+   either base-currency conversion or portfolios segregated by market.
+5. The Finnhub websocket cannot carry NSE ticks, so Indian symbols are
+   polling only in `useLivePrice`.
+6. Market hours (9:15 to 15:30 IST) and the NSE/BSE holiday calendar differ
+   from US sessions, touching alerts, movers, and live-price status.
+7. The SEC insider tracker has no free Indian equivalent. It stays US-only.
+
 ## State: NEXT UP (older items still open)
 
 1. Deploy via Vercel once the project is linked and env vars are synced.
