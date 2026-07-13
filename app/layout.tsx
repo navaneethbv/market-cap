@@ -5,6 +5,8 @@ import { AppSidebar, MobileNav } from "@/components/app-sidebar";
 import { Topbar } from "@/components/topbar";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
+import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 const jakarta = Plus_Jakarta_Sans({
   variable: "--font-sans",
@@ -38,6 +40,8 @@ export default function RootLayout({
           <MobileNav />
           <Toaster />
         </ThemeProvider>
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );
