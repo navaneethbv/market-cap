@@ -1,6 +1,6 @@
 function cleanOrigin(value: string): string | null {
   try {
-    const url = new URL(value.startsWith("http") ? value : `https://${value}`);
+    const url = new URL(value.includes("://") ? value : `https://${value}`);
     if (url.protocol !== "http:" && url.protocol !== "https:") return null;
     return url.origin;
   } catch {

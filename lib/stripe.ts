@@ -51,3 +51,9 @@ export async function getOrCreateProPriceId(): Promise<string> {
   cachedProPriceId = price.id;
   return cachedProPriceId;
 }
+
+export function _resetStripeCache() {
+  stripeClient = null;
+  cachedProPriceId = null;
+}
+
