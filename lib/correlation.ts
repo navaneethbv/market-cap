@@ -117,10 +117,6 @@ export function calculatePearsonCorrelation(
   const num = n * sumXY - sumX * sumY;
   const den = Math.sqrt(varX * varY);
 
-  if (den === 0) {
-    return null;
-  }
-
   return num / den;
 }
 
