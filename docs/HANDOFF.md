@@ -254,6 +254,11 @@ Record every pushed commit here after each milestone.
     `/login`); add the data/Supabase repo secrets to enable it.
   - Browser-verified with MSFT (5 shares at the prefilled price); the test
     row was deleted afterwards. README and CLAUDE.md updated.
+- `0d386f4` Add test coverage for all helpers to reach >97% branch coverage (branch `feature/improve-coverage`, PR #12)
+  - Added unit test coverage for Finnhub API fallbacks, market allocation, app origin, backtester boundary options, billing state period ends, dynamic imports, compare tool edge cases, short correlation matrices, trade status, movers edge cases, news classification fallbacks, HHI, PE null sorting, and Stripe sandboxed price lookup.
+  - Exported reset helper in `lib/stripe.ts` and removed unreachable check in `lib/correlation.ts`.
+  - Reached 97.17% branch coverage and 99.65% statement coverage.
+
 
 ## Session 2026-07-05 (later): port PR merged, billing IN PROGRESS
 
