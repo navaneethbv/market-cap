@@ -270,6 +270,11 @@ Record every pushed commit here after each milestone.
   - Created `TradeLogTable` component (`components/trade-log-table.tsx`) to eliminate 31 lines of duplicated trade table UI between `app/trading/page.tsx` and `app/trading/history/page.tsx`.
   - Created `QuotePriceChangeCells` and `StockQuoteRowCells` components (`components/stock-quote-row-cells.tsx`) to eliminate duplicated quote table cells across `app/compare/page.tsx`, `app/movers/page.tsx`, and `app/watchlist/page.tsx`.
   - Created `usePortfolioSync` hook and `SyncPortfolioButton` component (`components/sync-portfolio-control.tsx`) to eliminate 59 lines of duplicated portfolio sync state and UI between `app/portfolio/risk/simulations/page.tsx` and `app/portfolio/snowball/page.tsx`.
+- `3bf8493` Resolve 12 SonarQube code quality issues (branch `feature/code-coverage-95`, PR #26)
+  - Refactored `evaluateSignal` in `lib/backtester.ts` to accept a single `SignalEvalOptions` object, reducing parameter count from 8 to 1.
+  - Extracted `renderButtonContent` helper in `components/sync-portfolio-control.tsx` to unnest nested ternary operators.
+  - Marked tooltip component props as `Readonly<Props>` in `app/compare/matrix/page.tsx`, `components/dcf-calculator.tsx`, `components/equity-chart.tsx`, `components/portfolio-history-chart.tsx`, `components/sentiment-panel.tsx`, and `components/stock-chart.tsx`.
+  - Added safe typeof string check for payload name property in `components/dcf-calculator.tsx`.
 
 
 
