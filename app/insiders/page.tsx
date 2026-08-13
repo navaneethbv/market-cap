@@ -16,47 +16,65 @@ import NextLink from "next/link";
 
 export default function InsidersPage() {
   const [symbolQuery, setSymbolQuery] = useState("");
+  const [activeSymbol, setActiveSymbol] = useState("");
   const [watchlistOnly, setWatchlistOnly] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [transactions, setTransactions] = useState<InsiderTransaction[]>([]);
 
-  const fetchTransactions = async (isWatchlist: boolean, query: string) => {
-    setLoading(true);
-    setError(null);
+  useEffect(() => {
+    let active = true;
+    const controller = new AbortController();
 
     const qs = new URLSearchParams();
-    if (isWatchlist) {
+    if (watchlistOnly) {
       qs.set("watchlist", "true");
-    } else if (query.trim()) {
-      qs.set("symbol", query.trim().toUpperCase());
+    } else if (activeSymbol.trim()) {
+      qs.set("symbol", activeSymbol.trim().toUpperCase());
     }
 
-    try {
-      const res = await fetch(`/api/insiders?${qs}`);
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data.error ?? "Failed to load insider transactions");
+    async function load() {
+      setLoading(true);
+      setError(null);
+      try {
+        const res = await fetch(`/api/insiders?${qs}`, {
+          signal: controller.signal,
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          throw new Error(data.error ?? "Failed to load insider transactions");
+        }
+        if (active) {
+          setTransactions(data.transactions ?? []);
+        }
+      } catch (err) {
+        if (!controller.signal.aborted && active) {
+          console.error(err);
+          setError(
+            err instanceof Error
+              ? err.message
+              : "Error loading insider activity feed"
+          );
+        }
+      } finally {
+        if (active) {
+          setLoading(false);
+        }
       }
-      setTransactions(data.transactions ?? []);
-    } catch (err) {
-      console.error(err);
-      setError(err instanceof Error ? err.message : "Error loading insider activity feed");
-    } finally {
-      setLoading(false);
     }
-  };
 
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    fetchTransactions(watchlistOnly, symbolQuery);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [watchlistOnly]);
+    void load();
+
+    return () => {
+      active = false;
+      controller.abort();
+    };
+  }, [watchlistOnly, activeSymbol]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
+    setActiveSymbol(symbolQuery.trim().toUpperCase());
     setWatchlistOnly(false);
-    fetchTransactions(false, symbolQuery);
   };
 
   const getTransactionLabel = (code: string) => {
@@ -117,9 +135,11 @@ export default function InsidersPage() {
 
           <div className="flex items-center gap-3">
             <button
+              type="button"
               onClick={() => {
                 setSymbolQuery("");
-                setWatchlistOnly(!watchlistOnly);
+                setActiveSymbol("");
+                setWatchlistOnly((v) => !v);
               }}
               disabled={loading}
               className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold border transition-all ${
@@ -133,10 +153,11 @@ export default function InsidersPage() {
             </button>
 
             <button
+              type="button"
               onClick={() => {
                 setSymbolQuery("");
+                setActiveSymbol("");
                 setWatchlistOnly(false);
-                fetchTransactions(false, "");
               }}
               disabled={loading}
               className="text-xs text-muted-foreground hover:text-foreground font-semibold px-2 py-1 transition-all"
