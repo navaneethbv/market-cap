@@ -1,8 +1,8 @@
 import type { Quote } from "@/lib/market/types";
+import { isValidSymbol, normalizeSymbol } from "./symbol.ts";
 
 const DEFAULT_SYMBOLS = ["AAPL", "MSFT", "NVDA"];
 const MAX_SYMBOLS = 5;
-const SYMBOL_PATTERN = /^[A-Z0-9.^-]{1,12}$/;
 const RESERVED_WORDS = new Set(["DELETE", "DROP", "FROM", "INSERT", "SELECT", "TABLE", "UPDATE"]);
 
 export type ComparisonRow = {
@@ -20,8 +20,8 @@ export function normalizeComparisonSymbols(input: string | null | undefined) {
   const raw = input?.trim() ? input : DEFAULT_SYMBOLS.join(",");
   const symbols = raw
     .split(/[\s,]+/)
-    .map((symbol) => symbol.trim().toUpperCase())
-    .filter((symbol) => SYMBOL_PATTERN.test(symbol) && !RESERVED_WORDS.has(symbol));
+    .map(normalizeSymbol)
+    .filter((symbol) => isValidSymbol(symbol) && !RESERVED_WORDS.has(symbol));
 
   return [...new Set(symbols)].slice(0, MAX_SYMBOLS);
 }

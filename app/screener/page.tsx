@@ -17,22 +17,38 @@ import { cn } from "@/lib/utils";
 export default function ScreenerPage() {
   const [allStocks, setAllStocks] = useState<ScreenerStock[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [sector, setSector] = useState("All");
   const [marketCap, setMarketCap] = useState("All");
   const [valuation, setValuation] = useState("All");
   const [sortBy, setSortBy] = useState("marketCap");
 
+  const loadStocks = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/screener");
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error ?? "Failed to load screener data");
+      }
+      if (data.stocks) {
+        setAllStocks(data.stocks);
+      }
+    } catch (err) {
+      console.error("Failed to load screener data:", err);
+      setError(
+        err instanceof Error ? err.message : "Failed to load screener data"
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    fetch("/api/screener")
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.stocks) {
-          setAllStocks(data.stocks);
-        }
-      })
-      .catch((err) => console.error("Failed to load screener data:", err))
-      .finally(() => setLoading(false));
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    loadStocks();
   }, []);
 
   // Apply filters
@@ -169,6 +185,20 @@ export default function ScreenerPage() {
       {loading ? (
         <div className="flex items-center justify-center py-20">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+      ) : error ? (
+        <div className="rounded-2xl border border-red-500/20 bg-red-500/5 p-12 text-center shadow-sm">
+          <p className="text-sm text-red-600 dark:text-red-400 font-semibold">
+            {error}
+          </p>
+          <Button
+            variant="outline"
+            size="sm"
+            className="mt-4 rounded-xl"
+            onClick={loadStocks}
+          >
+            Retry
+          </Button>
         </div>
       ) : sorted.length === 0 ? (
         <div className="rounded-2xl border bg-card p-12 text-center shadow-sm">

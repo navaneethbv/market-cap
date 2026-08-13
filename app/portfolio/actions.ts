@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { normalizeHoldingInput } from "@/lib/portfolio";
+import { isUuid } from "@/lib/parse";
 
 async function requireUser() {
   const supabase = await createClient();
@@ -49,11 +50,16 @@ export async function createHolding(formData: FormData) {
   }
 }
 
-export async function updateHolding(formData: FormData) {
+function getHoldingId(formData: FormData) {
   const id = String(formData.get("id") ?? "");
-  if (!/^[0-9a-f-]{36}$/i.test(id)) {
+  if (!isUuid(id)) {
     throw new Error("Invalid holding id");
   }
+  return id;
+}
+
+export async function updateHolding(formData: FormData) {
+  const id = getHoldingId(formData);
 
   const { supabase, user } = await requireUser();
   const input = normalizeHoldingInput({
@@ -83,10 +89,7 @@ export async function updateHolding(formData: FormData) {
 }
 
 export async function deleteHolding(formData: FormData) {
-  const id = String(formData.get("id") ?? "");
-  if (!/^[0-9a-f-]{36}$/i.test(id)) {
-    throw new Error("Invalid holding id");
-  }
+  const id = getHoldingId(formData);
 
   const { supabase, user } = await requireUser();
   const { error } = await supabase

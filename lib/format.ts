@@ -1,4 +1,5 @@
 export function formatPrice(value: number): string {
+  if (!Number.isFinite(value)) return "-";
   return value.toLocaleString("en-US", {
     style: "currency",
     currency: "USD",
@@ -23,6 +24,7 @@ export function formatCompact(value: number): string {
 }
 
 export function formatNumber(value: number, digits = 2): string {
+  if (!Number.isFinite(value)) return "-";
   return value.toLocaleString("en-US", {
     minimumFractionDigits: digits,
     maximumFractionDigits: digits,

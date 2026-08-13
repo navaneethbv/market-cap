@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { normalizeAlertInput } from "@/lib/alerts";
+import { isUuid } from "@/lib/parse";
 import { createClient } from "@/lib/supabase/server";
 
 async function requireUser() {
@@ -20,7 +21,7 @@ async function requireUser() {
 
 function getAlertId(formData: FormData) {
   const id = String(formData.get("id") ?? "");
-  if (!/^[0-9a-f-]{36}$/i.test(id)) {
+  if (!isUuid(id)) {
     throw new Error("Invalid alert id");
   }
   return id;

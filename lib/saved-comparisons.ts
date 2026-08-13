@@ -1,6 +1,8 @@
+import { isValidSymbol } from "./symbol.ts";
+import { isUuid } from "./parse.ts";
+
 const MAX_SYMBOLS = 5;
 export const MAX_COMPARISON_NAME_LENGTH = 60;
-const SYMBOL_PATTERN = /^[A-Z0-9.^-]{1,12}$/;
 const RESERVED_WORDS = new Set([
   "DELETE",
   "DROP",
@@ -43,7 +45,7 @@ export function normalizeSavedComparisonInput(
         .split(/[\s,]+/)
         .map((symbol) => symbol.trim().toUpperCase())
         .filter(
-          (symbol) => SYMBOL_PATTERN.test(symbol) && !RESERVED_WORDS.has(symbol)
+          (symbol) => isValidSymbol(symbol) && !RESERVED_WORDS.has(symbol)
         )
     ),
   ].slice(0, MAX_SYMBOLS);
@@ -54,8 +56,4 @@ export function normalizeSavedComparisonInput(
   return { name, symbols };
 }
 
-export function isUuid(value: string): boolean {
-  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
-    value
-  );
-}
+export { isUuid };

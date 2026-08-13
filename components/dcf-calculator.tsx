@@ -42,6 +42,7 @@ function computeDCF(eps: number, growth: number, discount: number, terminal: num
 
 export function DCFCalculator({ currentPrice, initialEps }: DCFCalculatorProps) {
   const eps = initialEps !== null && initialEps > 0 ? initialEps : 5.0;
+  const usingFallbackEps = eps === 5.0 && initialEps !== 5.0;
 
   // Sliders state
   const [growthRate, setGrowthRate] = useState(10);
@@ -151,6 +152,11 @@ export function DCFCalculator({ currentPrice, initialEps }: DCFCalculatorProps) 
 
         {/* Right Side: Results */}
         <div className="flex flex-col justify-between rounded-xl border bg-muted/10 p-4 space-y-4">
+          {usingFallbackEps && (
+            <p className="text-[10px] leading-snug font-semibold text-muted-foreground bg-background border rounded-lg px-2.5 py-1.5">
+              Using a default EPS of $5.00 because trailing EPS is unavailable for this stock.
+            </p>
+          )}
           <div className="text-center py-2 space-y-1">
             <h4 className="text-xs font-bold text-muted-foreground uppercase">Estimated Fair Value</h4>
             <div className="text-3xl font-extrabold tabular-nums text-foreground">
