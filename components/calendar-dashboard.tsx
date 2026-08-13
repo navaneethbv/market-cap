@@ -19,7 +19,7 @@ export function CalendarDashboard({
   earnings,
   upcomingHolidays,
   watchlistSymbols,
-}: CalendarDashboardProps) {
+}: Readonly<CalendarDashboardProps>) {
   const [searchQuery, setSearchQuery] = useState("");
   const [filterWatchlist, setFilterWatchlist] = useState(false);
 

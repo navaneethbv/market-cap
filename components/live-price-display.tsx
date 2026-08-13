@@ -9,10 +9,10 @@ import { useLivePrice } from "@/hooks/useLivePrice";
 export function LivePriceDisplay({
   symbol,
   initialQuote,
-}: {
+}: Readonly<{
   symbol: string;
   initialQuote: Quote;
-}) {
+}>) {
   const { quote, status } = useLivePrice({ symbol, initialQuote });
 
   return (

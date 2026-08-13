@@ -15,6 +15,11 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { isUuid } from "@/lib/parse";
 
+function getFormString(formData: FormData, name: string): string {
+  const value = formData.get(name);
+  return typeof value === "string" ? value : "";
+}
+
 async function requireUser() {
   const supabase = await createClient();
   const {
@@ -67,13 +72,11 @@ async function recordPaperEquitySnapshot(userId: string) {
 export async function placePaperTrade(formData: FormData) {
   const user = await requireUser();
   const input = normalizePaperTradeInput({
-    symbol: String(formData.get("symbol") ?? ""),
-    side: String(formData.get("side") ?? ""),
-    shares: String(formData.get("shares") ?? ""),
+    symbol: getFormString(formData, "symbol"),
+    side: getFormString(formData, "side"),
+    shares: getFormString(formData, "shares"),
   });
-  const rawIdempotencyKey = formData.get("idempotencyKey");
-  const idempotencyKey =
-    typeof rawIdempotencyKey === "string" ? rawIdempotencyKey : "";
+  const idempotencyKey = getFormString(formData, "idempotencyKey");
   if (!isUuid(idempotencyKey)) {
     throw new Error("Idempotency key is required");
   }

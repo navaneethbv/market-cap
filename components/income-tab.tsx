@@ -4,7 +4,7 @@ import { formatPrice } from "@/lib/format";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { calculateIncomeSummary, type IncomeMetric } from "@/lib/income";
 
-export function IncomeTab({ metrics }: { metrics: IncomeMetric[] }) {
+export function IncomeTab({ metrics }: Readonly<{ metrics: IncomeMetric[] }>) {
   const { annualIncome, portfolioYield, yieldOnCost } = calculateIncomeSummary(metrics);
 
   return (

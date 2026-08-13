@@ -40,7 +40,28 @@ function computeDCF(eps: number, growth: number, discount: number, terminal: num
   return pvSum + pvTerminalValue;
 }
 
-export function DCFCalculator({ currentPrice, initialEps }: DCFCalculatorProps) {
+interface TooltipPayloadItem {
+  value?: number | string;
+  name?: string;
+  dataKey?: string | number;
+  payload?: Record<string, unknown>;
+}
+
+function DcfTooltip({ active, payload }: { active?: boolean; payload?: TooltipPayloadItem[] }) {
+  if (!active || !payload?.length) return null;
+  const val = Number(payload[0].value);
+  const name = String(payload[0].payload?.name ?? "");
+  return (
+    <div className="rounded-xl border bg-popover px-3 py-2 text-xs shadow-lg space-y-0.5">
+      <div className="font-semibold text-muted-foreground">{name}</div>
+      <div className="font-extrabold text-foreground">
+        Value: {formatPrice(val)}
+      </div>
+    </div>
+  );
+}
+
+export function DCFCalculator({ currentPrice, initialEps }: Readonly<DCFCalculatorProps>) {
   const eps = initialEps !== null && initialEps > 0 ? initialEps : null;
 
   // Sliders state
@@ -215,23 +236,11 @@ export function DCFCalculator({ currentPrice, initialEps }: DCFCalculatorProps) 
               />
               <Tooltip
                 cursor={{ fill: "var(--muted)", opacity: 0.15 }}
-                content={({ active, payload }) => {
-                  if (!active || !payload?.length) return null;
-                  const val = Number(payload[0].value);
-                  const name = String(payload[0].payload.name);
-                  return (
-                    <div className="rounded-xl border bg-popover px-3 py-2 text-xs shadow-lg space-y-0.5">
-                      <div className="font-semibold text-muted-foreground">{name}</div>
-                      <div className="font-extrabold text-foreground">
-                        Value: {formatPrice(val)}
-                      </div>
-                    </div>
-                  );
-                }}
+                content={<DcfTooltip />}
               />
               <Bar dataKey="value" radius={[4, 4, 0, 0]}>
-                {valuation.chartData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={entry.fill} />
+                {valuation.chartData.map((entry) => (
+                  <Cell key={entry.name} fill={entry.fill} />
                 ))}
               </Bar>
               </BarChart>

@@ -8,6 +8,11 @@ import {
 } from "@/lib/saved-comparisons";
 import { createClient } from "@/lib/supabase/server";
 
+function getFormString(formData: FormData, name: string): string {
+  const value = formData.get(name);
+  return typeof value === "string" ? value : "";
+}
+
 async function requireUser() {
   const supabase = await createClient();
   const {
@@ -22,7 +27,7 @@ async function requireUser() {
 }
 
 function getComparisonId(formData: FormData) {
-  const id = String(formData.get("id") ?? "");
+  const id = getFormString(formData, "id");
   if (!isUuid(id)) {
     throw new Error("Invalid saved comparison id");
   }
@@ -32,8 +37,8 @@ function getComparisonId(formData: FormData) {
 export async function createSavedComparison(formData: FormData) {
   const { supabase, user } = await requireUser();
   const input = normalizeSavedComparisonInput({
-    name: String(formData.get("name") ?? ""),
-    symbols: String(formData.get("symbols") ?? ""),
+    name: getFormString(formData, "name"),
+    symbols: getFormString(formData, "symbols"),
   });
 
   const { error } = await supabase.from("saved_comparisons").insert({
@@ -53,8 +58,8 @@ export async function updateSavedComparison(formData: FormData) {
   const id = getComparisonId(formData);
   const { supabase, user } = await requireUser();
   const input = normalizeSavedComparisonInput({
-    name: String(formData.get("name") ?? ""),
-    symbols: String(formData.get("symbols") ?? ""),
+    name: getFormString(formData, "name"),
+    symbols: getFormString(formData, "symbols"),
   });
 
   const { error } = await supabase

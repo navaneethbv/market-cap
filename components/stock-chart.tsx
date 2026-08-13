@@ -39,7 +39,78 @@ function formatTick(value: string, range: ChartRange): string {
   });
 }
 
-export function StockChart({ symbol }: { symbol: string }) {
+interface TooltipPayloadItem {
+  value?: number | string | null;
+  name?: string;
+  dataKey?: string | number;
+}
+
+function MainChartTooltip({ active, payload, label, range }: { active?: boolean; payload?: TooltipPayloadItem[]; label?: string | number; range: ChartRange }) {
+  if (!active || !payload?.length) return null;
+  const close = Number(payload.find(p => p.dataKey === "close")?.value ?? 0);
+  const s50 = payload.find(p => p.dataKey === "sma50")?.value;
+  const s200 = payload.find(p => p.dataKey === "sma200")?.value;
+  const e20 = payload.find(p => p.dataKey === "ema20")?.value;
+  const bUpper = payload.find(p => p.dataKey === "bbUpper")?.value;
+  const bLower = payload.find(p => p.dataKey === "bbLower")?.value;
+
+  return (
+    <div className="rounded-xl border bg-popover px-3 py-2 text-xs shadow-lg space-y-1">
+      <div className="font-semibold text-foreground">
+        Close: {formatPrice(close)}
+      </div>
+      {s50 !== undefined && s50 !== null && (
+        <div className="text-amber-600 dark:text-amber-400 font-medium">
+          SMA 50: {formatPrice(Number(s50))}
+        </div>
+      )}
+      {s200 !== undefined && s200 !== null && (
+        <div className="text-blue-600 dark:text-blue-400 font-medium">
+          SMA 200: {formatPrice(Number(s200))}
+        </div>
+      )}
+      {e20 !== undefined && e20 !== null && (
+        <div className="text-purple-600 dark:text-purple-400 font-medium">
+          EMA 20: {formatPrice(Number(e20))}
+        </div>
+      )}
+      {bUpper !== undefined && bUpper !== null && bLower !== undefined && bLower !== null && (
+        <div className="text-cyan-600 dark:text-cyan-400 font-medium">
+          Bollinger: [{formatPrice(Number(bLower))} - {formatPrice(Number(bUpper))}]
+        </div>
+      )}
+      <div className="text-[10px] text-muted-foreground pt-0.5 border-t">
+        {formatTick(String(label), range)}
+      </div>
+    </div>
+  );
+}
+
+function RsiTooltip({ active, payload }: { active?: boolean; payload?: TooltipPayloadItem[] }) {
+  if (!active || !payload?.length) return null;
+  const val = payload[0].value;
+  return (
+    <div className="rounded-lg border bg-popover px-2 py-1 text-[10px] shadow-md font-semibold text-foreground">
+      RSI: {val !== undefined && val !== null ? Number(val).toFixed(2) : "-"}
+    </div>
+  );
+}
+
+function MacdTooltip({ active, payload }: { active?: boolean; payload?: TooltipPayloadItem[] }) {
+  if (!active || !payload?.length) return null;
+  const line = payload.find(p => p.dataKey === "macdLine")?.value;
+  const sig = payload.find(p => p.dataKey === "signalLine")?.value;
+  const hist = payload.find(p => p.dataKey === "macdHist")?.value;
+  return (
+    <div className="rounded-lg border bg-popover px-2 py-1 text-[10px] shadow-md space-y-0.5 text-foreground">
+      <div className="font-semibold">MACD: {line !== undefined && line !== null ? Number(line).toFixed(3) : "-"}</div>
+      <div className="text-amber-500 font-semibold">Signal: {sig !== undefined && sig !== null ? Number(sig).toFixed(3) : "-"}</div>
+      <div className="text-indigo-500 font-semibold">Hist: {hist !== undefined && hist !== null ? Number(hist).toFixed(3) : "-"}</div>
+    </div>
+  );
+}
+
+export function StockChart({ symbol }: Readonly<{ symbol: string }>) {
   const [range, setRange] = useState<ChartRange>("1D");
   const [candles, setCandles] = useState<Candle[]>([]);
   const [loading, setLoading] = useState(true);
@@ -231,20 +302,27 @@ export function StockChart({ symbol }: { symbol: string }) {
             <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
           </div>
         )}
-        {error ? (
-          <div className="flex h-full items-center justify-center rounded-xl border border-dashed text-sm text-muted-foreground">
-            {error}
-          </div>
-        ) : candles.length === 0 && !loading ? (
-          <div className="flex h-full items-center justify-center rounded-xl border border-dashed text-sm text-muted-foreground">
-            No chart data available.
-          </div>
-        ) : (
-          <ResponsiveContainer width="100%" height="100%">
-            <ComposedChart
-              data={chartData}
-              margin={{ top: 10, right: 8, left: 0, bottom: 0 }}
-            >
+        {(() => {
+          if (error) {
+            return (
+              <div className="flex h-full items-center justify-center rounded-xl border border-dashed text-sm text-muted-foreground">
+                {error}
+              </div>
+            );
+          }
+          if (candles.length === 0 && !loading) {
+            return (
+              <div className="flex h-full items-center justify-center rounded-xl border border-dashed text-sm text-muted-foreground">
+                No chart data available.
+              </div>
+            );
+          }
+          return (
+            <ResponsiveContainer width="100%" height="100%">
+              <ComposedChart
+                data={chartData}
+                margin={{ top: 10, right: 8, left: 0, bottom: 0 }}
+              >
               <defs>
                 <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%" stopColor={stroke} stopOpacity={0.28} />
@@ -275,46 +353,7 @@ export function StockChart({ symbol }: { symbol: string }) {
               />
               <Tooltip
                 cursor={{ stroke, strokeDasharray: "4 4" }}
-                content={({ active, payload, label }) => {
-                  if (!active || !payload?.length) return null;
-                  const close = Number(payload.find(p => p.dataKey === "close")?.value ?? 0);
-                  const s50 = payload.find(p => p.dataKey === "sma50")?.value;
-                  const s200 = payload.find(p => p.dataKey === "sma200")?.value;
-                  const e20 = payload.find(p => p.dataKey === "ema20")?.value;
-                  const bUpper = payload.find(p => p.dataKey === "bbUpper")?.value;
-                  const bLower = payload.find(p => p.dataKey === "bbLower")?.value;
-
-                  return (
-                    <div className="rounded-xl border bg-popover px-3 py-2 text-xs shadow-lg space-y-1">
-                      <div className="font-semibold text-foreground">
-                        Close: {formatPrice(close)}
-                      </div>
-                      {s50 !== undefined && s50 !== null && (
-                        <div className="text-amber-600 dark:text-amber-400 font-medium">
-                          SMA 50: {formatPrice(Number(s50))}
-                        </div>
-                      )}
-                      {s200 !== undefined && s200 !== null && (
-                        <div className="text-blue-600 dark:text-blue-400 font-medium">
-                          SMA 200: {formatPrice(Number(s200))}
-                        </div>
-                      )}
-                      {e20 !== undefined && e20 !== null && (
-                        <div className="text-pink-600 dark:text-pink-400 font-medium">
-                          EMA 20: {formatPrice(Number(e20))}
-                        </div>
-                      )}
-                      {bUpper !== undefined && bUpper !== null && bLower !== undefined && bLower !== null && (
-                        <div className="text-purple-600 dark:text-purple-400 font-medium">
-                          Bands: {formatPrice(Number(bLower))} - {formatPrice(Number(bUpper))}
-                        </div>
-                      )}
-                      <div className="text-[10px] text-muted-foreground pt-0.5 border-t">
-                        {formatTick(String(label), range)}
-                      </div>
-                    </div>
-                  );
-                }}
+                content={<MainChartTooltip range={range} />}
               />
               <Area
                 type="monotone"
@@ -382,8 +421,9 @@ export function StockChart({ symbol }: { symbol: string }) {
               )}
             </ComposedChart>
           </ResponsiveContainer>
-        )}
-      </div>
+        );
+      })()}
+    </div>
 
       {/* Secondary Sub-Chart Panels */}
       {!loading && !error && candles.length > 0 && activeSubChart === "rsi" && (
@@ -407,15 +447,7 @@ export function StockChart({ symbol }: { symbol: string }) {
               />
               <Tooltip
                 cursor={{ stroke: "rgba(139, 92, 246, 0.4)", strokeDasharray: "4 4" }}
-                content={({ active, payload }) => {
-                  if (!active || !payload?.length) return null;
-                  const val = payload[0].value;
-                  return (
-                    <div className="rounded-lg border bg-popover px-2 py-1 text-[10px] shadow-md font-semibold text-foreground">
-                      RSI: {val !== null ? Number(val).toFixed(2) : "-"}
-                    </div>
-                  );
-                }}
+                content={<RsiTooltip />}
               />
               <ReferenceLine y={70} stroke="rgba(239, 68, 68, 0.4)" strokeDasharray="3 3" />
               <ReferenceLine y={50} stroke="rgba(255, 255, 255, 0.2)" strokeDasharray="3 3" />
@@ -451,24 +483,12 @@ export function StockChart({ symbol }: { symbol: string }) {
               />
               <Tooltip
                 cursor={{ stroke: "rgba(99, 102, 241, 0.4)", strokeDasharray: "4 4" }}
-                content={({ active, payload }) => {
-                  if (!active || !payload?.length) return null;
-                  const line = payload.find(p => p.dataKey === "macdLine")?.value;
-                  const sig = payload.find(p => p.dataKey === "signalLine")?.value;
-                  const hist = payload.find(p => p.dataKey === "macdHist")?.value;
-                  return (
-                    <div className="rounded-lg border bg-popover px-2 py-1 text-[10px] shadow-md space-y-0.5 text-foreground">
-                      <div className="font-semibold">MACD: {line !== null ? Number(line).toFixed(3) : "-"}</div>
-                      <div className="text-amber-500 font-semibold">Signal: {sig !== null ? Number(sig).toFixed(3) : "-"}</div>
-                      <div className="text-indigo-500 font-semibold">Hist: {hist !== null ? Number(hist).toFixed(3) : "-"}</div>
-                    </div>
-                  );
-                }}
+                content={<MacdTooltip />}
               />
               <Bar dataKey="macdHist">
-                {chartData.map((entry, index) => (
+                {chartData.map((entry) => (
                   <Cell
-                    key={`cell-${index}`}
+                    key={entry.time}
                     fill={
                       (entry.macdHist ?? 0) >= 0
                         ? "rgba(16, 185, 129, 0.4)"

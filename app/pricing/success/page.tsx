@@ -12,7 +12,7 @@ type SuccessPageProps = {
 
 export default async function CheckoutSuccessPage({
   searchParams,
-}: SuccessPageProps) {
+}: Readonly<SuccessPageProps>) {
   const { session_id: sessionId } = await searchParams;
   const supabase = await createClient();
   const {

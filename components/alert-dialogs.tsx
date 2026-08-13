@@ -16,7 +16,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import type { AlertRow } from "@/lib/alerts";
 
-function AlertFields({ alert }: { alert?: AlertRow }) {
+function AlertFields({ alert }: Readonly<{ alert?: AlertRow }>) {
   return (
     <>
       {alert && <input type="hidden" name="id" value={alert.id} />}
@@ -100,7 +100,7 @@ export function AddAlertDialog() {
   );
 }
 
-export function EditAlertDialog({ alert }: { alert: AlertRow }) {
+export function EditAlertDialog({ alert }: Readonly<{ alert: AlertRow }>) {
   return (
     <Dialog>
       <DialogTrigger asChild>

@@ -9,6 +9,41 @@ export interface PortfolioHistoryPoint {
   profitLossPercent: number;
 }
 
+function buildPriceMap(candlesMap: Record<string, Candle[]>): Record<string, Map<string, number>> {
+  const priceMap: Record<string, Map<string, number>> = {};
+  for (const symbol in candlesMap) {
+    priceMap[symbol] = new Map();
+    for (const candle of candlesMap[symbol]) {
+      priceMap[symbol].set(candle.time, candle.close);
+    }
+  }
+  return priceMap;
+}
+
+function getPriceOnOrBefore(
+  symbol: string,
+  time: string,
+  priceMap: Record<string, Map<string, number>>,
+  candlesMap: Record<string, Candle[]>
+): number | null {
+  const directPrice = priceMap[symbol]?.get(time);
+  if (directPrice !== undefined) return directPrice;
+
+  const symbolCandles = candlesMap[symbol] ?? [];
+  const targetTime = new Date(time).getTime();
+
+  let lastKnownPrice: number | null = null;
+  for (const candle of symbolCandles) {
+    const candleTime = new Date(candle.time).getTime();
+    if (candleTime <= targetTime) {
+      lastKnownPrice = candle.close;
+    } else {
+      break;
+    }
+  }
+  return lastKnownPrice;
+}
+
 export function calculatePortfolioHistory(
   holdings: Holding[],
   candlesMap: Record<string, Candle[]>
@@ -28,34 +63,8 @@ export function calculatePortfolioHistory(
     return new Date(a).getTime() - new Date(b).getTime();
   });
 
-  const priceMap: Record<string, Map<string, number>> = {};
-  for (const symbol in candlesMap) {
-    priceMap[symbol] = new Map();
-    for (const candle of candlesMap[symbol]) {
-      priceMap[symbol].set(candle.time, candle.close);
-    }
-  }
-
+  const priceMap = buildPriceMap(candlesMap);
   const history: PortfolioHistoryPoint[] = [];
-
-  const getPriceOnOrBefore = (symbol: string, time: string): number | null => {
-    const directPrice = priceMap[symbol]?.get(time);
-    if (directPrice !== undefined) return directPrice;
-
-    const symbolCandles = candlesMap[symbol] ?? [];
-    const targetTime = new Date(time).getTime();
-
-    let lastKnownPrice: number | null = null;
-    for (const candle of symbolCandles) {
-      const candleTime = new Date(candle.time).getTime();
-      if (candleTime <= targetTime) {
-        lastKnownPrice = candle.close;
-      } else {
-        break;
-      }
-    }
-    return lastKnownPrice;
-  };
 
   for (const time of sortedTimes) {
     let totalValue = 0;
@@ -65,10 +74,7 @@ export function calculatePortfolioHistory(
 
     for (const holding of holdings) {
       if (holding.purchased_at <= candleDateStr) {
-        const price = getPriceOnOrBefore(holding.symbol, time);
-        // Skip holdings with no candle data (failed fetch, delisted symbol)
-        // rather than valuing them at $0, which would drag the whole chart
-        // toward zero and show artificial losses.
+        const price = getPriceOnOrBefore(holding.symbol, time, priceMap, candlesMap);
         if (price === null) continue;
         totalValue += holding.shares * price;
         totalCost += holding.shares * holding.avg_cost;

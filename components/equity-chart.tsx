@@ -27,7 +27,27 @@ function formatTick(value: string): string {
   });
 }
 
-export function EquityChart({ points }: { points: EquityPoint[] }) {
+interface TooltipPayloadItem {
+  value?: number | string;
+  name?: string;
+  dataKey?: string | number;
+}
+
+function EquityChartTooltip({ active, payload, label }: { active?: boolean; payload?: TooltipPayloadItem[]; label?: string | number }) {
+  if (!active || !payload?.length) return null;
+  return (
+    <div className="rounded-xl border bg-popover px-3 py-2 text-xs shadow-lg">
+      <div className="font-semibold text-foreground">
+        {formatPrice(Number(payload[0].value))}
+      </div>
+      <div className="mt-1 text-muted-foreground">
+        {formatTick(String(label))}
+      </div>
+    </div>
+  );
+}
+
+export function EquityChart({ points }: Readonly<{ points: EquityPoint[] }>) {
   if (points.length === 0) {
     return (
       <div className="flex h-[280px] items-center justify-center rounded-xl border border-dashed text-sm text-muted-foreground">
@@ -38,7 +58,7 @@ export function EquityChart({ points }: { points: EquityPoint[] }) {
   }
 
   const first = points[0].equity;
-  const last = points[points.length - 1].equity;
+  const last = points.at(-1)?.equity ?? first;
   const stroke = last >= first ? "rgb(16 185 129)" : "rgb(239 68 68)";
 
   return (
@@ -71,19 +91,7 @@ export function EquityChart({ points }: { points: EquityPoint[] }) {
           />
           <Tooltip
             cursor={{ stroke, strokeDasharray: "4 4" }}
-            content={({ active, payload, label }) => {
-              if (!active || !payload?.length) return null;
-              return (
-                <div className="rounded-xl border bg-popover px-3 py-2 text-xs shadow-lg">
-                  <div className="font-semibold text-foreground">
-                    {formatPrice(Number(payload[0].value))}
-                  </div>
-                  <div className="mt-1 text-muted-foreground">
-                    {formatTick(String(label))}
-                  </div>
-                </div>
-              );
-            }}
+            content={<EquityChartTooltip />}
           />
           <Area
             type="monotone"

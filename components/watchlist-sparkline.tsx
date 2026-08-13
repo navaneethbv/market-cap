@@ -12,7 +12,7 @@ interface CandlePoint {
   close: number;
 }
 
-export function WatchlistSparkline({ symbol }: SparklineProps) {
+export function WatchlistSparkline({ symbol }: Readonly<SparklineProps>) {
   const [data, setData] = useState<CandlePoint[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -22,7 +22,7 @@ export function WatchlistSparkline({ symbol }: SparklineProps) {
     // Fetch 1 week candle history
     fetch(`/api/candles?symbol=${symbol}&range=1W`)
       .then((res) => {
-        if (!res.ok) throw new Error();
+        if (!res.ok) throw new Error("Failed to fetch candle history");
         return res.json();
       })
       .then((resData) => {
@@ -59,7 +59,7 @@ export function WatchlistSparkline({ symbol }: SparklineProps) {
     );
   }
 
-  const isPositive = data[data.length - 1].close >= data[0].close;
+  const isPositive = (data.at(-1)?.close ?? 0) >= data[0].close;
   const strokeColor = isPositive ? "#10B981" : "#EF4444"; // Green vs Red
 
   return (

@@ -13,7 +13,7 @@ interface NewsTabsProps {
   news: NewsArticle[];
 }
 
-export function NewsTabs({ symbol, news }: NewsTabsProps) {
+export function NewsTabs({ symbol, news }: Readonly<NewsTabsProps>) {
   const [activeTab, setActiveTab] = useState<"news" | "sentiment">("news");
 
   return (

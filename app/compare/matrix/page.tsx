@@ -28,6 +28,29 @@ interface ComparedStock {
   eps: number | null;
 }
 
+interface TooltipPayloadItem {
+  name?: string;
+  dataKey?: string | number;
+  value?: number | string;
+}
+
+function RadarTooltip({ active, payload }: { active?: boolean; payload?: TooltipPayloadItem[] }) {
+  if (!active || !payload?.length) return null;
+  return (
+    <div className="rounded-xl border bg-popover px-3 py-2 text-xs shadow-lg space-y-1.5">
+      <p className="font-bold text-foreground border-b pb-1 mb-1">
+        {payload[0].name}
+      </p>
+      {payload.map((p) => (
+        <div key={`${String(p.dataKey)}-${p.value}`} className="flex justify-between gap-4 font-semibold">
+          <span className="text-muted-foreground">{String(p.dataKey)}:</span>
+          <span className="text-foreground">{p.value}/100</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export default function CompareMatrixPage() {
   const [symbols, setSymbols] = useState<string[]>(["AAPL", "MSFT", "GOOGL"]);
   const [inputSymbol, setInputSymbol] = useState("");
@@ -92,12 +115,6 @@ export default function CompareMatrixPage() {
     setErrorMsg("");
   }
 
-  // Radar mapping algorithm to score metrics out of 100
-  // Value (peRatio: lower is better, standard pe 15-25 gets 60-80 score)
-  // Yield (dividendYield: higher is better, 4% gets 80, cap at 100)
-  // Risk (beta: lower is better, 1.0 gets 70)
-  // Profitability (eps: higher is better, 10 gets 80)
-  // Momentum (changePercent: higher is better, 2% gets 70)
   const radarFields = [
     { key: "value", label: "Valuation Score (P/E)" },
     { key: "yield", label: "Income Score (Yield)" },
@@ -112,13 +129,13 @@ export default function CompareMatrixPage() {
     };
 
     stocks.forEach((stock) => {
-      let score = 50; // Default baseline score
+      let score = 50;
       if (field.key === "value") {
         const pe = stock.peRatio;
         if (pe !== null && pe > 0) {
           score = Math.max(10, Math.min(100, 110 - pe * 1.5));
         } else {
-          score = 30; // Unknown or negative PE
+          score = 30;
         }
       } else if (field.key === "yield") {
         const y = stock.dividendYield;
@@ -146,6 +163,149 @@ export default function CompareMatrixPage() {
     { stroke: "rgb(245, 158, 11)", fill: "rgba(245, 158, 11, 0.2)" },
     { stroke: "rgb(239, 68, 68)", fill: "rgba(239, 68, 68, 0.2)" },
   ];
+
+  const renderMatrixContent = () => {
+    if (symbols.length === 0) {
+      return (
+        <div className="rounded-2xl border bg-card p-12 text-center shadow-sm">
+          <p className="text-sm text-muted-foreground font-semibold">
+            Add at least one stock symbol to view the comparison matrix.
+          </p>
+        </div>
+      );
+    }
+    if (loading) {
+      return (
+        <div className="flex items-center justify-center py-24">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+      );
+    }
+    return (
+      <div className="grid gap-6 lg:grid-cols-5">
+        {/* Radar Chart Panel */}
+        <section className="rounded-2xl border bg-card p-4 shadow-sm lg:col-span-2 flex flex-col justify-between">
+          <div className="mb-2">
+            <h2 className="text-base font-semibold">Relative Metrics Radar</h2>
+            <p className="text-xs text-muted-foreground">Comparative vector analysis (higher is better)</p>
+          </div>
+          <div className="h-[280px] w-full flex items-center justify-center">
+            <ResponsiveContainer width="100%" height="100%">
+              <RadarChart cx="50%" cy="50%" outerRadius="70%" data={radarData}>
+                <PolarGrid stroke="var(--border)" opacity={0.3} />
+                <PolarAngleAxis
+                  dataKey="subject"
+                  tick={{ fill: "var(--muted-foreground)", fontSize: 10, fontWeight: "bold" }}
+                />
+                <PolarRadiusAxis angle={30} domain={[0, 100]} tick={false} axisLine={false} />
+                {stocks.map((stock, idx) => (
+                  <Radar
+                    key={stock.symbol}
+                    name={stock.symbol}
+                    dataKey={stock.symbol}
+                    stroke={radarColors[idx % radarColors.length].stroke}
+                    fill={radarColors[idx % radarColors.length].fill}
+                    fillOpacity={0.25}
+                  />
+                ))}
+                <Legend verticalAlign="bottom" height={36} wrapperStyle={{ fontSize: 11, fontWeight: "bold" }} />
+                <Tooltip content={<RadarTooltip />} />
+              </RadarChart>
+            </ResponsiveContainer>
+          </div>
+        </section>
+
+        {/* Metric Comparison Table */}
+        <section className="rounded-2xl border bg-card p-4 shadow-sm lg:col-span-3 overflow-x-auto">
+          <div className="mb-4">
+            <h2 className="text-base font-semibold">Metric Comparison</h2>
+            <p className="text-xs text-muted-foreground">Raw metrics comparison</p>
+          </div>
+          <table className="w-full text-sm leading-relaxed border-collapse">
+            <thead>
+              <tr className="border-b text-muted-foreground text-xs font-bold text-left">
+                <th className="py-2.5">Metric</th>
+                {stocks.map((stock) => (
+                  <th key={stock.symbol} className="py-2.5 px-3 text-right">
+                    {stock.symbol}
+                    <p className="text-[10px] text-muted-foreground font-semibold line-clamp-1 max-w-[90px] ml-auto">
+                      {stock.name}
+                    </p>
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody className="divide-y font-semibold">
+              <tr>
+                <td className="py-3 text-muted-foreground flex items-center gap-1.5">
+                  <BarChart3 className="h-4 w-4 text-primary" /> Price
+                </td>
+                {stocks.map((stock) => (
+                  <td key={stock.symbol} className="py-3 px-3 text-right tabular-nums">
+                    {formatPrice(stock.price)}
+                  </td>
+                ))}
+              </tr>
+              <tr>
+                <td className="py-3 text-muted-foreground flex items-center gap-1.5">
+                  <TrendingUp className="h-4 w-4 text-emerald-500" /> 1D Return
+                </td>
+                {stocks.map((stock) => {
+                  const color = stock.changePercent >= 0 ? "text-emerald-600 dark:text-emerald-400" : "text-red-600 dark:text-red-400";
+                  return (
+                    <td key={stock.symbol} className={cn("py-3 px-3 text-right tabular-nums font-bold", color)}>
+                      {stock.changePercent >= 0 ? "+" : ""}
+                      {stock.changePercent.toFixed(2)}%
+                    </td>
+                  );
+                })}
+              </tr>
+              <tr>
+                <td className="py-3 text-muted-foreground flex items-center gap-1.5">
+                  <Shield className="h-4 w-4 text-purple-500" /> P/E Ratio
+                </td>
+                {stocks.map((stock) => (
+                  <td key={stock.symbol} className="py-3 px-3 text-right tabular-nums">
+                    {stock.peRatio !== null ? stock.peRatio.toFixed(1) : "-"}
+                  </td>
+                ))}
+              </tr>
+              <tr>
+                <td className="py-3 text-muted-foreground flex items-center gap-1.5">
+                  <DollarSign className="h-4 w-4 text-amber-500" /> Dividend Yield
+                </td>
+                {stocks.map((stock) => (
+                  <td key={stock.symbol} className="py-3 px-3 text-right tabular-nums">
+                    {stock.dividendYield !== null ? `${stock.dividendYield.toFixed(2)}%` : "0.00%"}
+                  </td>
+                ))}
+              </tr>
+              <tr>
+                <td className="py-3 text-muted-foreground flex items-center gap-1.5">
+                  <Shield className="h-4 w-4 text-rose-500" /> Beta (Volatility)
+                </td>
+                {stocks.map((stock) => (
+                  <td key={stock.symbol} className="py-3 px-3 text-right tabular-nums">
+                    {stock.beta !== null ? stock.beta.toFixed(2) : "-"}
+                  </td>
+                ))}
+              </tr>
+              <tr>
+                <td className="py-3 text-muted-foreground flex items-center gap-1.5">
+                  <BarChart3 className="h-4 w-4 text-blue-500" /> EPS (TTM)
+                </td>
+                {stocks.map((stock) => (
+                  <td key={stock.symbol} className="py-3 px-3 text-right tabular-nums">
+                    {stock.eps !== null ? formatPrice(stock.eps) : "-"}
+                  </td>
+                ))}
+              </tr>
+            </tbody>
+          </table>
+        </section>
+      </div>
+    );
+  };
 
   return (
     <div className="space-y-6">
@@ -204,157 +364,7 @@ export default function CompareMatrixPage() {
         )}
       </section>
 
-      {symbols.length === 0 ? (
-        <div className="rounded-2xl border bg-card p-12 text-center shadow-sm">
-          <p className="text-sm text-muted-foreground font-semibold">
-            Add at least one stock symbol to view the comparison matrix.
-          </p>
-        </div>
-      ) : loading ? (
-        <div className="flex items-center justify-center py-24">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        </div>
-      ) : (
-        <div className="grid gap-6 lg:grid-cols-5">
-          {/* Radar Chart Panel */}
-          <section className="rounded-2xl border bg-card p-4 shadow-sm lg:col-span-2 flex flex-col justify-between">
-            <div className="mb-2">
-              <h2 className="text-base font-semibold">Relative Metrics Radar</h2>
-              <p className="text-xs text-muted-foreground">Comparative vector analysis (higher is better)</p>
-            </div>
-            <div className="h-[280px] w-full flex items-center justify-center">
-              <ResponsiveContainer width="100%" height="100%">
-                <RadarChart cx="50%" cy="50%" outerRadius="70%" data={radarData}>
-                  <PolarGrid stroke="var(--border)" opacity={0.3} />
-                  <PolarAngleAxis
-                    dataKey="subject"
-                    tick={{ fill: "var(--muted-foreground)", fontSize: 10, fontWeight: "bold" }}
-                  />
-                  <PolarRadiusAxis angle={30} domain={[0, 100]} tick={false} axisLine={false} />
-                  {stocks.map((stock, idx) => (
-                    <Radar
-                      key={stock.symbol}
-                      name={stock.symbol}
-                      dataKey={stock.symbol}
-                      stroke={radarColors[idx % radarColors.length].stroke}
-                      fill={radarColors[idx % radarColors.length].fill}
-                      fillOpacity={0.25}
-                    />
-                  ))}
-                  <Legend verticalAlign="bottom" height={36} wrapperStyle={{ fontSize: 11, fontWeight: "bold" }} />
-                  <Tooltip
-                    content={({ active, payload }) => {
-                      if (!active || !payload?.length) return null;
-                      return (
-                        <div className="rounded-xl border bg-popover px-3 py-2 text-xs shadow-lg space-y-1.5">
-                          <p className="font-bold text-foreground border-b pb-1 mb-1">
-                            {payload[0].name}
-                          </p>
-                          {payload.map((p, idx) => (
-                            <div key={idx} className="flex justify-between gap-4 font-semibold">
-                              <span className="text-muted-foreground">{String(p.dataKey)}:</span>
-                              <span className="text-foreground">{p.value}/100</span>
-                            </div>
-                          ))}
-                        </div>
-                      );
-                    }}
-                  />
-                </RadarChart>
-              </ResponsiveContainer>
-            </div>
-          </section>
-
-          {/* Metric Comparison Table */}
-          <section className="rounded-2xl border bg-card p-4 shadow-sm lg:col-span-3 overflow-x-auto">
-            <div className="mb-4">
-              <h2 className="text-base font-semibold">Metric Comparison</h2>
-              <p className="text-xs text-muted-foreground">Raw metrics comparison</p>
-            </div>
-            <table className="w-full text-sm leading-relaxed border-collapse">
-              <thead>
-                <tr className="border-b text-muted-foreground text-xs font-bold text-left">
-                  <th className="py-2.5">Metric</th>
-                  {stocks.map((stock) => (
-                    <th key={stock.symbol} className="py-2.5 px-3 text-right">
-                      {stock.symbol}
-                      <p className="text-[10px] text-muted-foreground font-semibold line-clamp-1 max-w-[90px] ml-auto">
-                        {stock.name}
-                      </p>
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody className="divide-y font-semibold">
-                <tr>
-                  <td className="py-3 text-muted-foreground flex items-center gap-1.5">
-                    <BarChart3 className="h-4 w-4 text-primary" /> Price
-                  </td>
-                  {stocks.map((stock) => (
-                    <td key={stock.symbol} className="py-3 px-3 text-right tabular-nums">
-                      {formatPrice(stock.price)}
-                    </td>
-                  ))}
-                </tr>
-                <tr>
-                  <td className="py-3 text-muted-foreground flex items-center gap-1.5">
-                    <TrendingUp className="h-4 w-4 text-emerald-500" /> 1D Return
-                  </td>
-                  {stocks.map((stock) => {
-                    const color = stock.changePercent >= 0 ? "text-emerald-600 dark:text-emerald-400" : "text-red-600 dark:text-red-400";
-                    return (
-                      <td key={stock.symbol} className={cn("py-3 px-3 text-right tabular-nums font-bold", color)}>
-                        {stock.changePercent >= 0 ? "+" : ""}
-                        {stock.changePercent.toFixed(2)}%
-                      </td>
-                    );
-                  })}
-                </tr>
-                <tr>
-                  <td className="py-3 text-muted-foreground flex items-center gap-1.5">
-                    <Shield className="h-4 w-4 text-purple-500" /> P/E Ratio
-                  </td>
-                  {stocks.map((stock) => (
-                    <td key={stock.symbol} className="py-3 px-3 text-right tabular-nums">
-                      {stock.peRatio !== null ? stock.peRatio.toFixed(1) : "-"}
-                    </td>
-                  ))}
-                </tr>
-                <tr>
-                  <td className="py-3 text-muted-foreground flex items-center gap-1.5">
-                    <DollarSign className="h-4 w-4 text-amber-500" /> Dividend Yield
-                  </td>
-                  {stocks.map((stock) => (
-                    <td key={stock.symbol} className="py-3 px-3 text-right tabular-nums">
-                      {stock.dividendYield !== null ? `${stock.dividendYield.toFixed(2)}%` : "0.00%"}
-                    </td>
-                  ))}
-                </tr>
-                <tr>
-                  <td className="py-3 text-muted-foreground flex items-center gap-1.5">
-                    <Shield className="h-4 w-4 text-rose-500" /> Beta (Volatility)
-                  </td>
-                  {stocks.map((stock) => (
-                    <td key={stock.symbol} className="py-3 px-3 text-right tabular-nums">
-                      {stock.beta !== null ? stock.beta.toFixed(2) : "-"}
-                    </td>
-                  ))}
-                </tr>
-                <tr>
-                  <td className="py-3 text-muted-foreground flex items-center gap-1.5">
-                    <BarChart3 className="h-4 w-4 text-blue-500" /> EPS (TTM)
-                  </td>
-                  {stocks.map((stock) => (
-                    <td key={stock.symbol} className="py-3 px-3 text-right tabular-nums">
-                      {stock.eps !== null ? formatPrice(stock.eps) : "-"}
-                    </td>
-                  ))}
-                </tr>
-              </tbody>
-            </table>
-          </section>
-        </div>
-      )}
+      {renderMatrixContent()}
     </div>
   );
 }

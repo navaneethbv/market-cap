@@ -31,7 +31,7 @@ type PricingPageProps = {
   searchParams: Promise<{ reason?: string; already?: string }>;
 };
 
-export default async function PricingPage({ searchParams }: PricingPageProps) {
+export default async function PricingPage({ searchParams }: Readonly<PricingPageProps>) {
   const params = await searchParams;
   const supabase = await createClient();
   const {
@@ -126,34 +126,42 @@ export default async function PricingPage({ searchParams }: PricingPageProps) {
             ))}
           </ul>
           <div className="mt-auto pt-6">
-            {billing.isPro ? (
-              <div className="space-y-2">
-                <Button className="w-full rounded-full" disabled>
-                  <Star className="h-4 w-4" />
-                  You are on Pro
-                </Button>
-                {billing.currentPeriodEnd && (
-                  <p className="text-center text-xs text-muted-foreground">
-                    {billing.cancelAtPeriodEnd ? "Ends" : "Renews"} on{" "}
-                    {new Date(billing.currentPeriodEnd).toLocaleDateString(
-                      "en-US",
-                      { month: "long", day: "numeric", year: "numeric" }
+            {(() => {
+              if (billing.isPro) {
+                return (
+                  <div className="space-y-2">
+                    <Button className="w-full rounded-full" disabled>
+                      <Star className="h-4 w-4" />
+                      You are on Pro
+                    </Button>
+                    {billing.currentPeriodEnd && (
+                      <p className="text-center text-xs text-muted-foreground">
+                        {billing.cancelAtPeriodEnd ? "Ends" : "Renews"} on{" "}
+                        {new Date(billing.currentPeriodEnd).toLocaleDateString(
+                          "en-US",
+                          { month: "long", day: "numeric", year: "numeric" }
+                        )}
+                      </p>
                     )}
-                  </p>
-                )}
-              </div>
-            ) : user ? (
-              <form action={startProCheckout}>
-                <IdempotencyKeyInput />
-                <PricingSubmitButton className="w-full rounded-full" pendingLabel="Redirecting...">
-                  Upgrade to Pro
-                </PricingSubmitButton>
-              </form>
-            ) : (
-              <Button className="w-full rounded-full" asChild>
-                <Link href="/login?next=%2Fpricing">Log in to upgrade</Link>
-              </Button>
-            )}
+                  </div>
+                );
+              }
+              if (user) {
+                return (
+                  <form action={startProCheckout}>
+                    <IdempotencyKeyInput />
+                    <PricingSubmitButton className="w-full rounded-full" pendingLabel="Redirecting...">
+                      Upgrade to Pro
+                    </PricingSubmitButton>
+                  </form>
+                );
+              }
+              return (
+                <Button className="w-full rounded-full" asChild>
+                  <Link href="/login?next=%2Fpricing">Log in to upgrade</Link>
+                </Button>
+              );
+            })()}
           </div>
         </div>
       </div>

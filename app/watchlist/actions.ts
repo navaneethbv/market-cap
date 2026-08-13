@@ -10,8 +10,13 @@ import {
   normalizeWatchlistSymbol,
 } from "@/lib/watchlist";
 
+function getFormString(formData: FormData, name: string): string {
+  const value = formData.get(name);
+  return typeof value === "string" ? value : "";
+}
+
 export async function toggleWatchlistItem(formData: FormData) {
-  const symbol = normalizeWatchlistSymbol(String(formData.get("symbol") ?? ""));
+  const symbol = normalizeWatchlistSymbol(getFormString(formData, "symbol"));
   const nextPath = getSafeWatchlistNextPath(formData.get("next"));
 
   if (!isWatchlistSymbol(symbol)) {

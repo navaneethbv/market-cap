@@ -5,11 +5,11 @@ export function ChangeChip({
   value,
   suffix = "%",
   className,
-}: {
+}: Readonly<{
   value: number;
   suffix?: string;
   className?: string;
-}) {
+}>) {
   const up = value >= 0;
   const Icon = up ? ArrowUp : ArrowDown;
   return (

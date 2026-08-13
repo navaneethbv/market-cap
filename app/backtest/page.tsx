@@ -353,7 +353,7 @@ export default function BacktestPage() {
                       </thead>
                       <tbody>
                         {result.trades.map((trade, idx) => (
-                          <tr key={idx} className="border-b hover:bg-muted/30">
+                          <tr key={`${trade.time}-${trade.type}-${trade.price}-${idx}`} className="border-b hover:bg-muted/30">
                             <td className="py-2.5 font-medium">{trade.time}</td>
                             <td className="py-2.5">
                               <span

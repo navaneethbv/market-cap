@@ -33,11 +33,11 @@ function MoverCard({
   title,
   rows,
   icon,
-}: {
+}: Readonly<{
   title: string;
   rows: ReturnType<typeof getTopMovers>["gainers"];
   icon: "up" | "down";
-}) {
+}>) {
   const Icon = icon === "up" ? ArrowUp : ArrowDown;
   return (
     <section className="rounded-2xl border bg-card p-5 shadow-sm">
@@ -66,7 +66,7 @@ function MoverCard({
   );
 }
 
-export default async function MoversPage({ searchParams }: MoversPageProps) {
+export default async function MoversPage({ searchParams }: Readonly<MoversPageProps>) {
   const params = await searchParams;
   const basket = getMoverBasket(basketParam(params.basket));
   const quoteResults = await Promise.allSettled(

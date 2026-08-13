@@ -28,7 +28,7 @@ function symbolsParam(value: string | string[] | undefined) {
   return Array.isArray(value) ? value.join(",") : value;
 }
 
-export default async function ComparePage({ searchParams }: ComparePageProps) {
+export default async function ComparePage({ searchParams }: Readonly<ComparePageProps>) {
   const params = await searchParams;
   const symbols = normalizeComparisonSymbols(symbolsParam(params.symbols));
   const quoteResults = await Promise.allSettled(

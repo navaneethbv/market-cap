@@ -6,6 +6,11 @@ import { normalizeAlertInput } from "@/lib/alerts";
 import { isUuid } from "@/lib/parse";
 import { createClient } from "@/lib/supabase/server";
 
+function getFormString(formData: FormData, name: string): string {
+  const value = formData.get(name);
+  return typeof value === "string" ? value : "";
+}
+
 async function requireUser() {
   const supabase = await createClient();
   const {
@@ -20,7 +25,7 @@ async function requireUser() {
 }
 
 function getAlertId(formData: FormData) {
-  const id = String(formData.get("id") ?? "");
+  const id = getFormString(formData, "id");
   if (!isUuid(id)) {
     throw new Error("Invalid alert id");
   }
@@ -30,9 +35,9 @@ function getAlertId(formData: FormData) {
 export async function createAlert(formData: FormData) {
   const { supabase, user } = await requireUser();
   const input = normalizeAlertInput({
-    symbol: String(formData.get("symbol") ?? ""),
-    direction: String(formData.get("direction") ?? ""),
-    targetPrice: String(formData.get("targetPrice") ?? ""),
+    symbol: getFormString(formData, "symbol"),
+    direction: getFormString(formData, "direction"),
+    targetPrice: getFormString(formData, "targetPrice"),
   });
 
   const { error } = await supabase.from("price_alerts").insert({
@@ -53,9 +58,9 @@ export async function updateAlert(formData: FormData) {
   const id = getAlertId(formData);
   const { supabase, user } = await requireUser();
   const input = normalizeAlertInput({
-    symbol: String(formData.get("symbol") ?? ""),
-    direction: String(formData.get("direction") ?? ""),
-    targetPrice: String(formData.get("targetPrice") ?? ""),
+    symbol: getFormString(formData, "symbol"),
+    direction: getFormString(formData, "direction"),
+    targetPrice: getFormString(formData, "targetPrice"),
   });
 
   const { error } = await supabase
@@ -95,7 +100,7 @@ export async function deleteAlert(formData: FormData) {
 
 export async function toggleAlertActive(formData: FormData) {
   const id = getAlertId(formData);
-  const active = String(formData.get("active") ?? "") !== "true";
+  const active = getFormString(formData, "active") !== "true";
   const { supabase, user } = await requireUser();
   const { error } = await supabase
     .from("price_alerts")

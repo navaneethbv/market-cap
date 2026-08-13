@@ -124,18 +124,19 @@ export function getUpcomingHolidays(
   );
 }
 
+function parseEarningsSession(hour?: string): string {
+  if (hour === "bmo") return "Before open";
+  if (hour === "amc") return "After close";
+  return "Time unavailable";
+}
+
 export function buildEarningsRows(events: RawEarningsEvent[]): EarningsRow[] {
   return events
     .filter((event) => event.symbol && event.date)
     .map((event) => ({
       symbol: event.symbol!.trim().toUpperCase(),
       date: event.date!,
-      session:
-        event.hour === "bmo"
-          ? "Before open"
-          : event.hour === "amc"
-            ? "After close"
-            : "Time unavailable",
+      session: parseEarningsSession(event.hour),
       epsEstimate:
         typeof event.epsEstimate === "number" ? event.epsEstimate : null,
     }))
