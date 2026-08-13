@@ -80,7 +80,7 @@ export default async function RiskDiagnosticsPage() {
   const hhi = calculateHHI(assets);
   const hhiInfo = getHHILabel(hhi);
   const totalValue = assets.reduce((sum, a) => sum + a.value, 0);
-  const betaTone = getBetaTone(weightedBeta);
+  const betaTone = weightedBeta === null ? null : getBetaTone(weightedBeta);
 
   return (
     <div className="space-y-6">
@@ -129,11 +129,11 @@ export default async function RiskDiagnosticsPage() {
                   Weighted average relative to S&amp;P 500 (1.0)
                 </p>
               </div>
-              <div className={cn("text-4xl font-extrabold tabular-nums", betaTone.color)}>
-                {weightedBeta.toFixed(2)}
+              <div className={cn("text-4xl font-extrabold tabular-nums", betaTone?.color)}>
+                {weightedBeta === null ? "-" : weightedBeta.toFixed(2)}
               </div>
-              <span className={cn("text-xs font-bold block", betaTone.color)}>
-                {betaTone.label}
+              <span className={cn("text-xs font-bold block", betaTone?.color)}>
+                {betaTone?.label}
               </span>
             </div>
 

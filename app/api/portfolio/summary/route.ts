@@ -23,7 +23,11 @@ export async function GET() {
     }
 
     if (!holdingsData || holdingsData.length === 0) {
-      return NextResponse.json({ portfolioValue: 0, annualDividends: 0 });
+      return NextResponse.json({
+        portfolioValue: 0,
+        annualDividends: 0,
+        unpriced: [],
+      });
     }
 
     const holdings = holdingsData.map((h) => ({
@@ -56,11 +60,18 @@ export async function GET() {
 
     let portfolioValue = 0;
     let annualDividends = 0;
+    const unpriced: string[] = [];
 
     for (const h of holdings) {
       const q = quotesMap.get(h.symbol);
-      const price = q ? q.price : h.avg_cost;
-      const val = h.shares * price;
+      // Omit holdings we could not price rather than valuing them at cost
+      // basis, which would fabricate a return that never happened.
+      if (!q) {
+        unpriced.push(h.symbol);
+        continue;
+      }
+
+      const val = h.shares * q.price;
       portfolioValue += val;
 
       const m = metricsMap.get(h.symbol);
@@ -71,6 +82,7 @@ export async function GET() {
     return NextResponse.json({
       portfolioValue: Math.round(portfolioValue * 100) / 100,
       annualDividends: Math.round(annualDividends * 100) / 100,
+      unpriced,
     });
   } catch (err) {
     console.error("portfolio summary API failed:", err);
