@@ -266,6 +266,10 @@ Record every pushed commit here after each milestone.
   - Reduced Cognitive Complexity in `app/stock/[symbol]/volatility/page.tsx`, `components/portfolio-history-chart.tsx`, `lib/backtester.ts`, `lib/portfolio-history.ts`, `lib/screener.ts`.
   - Updated React component prop types to `Readonly<Props>` across all page and component files.
   - Used `String.raw` for regex escaping, replaced `.match()` loops with `RegExp.exec()`, and updated array index keys to unique entity keys.
+- `6bf32de` Refactor code duplication across pages (branch `feature/code-coverage-95`, PR #26)
+  - Created `TradeLogTable` component (`components/trade-log-table.tsx`) to eliminate 31 lines of duplicated trade table UI between `app/trading/page.tsx` and `app/trading/history/page.tsx`.
+  - Created `QuotePriceChangeCells` and `StockQuoteRowCells` components (`components/stock-quote-row-cells.tsx`) to eliminate duplicated quote table cells across `app/compare/page.tsx`, `app/movers/page.tsx`, and `app/watchlist/page.tsx`.
+  - Created `usePortfolioSync` hook and `SyncPortfolioButton` component (`components/sync-portfolio-control.tsx`) to eliminate 59 lines of duplicated portfolio sync state and UI between `app/portfolio/risk/simulations/page.tsx` and `app/portfolio/snowball/page.tsx`.
 
 
 
