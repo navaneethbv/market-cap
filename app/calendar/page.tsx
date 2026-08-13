@@ -45,11 +45,13 @@ export default async function MarketCalendarPage() {
 
   let watchlistSymbols: string[] = [];
   if (user) {
-    const { data: wData } = await supabase
-      .from("watchlist")
+    const { data: wData, error: wError } = await supabase
+      .from("watchlist_items")
       .select("symbol")
       .eq("user_id", user.id);
-    watchlistSymbols = (wData ?? []).map((w) => w.symbol);
+    if (!wError) {
+      watchlistSymbols = (wData ?? []).map((w) => w.symbol);
+    }
   }
 
   return (

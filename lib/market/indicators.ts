@@ -121,8 +121,9 @@ export function calculateRSI(prices: number[], period = 14): (number | null)[] {
   avgGain = avgGain / period;
   avgLoss = avgLoss / period;
 
-  let rs = avgLoss === 0 ? 100 : avgGain / avgLoss;
-  rsi[period] = avgLoss === 0 ? 100 : 100 - 100 / (1 + rs);
+  // A flat series (avgGain and avgLoss both 0) is neutral, not overbought.
+  rsi[period] =
+    avgLoss === 0 ? (avgGain === 0 ? 50 : 100) : 100 - 100 / (1 + avgGain / avgLoss);
 
   for (let i = period + 1; i < prices.length; i++) {
     const currentGain = gains[i - 1];
@@ -132,10 +133,9 @@ export function calculateRSI(prices: number[], period = 14): (number | null)[] {
     avgLoss = (avgLoss * (period - 1) + currentLoss) / period;
 
     if (avgLoss === 0) {
-      rsi[i] = 100;
+      rsi[i] = avgGain === 0 ? 50 : 100;
     } else {
-      rs = avgGain / avgLoss;
-      rsi[i] = 100 - 100 / (1 + rs);
+      rsi[i] = 100 - 100 / (1 + avgGain / avgLoss);
     }
   }
   return rsi;
