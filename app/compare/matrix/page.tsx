@@ -34,7 +34,7 @@ interface TooltipPayloadItem {
   value?: number | string;
 }
 
-function RadarTooltip({ active, payload }: { active?: boolean; payload?: TooltipPayloadItem[] }) {
+function RadarTooltip({ active, payload }: Readonly<{ active?: boolean; payload?: TooltipPayloadItem[] }>) {
   if (!active || !payload?.length) return null;
   return (
     <div className="rounded-xl border bg-popover px-3 py-2 text-xs shadow-lg space-y-1.5">

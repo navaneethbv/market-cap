@@ -116,16 +116,29 @@ export function normalizeBacktestOptions(input: {
   };
 }
 
-function evaluateSignal(
-  strategy: StrategyType,
-  i: number,
-  startIdx: number,
-  shortSma: (number | null)[],
-  longSma: (number | null)[],
-  rsi: (number | null)[],
-  rsiOversold: number,
-  rsiOverbought: number
-): "buy" | "sell" | "hold" {
+interface SignalEvalOptions {
+  strategy: StrategyType;
+  i: number;
+  startIdx: number;
+  shortSma: (number | null)[];
+  longSma: (number | null)[];
+  rsi: (number | null)[];
+  rsiOversold: number;
+  rsiOverbought: number;
+}
+
+function evaluateSignal(options: Readonly<SignalEvalOptions>): "buy" | "sell" | "hold" {
+  const {
+    strategy,
+    i,
+    startIdx,
+    shortSma,
+    longSma,
+    rsi,
+    rsiOversold,
+    rsiOverbought,
+  } = options;
+
   if (i <= startIdx) return "hold";
 
   if (strategy === "sma_crossover") {
@@ -226,7 +239,7 @@ export function runBacktest(params: BacktestParams): BacktestResult {
     const close = candle.close;
     const time = candle.time;
 
-    const signal = evaluateSignal(
+    const signal = evaluateSignal({
       strategy,
       i,
       startIdx,
@@ -234,8 +247,8 @@ export function runBacktest(params: BacktestParams): BacktestResult {
       longSma,
       rsi,
       rsiOversold,
-      rsiOverbought
-    );
+      rsiOverbought,
+    });
 
     if (signal === "buy" && cash > 0) {
       shares = cash / close;

@@ -25,7 +25,7 @@ interface TooltipPayloadItem {
   dataKey?: string | number;
 }
 
-function SentimentTooltip({ active, payload }: { active?: boolean; payload?: TooltipPayloadItem[] }) {
+function SentimentTooltip({ active, payload }: Readonly<{ active?: boolean; payload?: TooltipPayloadItem[] }>) {
   if (!active || !payload?.length) return null;
   const val = Number(payload[0].value);
   return (

@@ -33,7 +33,7 @@ interface TooltipPayloadItem {
   dataKey?: string | number;
 }
 
-function EquityChartTooltip({ active, payload, label }: { active?: boolean; payload?: TooltipPayloadItem[]; label?: string | number }) {
+function EquityChartTooltip({ active, payload, label }: Readonly<{ active?: boolean; payload?: TooltipPayloadItem[]; label?: string | number }>) {
   if (!active || !payload?.length) return null;
   return (
     <div className="rounded-xl border bg-popover px-3 py-2 text-xs shadow-lg">

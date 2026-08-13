@@ -47,7 +47,7 @@ interface TooltipPayloadItem {
   dataKey?: string | number;
 }
 
-function PortfolioHistoryTooltip({ active, payload, label }: { active?: boolean; payload?: TooltipPayloadItem[]; label?: string | number }) {
+function PortfolioHistoryTooltip({ active, payload, label }: Readonly<{ active?: boolean; payload?: TooltipPayloadItem[]; label?: string | number }>) {
   if (!active || !payload?.length) return null;
   const value = Number(payload[0].value);
   const costBasis = Number(payload[1]?.value ?? 0);

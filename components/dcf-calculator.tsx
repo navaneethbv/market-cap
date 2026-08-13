@@ -47,10 +47,11 @@ interface TooltipPayloadItem {
   payload?: Record<string, unknown>;
 }
 
-function DcfTooltip({ active, payload }: { active?: boolean; payload?: TooltipPayloadItem[] }) {
+function DcfTooltip({ active, payload }: Readonly<{ active?: boolean; payload?: TooltipPayloadItem[] }>) {
   if (!active || !payload?.length) return null;
   const val = Number(payload[0].value);
-  const name = String(payload[0].payload?.name ?? "");
+  const rawName = payload[0].payload?.name;
+  const name = typeof rawName === "string" ? rawName : "";
   return (
     <div className="rounded-xl border bg-popover px-3 py-2 text-xs shadow-lg space-y-0.5">
       <div className="font-semibold text-muted-foreground">{name}</div>

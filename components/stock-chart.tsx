@@ -45,7 +45,7 @@ interface TooltipPayloadItem {
   dataKey?: string | number;
 }
 
-function MainChartTooltip({ active, payload, label, range }: { active?: boolean; payload?: TooltipPayloadItem[]; label?: string | number; range: ChartRange }) {
+function MainChartTooltip({ active, payload, label, range }: Readonly<{ active?: boolean; payload?: TooltipPayloadItem[]; label?: string | number; range: ChartRange }>) {
   if (!active || !payload?.length) return null;
   const close = Number(payload.find(p => p.dataKey === "close")?.value ?? 0);
   const s50 = payload.find(p => p.dataKey === "sma50")?.value;
@@ -86,7 +86,7 @@ function MainChartTooltip({ active, payload, label, range }: { active?: boolean;
   );
 }
 
-function RsiTooltip({ active, payload }: { active?: boolean; payload?: TooltipPayloadItem[] }) {
+function RsiTooltip({ active, payload }: Readonly<{ active?: boolean; payload?: TooltipPayloadItem[] }>) {
   if (!active || !payload?.length) return null;
   const val = payload[0].value;
   return (
@@ -96,7 +96,7 @@ function RsiTooltip({ active, payload }: { active?: boolean; payload?: TooltipPa
   );
 }
 
-function MacdTooltip({ active, payload }: { active?: boolean; payload?: TooltipPayloadItem[] }) {
+function MacdTooltip({ active, payload }: Readonly<{ active?: boolean; payload?: TooltipPayloadItem[] }>) {
   if (!active || !payload?.length) return null;
   const line = payload.find(p => p.dataKey === "macdLine")?.value;
   const sig = payload.find(p => p.dataKey === "signalLine")?.value;

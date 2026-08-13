@@ -44,6 +44,26 @@ export function usePortfolioSync(onSuccess: (data: PortfolioSummaryData) => void
   };
 }
 
+function renderButtonContent(importing: boolean, importSuccess: boolean) {
+  if (importing) {
+    return (
+      <>
+        <Loader2 className="h-3 w-3 animate-spin" />
+        <span>Syncing...</span>
+      </>
+    );
+  }
+  if (importSuccess) {
+    return (
+      <>
+        <CheckCircle className="h-3 w-3 text-green-400" />
+        <span className="text-green-400">Synced!</span>
+      </>
+    );
+  }
+  return <span>Sync Portfolio</span>;
+}
+
 export function SyncPortfolioButton({
   importing,
   importSuccess,
@@ -60,19 +80,7 @@ export function SyncPortfolioButton({
       disabled={importing}
       className="text-xs font-semibold text-blue-500 hover:text-blue-400 flex items-center gap-1 transition-all disabled:opacity-50"
     >
-      {importing ? (
-        <>
-          <Loader2 className="h-3 w-3 animate-spin" />
-          <span>Syncing...</span>
-        </>
-      ) : importSuccess ? (
-        <>
-          <CheckCircle className="h-3 w-3 text-green-400" />
-          <span className="text-green-400">Synced!</span>
-        </>
-      ) : (
-        <span>Sync Portfolio</span>
-      )}
+      {renderButtonContent(importing, importSuccess)}
     </button>
   );
 }
