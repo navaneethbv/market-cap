@@ -39,7 +39,7 @@ export default async function CheckoutSuccessPage({
 
   if (verified) {
     // The next entitlement check should see the new subscription immediately
-    invalidateBillingCache(user.id);
+    invalidateBillingCache();
   }
 
   return (

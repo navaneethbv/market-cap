@@ -27,7 +27,9 @@ export async function createHolding(formData: FormData) {
     avgCost: String(formData.get("avgCost") ?? ""),
     purchasedAt: String(formData.get("purchasedAt") ?? ""),
   });
-  const idempotencyKey = String(formData.get("idempotencyKey") ?? "");
+  const rawIdempotencyKey = formData.get("idempotencyKey");
+  const idempotencyKey =
+    typeof rawIdempotencyKey === "string" ? rawIdempotencyKey : "";
   if (!isUuid(idempotencyKey)) {
     throw new Error("Idempotency key is required");
   }

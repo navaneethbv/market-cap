@@ -9,8 +9,8 @@ import { getOrCreateProPriceId, getStripe } from "./stripe.ts";
 
 // Billing state is read from Stripe on every check so cancellation and
 // payment-status changes are not hidden by a process-local cache.
-export function invalidateBillingCache(userId: string) {
-  void userId;
+export function invalidateBillingCache() {
+  // Intentional no-op: the Stripe-backed check above is always authoritative.
 }
 
 /**

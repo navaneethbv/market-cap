@@ -71,7 +71,9 @@ export async function placePaperTrade(formData: FormData) {
     side: String(formData.get("side") ?? ""),
     shares: String(formData.get("shares") ?? ""),
   });
-  const idempotencyKey = String(formData.get("idempotencyKey") ?? "");
+  const rawIdempotencyKey = formData.get("idempotencyKey");
+  const idempotencyKey =
+    typeof rawIdempotencyKey === "string" ? rawIdempotencyKey : "";
   if (!isUuid(idempotencyKey)) {
     throw new Error("Idempotency key is required");
   }

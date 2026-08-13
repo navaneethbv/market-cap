@@ -23,7 +23,9 @@ export async function startProCheckout(formData: FormData) {
     redirect("/pricing?already=pro");
   }
 
-  const idempotencyKey = String(formData.get("idempotencyKey") ?? "");
+  const rawIdempotencyKey = formData.get("idempotencyKey");
+  const idempotencyKey =
+    typeof rawIdempotencyKey === "string" ? rawIdempotencyKey : "";
   if (!isUuid(idempotencyKey)) {
     throw new Error("Idempotency key is required");
   }
