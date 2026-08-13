@@ -3,8 +3,7 @@ import { Button } from "@/components/ui/button";
 import {
   buildEarningsRows,
   type EarningsRow,
-  getMarketHolidays,
-  getNextMarketEvents,
+  getUpcomingHolidays,
 } from "@/lib/calendar";
 import { getEarningsCalendar } from "@/lib/market/finnhub";
 import { createClient } from "@/lib/supabase/server";
@@ -25,8 +24,7 @@ export default async function MarketCalendarPage() {
   const today = isoDate(todayDate);
   const to = isoDate(addDays(todayDate, 21));
   const year = todayDate.getUTCFullYear();
-  const holidays = getMarketHolidays(year);
-  const upcomingHolidays = getNextMarketEvents(today, holidays);
+  const upcomingHolidays = getUpcomingHolidays(today, year);
   let earnings: EarningsRow[] = [];
   let earningsError: string | null = null;
 
@@ -45,11 +43,13 @@ export default async function MarketCalendarPage() {
 
   let watchlistSymbols: string[] = [];
   if (user) {
-    const { data: wData } = await supabase
-      .from("watchlist")
+    const { data: wData, error: wError } = await supabase
+      .from("watchlist_items")
       .select("symbol")
       .eq("user_id", user.id);
-    watchlistSymbols = (wData ?? []).map((w) => w.symbol);
+    if (!wError) {
+      watchlistSymbols = (wData ?? []).map((w) => w.symbol);
+    }
   }
 
   return (

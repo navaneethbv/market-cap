@@ -36,6 +36,13 @@ export function IncomeTab({ metrics }: { metrics: IncomeMetric[] }) {
         from Finnhub applied to your position value.
       </p>
 
+      {metrics.some((metric) => metric.price === null) && (
+        <p className="text-xs text-amber-700 dark:text-amber-300">
+          Some holdings are excluded from the income totals because their latest
+          market price is unavailable.
+        </p>
+      )}
+
       {/* Holdings List */}
       <section className="space-y-3">
         <h3 className="text-base font-semibold">Dividend Assets</h3>
@@ -59,17 +66,22 @@ export function IncomeTab({ metrics }: { metrics: IncomeMetric[] }) {
                 </TableRow>
               ) : (
                 metrics.map((h) => {
-                  const estAnnual = h.shares * h.price * (h.dividendYield / 100);
+                  const estAnnual =
+                    h.price === null
+                      ? null
+                      : h.shares * h.price * (h.dividendYield / 100);
                   return (
                     <TableRow key={h.symbol}>
                       <TableCell className="font-semibold">{h.symbol}</TableCell>
                       <TableCell className="text-right tabular-nums">{h.shares}</TableCell>
-                      <TableCell className="text-right tabular-nums">{formatPrice(h.price)}</TableCell>
+                      <TableCell className="text-right tabular-nums">
+                        {h.price === null ? "Unavailable" : formatPrice(h.price)}
+                      </TableCell>
                       <TableCell className="text-right tabular-nums">
                         {h.dividendYield > 0 ? `${h.dividendYield.toFixed(2)}%` : "0%"}
                       </TableCell>
                       <TableCell className="text-right tabular-nums font-medium">
-                        {formatPrice(estAnnual)}
+                        {estAnnual === null ? "-" : formatPrice(estAnnual)}
                       </TableCell>
                     </TableRow>
                   );

@@ -108,6 +108,22 @@ export function getNextMarketEvents(
     .slice(0, limit);
 }
 
+/**
+ * Returns the next upcoming market holidays, spanning the given year and the
+ * year after so late-year views still surface the next New Year's Day.
+ */
+export function getUpcomingHolidays(
+  today: string,
+  currentYear: number,
+  limit = 6
+): MarketHoliday[] {
+  return getNextMarketEvents(
+    today,
+    [...getMarketHolidays(currentYear), ...getMarketHolidays(currentYear + 1)],
+    limit
+  );
+}
+
 export function buildEarningsRows(events: RawEarningsEvent[]): EarningsRow[] {
   return events
     .filter((event) => event.symbol && event.date)

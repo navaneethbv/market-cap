@@ -11,6 +11,8 @@ import type { RawEarningsEvent } from "@/lib/calendar";
 
 const BASE = "https://finnhub.io/api/v1";
 
+const FETCH_TIMEOUT_MS = 10_000;
+
 async function finnhub<T>(
   path: string,
   params: Record<string, string>,
@@ -21,7 +23,10 @@ async function finnhub<T>(
     throw new Error("FINNHUB_API_KEY is not set. Add it to .env.local");
   }
   const qs = new URLSearchParams({ ...params, token: key });
-  const res = await fetch(`${BASE}${path}?${qs}`, { next: { revalidate } });
+  const res = await fetch(`${BASE}${path}?${qs}`, {
+    next: { revalidate },
+    signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
+  });
   if (!res.ok) {
     throw new Error(`Finnhub ${path} failed: ${res.status}`);
   }

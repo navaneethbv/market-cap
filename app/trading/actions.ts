@@ -3,9 +3,17 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { getQuote } from "@/lib/market/finnhub";
-import { normalizePaperTradeInput } from "@/lib/paper-trading";
+import {
+  buildPaperPortfolio,
+  buildPaperPositionRows,
+  buildPaperSummary,
+  DEFAULT_STARTING_CASH,
+  normalizePaperTradeInput,
+} from "@/lib/paper-trading";
+import { fetchAllPaperTrades } from "@/app/trading/data";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
+import { isUuid } from "@/lib/parse";
 
 async function requireUser() {
   const supabase = await createClient();
@@ -20,6 +28,42 @@ async function requireUser() {
   return user;
 }
 
+async function recordPaperEquitySnapshot(userId: string) {
+  try {
+    const admin = createAdminClient();
+    const [{ data: account }, trades] = await Promise.all([
+      admin
+        .from("paper_accounts")
+        .select("starting_cash")
+        .eq("user_id", userId)
+        .maybeSingle(),
+      fetchAllPaperTrades(admin, userId),
+    ]);
+    const portfolio = buildPaperPortfolio(trades);
+    const quoteResults = await Promise.allSettled(
+      portfolio.positions.map((position) => getQuote(position.symbol))
+    );
+    const positionRows = buildPaperPositionRows(
+      portfolio.positions,
+      quoteResults
+    );
+    if (positionRows.some((row) => row.error !== null)) return;
+
+    const summary = buildPaperSummary({
+      startingCash: account ? Number(account.starting_cash) : DEFAULT_STARTING_CASH,
+      portfolio,
+      positionRows,
+    });
+    const { error } = await admin.rpc("upsert_paper_equity_snapshot", {
+      p_user_id: userId,
+      p_equity: Math.max(0, summary.equity),
+    });
+    if (error) console.error("equity snapshot failed:", error.message);
+  } catch (error) {
+    console.error("equity snapshot failed:", error);
+  }
+}
+
 export async function placePaperTrade(formData: FormData) {
   const user = await requireUser();
   const input = normalizePaperTradeInput({
@@ -27,6 +71,12 @@ export async function placePaperTrade(formData: FormData) {
     side: String(formData.get("side") ?? ""),
     shares: String(formData.get("shares") ?? ""),
   });
+  const rawIdempotencyKey = formData.get("idempotencyKey");
+  const idempotencyKey =
+    typeof rawIdempotencyKey === "string" ? rawIdempotencyKey : "";
+  if (!isUuid(idempotencyKey)) {
+    throw new Error("Idempotency key is required");
+  }
 
   let quotePrice: number;
   try {
@@ -42,11 +92,14 @@ export async function placePaperTrade(formData: FormData) {
     p_side: input.side,
     p_shares: input.shares,
     p_price: quotePrice,
+    p_idempotency_key: idempotencyKey,
   });
 
   if (error) {
     throw new Error(error.message);
   }
+
+  await recordPaperEquitySnapshot(user.id);
 
   revalidatePath("/trading");
   revalidatePath("/trading/history");

@@ -88,11 +88,7 @@ export function sortScreenerStocks(
     sorted.sort((a, b) => b.marketCap - a.marketCap);
   } else if (sortBy === "peRatio") {
     // Put null values at the end
-    sorted.sort((a, b) => {
-      if (a.peRatio === null) return 1;
-      if (b.peRatio === null) return -1;
-      return a.peRatio - b.peRatio;
-    });
+    sorted.sort((a, b) => (a.peRatio ?? Infinity) - (b.peRatio ?? Infinity));
   } else if (sortBy === "dividendYield") {
     sorted.sort((a, b) => (b.dividendYield ?? 0) - (a.dividendYield ?? 0));
   } else if (sortBy === "changePercent") {

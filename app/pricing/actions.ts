@@ -6,8 +6,9 @@ import { getAppOrigin } from "@/lib/app-url";
 import { createClient } from "@/lib/supabase/server";
 import { getBillingState } from "@/lib/billing";
 import { getOrCreateProPriceId, getStripe } from "@/lib/stripe";
+import { isUuid } from "@/lib/parse";
 
-export async function startProCheckout() {
+export async function startProCheckout(formData: FormData) {
   const supabase = await createClient();
   const {
     data: { user },
@@ -20,6 +21,13 @@ export async function startProCheckout() {
   const billing = await getBillingState(user.id);
   if (billing.isPro) {
     redirect("/pricing?already=pro");
+  }
+
+  const rawIdempotencyKey = formData.get("idempotencyKey");
+  const idempotencyKey =
+    typeof rawIdempotencyKey === "string" ? rawIdempotencyKey : "";
+  if (!isUuid(idempotencyKey)) {
+    throw new Error("Idempotency key is required");
   }
 
   const stripe = getStripe();
@@ -50,10 +58,13 @@ export async function startProCheckout() {
   }
 
   if (!customerId) {
-    const customer = await stripe.customers.create({
-      email: user.email ?? undefined,
-      metadata: { supabase_user_id: user.id },
-    });
+    const customer = await stripe.customers.create(
+      {
+        email: user.email ?? undefined,
+        metadata: { supabase_user_id: user.id },
+      },
+      { idempotencyKey: `marketcap-customer-${user.id}` }
+    );
     customerId = customer.id;
 
     const { error } = await supabase
@@ -79,7 +90,7 @@ export async function startProCheckout() {
     line_items: [{ price: proPriceId, quantity: 1 }],
     success_url: `${origin}/pricing/success?session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${origin}/pricing`,
-  });
+  }, { idempotencyKey });
 
   if (!session.url) {
     throw new Error("Stripe did not return a checkout URL");

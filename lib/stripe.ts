@@ -18,14 +18,26 @@ export function getStripe(): Stripe {
 }
 
 let cachedProPriceId: string | null = null;
+let proPriceIdPromise: Promise<string> | null = null;
 
 /**
  * Finds the Pro price by lookup key, creating the product and price in the
- * connected Stripe account on first use. Safe to call repeatedly.
+ * connected Stripe account on first use. Concurrent calls share a single
+ * in-flight lookup so the product and price are never created twice.
  */
 export async function getOrCreateProPriceId(): Promise<string> {
   if (cachedProPriceId) return cachedProPriceId;
+  if (proPriceIdPromise) return proPriceIdPromise;
 
+  proPriceIdPromise = resolveProPriceId();
+  try {
+    return await proPriceIdPromise;
+  } finally {
+    proPriceIdPromise = null;
+  }
+}
+
+async function resolveProPriceId(): Promise<string> {
   const stripe = getStripe();
   const existing = await stripe.prices.list({
     lookup_keys: [PRO_PRICE_LOOKUP_KEY],
@@ -37,17 +49,23 @@ export async function getOrCreateProPriceId(): Promise<string> {
     return cachedProPriceId;
   }
 
-  const product = await stripe.products.create({
-    name: "MarketCap Pro",
-    description: "Save stocks to your watchlist and unlock future Pro features.",
-  });
-  const price = await stripe.prices.create({
-    product: product.id,
-    unit_amount: PRO_PRICE_USD_CENTS,
-    currency: "usd",
-    recurring: { interval: "month" },
-    lookup_key: PRO_PRICE_LOOKUP_KEY,
-  });
+  const product = await stripe.products.create(
+    {
+      name: "MarketCap Pro",
+      description: "Save stocks to your watchlist and unlock future Pro features.",
+    },
+    { idempotencyKey: "marketcap-pro-product" }
+  );
+  const price = await stripe.prices.create(
+    {
+      product: product.id,
+      unit_amount: PRO_PRICE_USD_CENTS,
+      currency: "usd",
+      recurring: { interval: "month" },
+      lookup_key: PRO_PRICE_LOOKUP_KEY,
+    },
+    { idempotencyKey: "marketcap-pro-price" }
+  );
   cachedProPriceId = price.id;
   return cachedProPriceId;
 }
@@ -55,5 +73,5 @@ export async function getOrCreateProPriceId(): Promise<string> {
 export function _resetStripeCache() {
   stripeClient = null;
   cachedProPriceId = null;
+  proPriceIdPromise = null;
 }
-

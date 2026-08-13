@@ -37,7 +37,7 @@ export function runSnowballProjection(params: SnowballParams): SnowballResult {
   const points: SnowballYearPoint[] = [];
   let portfolioValue = initialPortfolioValue;
   let costBasis = initialPortfolioValue;
-  let annualDividends = initialAnnualDividends;
+  let lastYearDividends = initialAnnualDividends;
   let cumulativeDividends = 0;
 
   // Average yield starts as initial dividends / initial value
@@ -51,17 +51,21 @@ export function runSnowballProjection(params: SnowballParams): SnowballResult {
     year: 0,
     portfolioValue,
     costBasis,
-    annualDividends,
+    annualDividends: initialAnnualDividends,
     cumulativeDividends: 0,
   });
 
   const monthlyAppreciationRate = expectedPriceAppreciation / 12;
 
   for (let year = 1; year <= timeHorizonYears; year++) {
+    // Dividends actually received during this year; the yield only grows
+    // for the following year, so points[year].annualDividends is not forward-looking.
+    let dividendsThisYear = 0;
     for (let month = 1; month <= 12; month++) {
       // Monthly dividend payment is based on current annual rate / 12
       // In a real portfolio, dividend yields are tied to the share counts, which appreciate
       const monthlyDividends = (portfolioValue * averageYield) / 12;
+      dividendsThisYear += monthlyDividends;
       cumulativeDividends += monthlyDividends;
 
       // Price appreciation on the current portfolio value
@@ -78,14 +82,13 @@ export function runSnowballProjection(params: SnowballParams): SnowballResult {
       }
     }
 
-    // Apply annual dividend growth rate to the yield
+    lastYearDividends = dividendsThisYear;
+
+    // Apply annual dividend growth rate to the yield for the following year
     averageYield = averageYield * (1 + dividendGrowthRate);
 
-    // Compute annual dividends for the next year based on the new yield and portfolio value
-    annualDividends = portfolioValue * averageYield;
-
-    // Check for contribution crossover
-    if (crossoverYear === null && annualDividends > annualContributions && annualContributions > 0) {
+    // Check for contribution crossover based on dividends received this year
+    if (crossoverYear === null && dividendsThisYear > annualContributions && annualContributions > 0) {
       crossoverYear = year;
     }
 
@@ -93,12 +96,12 @@ export function runSnowballProjection(params: SnowballParams): SnowballResult {
       year,
       portfolioValue: Math.round(portfolioValue * 100) / 100,
       costBasis: Math.round(costBasis * 100) / 100,
-      annualDividends: Math.round(annualDividends * 100) / 100,
+      annualDividends: Math.round(dividendsThisYear * 100) / 100,
       cumulativeDividends: Math.round(cumulativeDividends * 100) / 100,
     });
   }
 
-  const finalYieldOnCost = costBasis > 0 ? (annualDividends / costBasis) * 100 : 0;
+  const finalYieldOnCost = costBasis > 0 ? (lastYearDividends / costBasis) * 100 : 0;
 
   return {
     points,

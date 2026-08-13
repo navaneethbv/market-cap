@@ -1,7 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { getQuote, getKeyMetrics, getProfile } from "@/lib/market/finnhub";
-
-const SYMBOL_PATTERN = /^[A-Z0-9.^-]{1,12}$/;
+import { splitSymbols } from "@/lib/symbol";
 
 interface MatrixStock {
   symbol: string;
@@ -16,14 +15,7 @@ interface MatrixStock {
 
 export async function GET(request: NextRequest) {
   const symbolsParam = request.nextUrl.searchParams.get("symbols") ?? "";
-  const symbols = [
-    ...new Set(
-      symbolsParam
-        .split(",")
-        .map((s) => s.trim().toUpperCase())
-        .filter((s) => SYMBOL_PATTERN.test(s))
-    ),
-  ].slice(0, 4);
+  const symbols = splitSymbols(symbolsParam, 4);
 
   if (symbols.length === 0) {
     return NextResponse.json({ stocks: [] });

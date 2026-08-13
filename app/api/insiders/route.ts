@@ -2,6 +2,8 @@ import { NextResponse, type NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server.ts";
 import { getInsiderTransactions } from "@/lib/market/finnhub";
 import type { InsiderTransaction } from "@/lib/market/types";
+import { isValidSymbol } from "@/lib/symbol";
+import { parseDateTimestamp } from "@/lib/parse";
 
 export async function GET(request: NextRequest) {
   const symbol = request.nextUrl.searchParams.get("symbol")?.trim().toUpperCase();
@@ -11,7 +13,7 @@ export async function GET(request: NextRequest) {
     let targetSymbols: string[] = [];
 
     if (symbol) {
-      if (!/^[A-Z0-9.^-]{1,12}$/.test(symbol)) {
+      if (!isValidSymbol(symbol)) {
         return NextResponse.json({ error: "invalid symbol" }, { status: 400 });
       }
       const transactions = await getInsiderTransactions(symbol);
@@ -58,9 +60,9 @@ export async function GET(request: NextRequest) {
       }
     });
 
-    // Sort by transaction date descending
+    // Sort by transaction date descending; malformed dates sort last
     allTransactions.sort(
-      (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+      (a, b) => parseDateTimestamp(b.date) - parseDateTimestamp(a.date)
     );
 
     // Limit to 50 items
@@ -70,10 +72,7 @@ export async function GET(request: NextRequest) {
   } catch (err) {
     console.error("insiders route failed:", err);
     return NextResponse.json(
-      {
-        error:
-          err instanceof Error ? err.message : "Failed to load insider activity",
-      },
+      { error: "Failed to load insider activity" },
       { status: 502 }
     );
   }

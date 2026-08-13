@@ -95,6 +95,14 @@ export function calculateBollingerBands(
   return { upper, middle, lower };
 }
 
+function rsiFromAverages(avgGain: number, avgLoss: number): number {
+  if (avgLoss === 0) {
+    // A flat series (avgGain and avgLoss both 0) is neutral, not overbought.
+    return avgGain === 0 ? 50 : 100;
+  }
+  return 100 - 100 / (1 + avgGain / avgLoss);
+}
+
 export function calculateRSI(prices: number[], period = 14): (number | null)[] {
   const rsi: (number | null)[] = Array(prices.length).fill(null);
   if (prices.length <= period) {
@@ -106,8 +114,8 @@ export function calculateRSI(prices: number[], period = 14): (number | null)[] {
 
   for (let i = 1; i < prices.length; i++) {
     const diff = prices[i] - prices[i - 1];
-    gains.push(diff > 0 ? diff : 0);
-    losses.push(diff < 0 ? -diff : 0);
+    gains.push(Math.max(diff, 0));
+    losses.push(Math.max(-diff, 0));
   }
 
   let avgGain = 0;
@@ -118,25 +126,15 @@ export function calculateRSI(prices: number[], period = 14): (number | null)[] {
     avgLoss += losses[i];
   }
 
-  avgGain = avgGain / period;
-  avgLoss = avgLoss / period;
+  avgGain /= period;
+  avgLoss /= period;
 
-  let rs = avgLoss === 0 ? 100 : avgGain / avgLoss;
-  rsi[period] = avgLoss === 0 ? 100 : 100 - 100 / (1 + rs);
+  rsi[period] = rsiFromAverages(avgGain, avgLoss);
 
   for (let i = period + 1; i < prices.length; i++) {
-    const currentGain = gains[i - 1];
-    const currentLoss = losses[i - 1];
-
-    avgGain = (avgGain * (period - 1) + currentGain) / period;
-    avgLoss = (avgLoss * (period - 1) + currentLoss) / period;
-
-    if (avgLoss === 0) {
-      rsi[i] = 100;
-    } else {
-      rs = avgGain / avgLoss;
-      rsi[i] = 100 - 100 / (1 + rs);
-    }
+    avgGain = (avgGain * (period - 1) + gains[i - 1]) / period;
+    avgLoss = (avgLoss * (period - 1) + losses[i - 1]) / period;
+    rsi[i] = rsiFromAverages(avgGain, avgLoss);
   }
   return rsi;
 }

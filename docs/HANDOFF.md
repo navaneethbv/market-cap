@@ -13,11 +13,10 @@ Tailwind v4 + shadcn/ui (radix-nova preset), Supabase (auth + Postgres + RLS),
 Recharts, deploy target Vercel. US stocks only, free API tiers.
 
 Data providers:
-- Finnhub (quotes, search, profile, metrics, news, websocket). 60 calls/min.
+- Finnhub (quotes, search, profile, metrics, news). 60 calls/min.
 - Twelve Data (chart candles). 8 credits/min, 800/day.
-- Keys are filled in `.env.local` (gitignored). Finnhub key duplicated as
-  NEXT_PUBLIC_FINNHUB_API_KEY for the future client-side websocket (accepted
-  trade-off, noted in plan).
+- Keys are filled in `.env.local` (gitignored). The Finnhub key remains
+  server-only, and live prices use the `/api/quote` proxy.
 
 ## Design direction (user-approved)
 
@@ -62,10 +61,9 @@ Reference images in `img/` (committed). Blend of two dribbble shots:
   `create_holdings`, `drop_unused_holdings_symbol_idx`, and
   `default_holdings_purchased_at`. Authenticated CRUD, cross-user insert
   rejection, and signed-in app route smoke tests were run with the test account.
-- Phase 6 DONE in current working tree: `hooks/useLivePrice.ts` connects to the
-  Finnhub websocket using `NEXT_PUBLIC_FINNHUB_API_KEY`, merges trade ticks into
-  quote state, and falls back to `/api/quote` polling every 15 seconds. Stock
-  detail page now shows the live price status.
+- Phase 6 DONE in current working tree: `hooks/useLivePrice.ts` polls the
+  server-side `/api/quote` proxy every 15 seconds. Stock detail page now shows
+  the live price status without exposing the Finnhub key to clients.
 - Phase 7 DONE in current working tree: dashboard home page now shows SPY/QQQ/DIA
   cards, watchlist summary, and market news using existing market helpers.
 - Price alerts feature DONE on main: `price_alerts` migration with RLS and
@@ -101,11 +99,9 @@ Reference images in `img/` (committed). Blend of two dribbble shots:
   theme-toggle button attribute mismatches. Playwright recheck showed no console
   errors afterward.
 - Review and hardening pass DONE in current working tree (2026-07-04):
-  - `hooks/useLivePrice.ts`: dropped `initialQuote` from the effect deps (it
-    is not read inside the effect) so server re-renders such as a Watch
-    toggle no longer tear down and reconnect the Finnhub websocket; wrapped
-    the websocket `JSON.parse` in try/catch so a malformed frame cannot throw
-    an uncaught error.
+  - `hooks/useLivePrice.ts`: dropped `initialQuote` from the effect deps and
+    uses the server-side quote proxy for polling, so server re-renders such as
+    a Watch toggle do not restart live-price polling.
   - `components/search-box.tsx`: guarded `setResults`/`setOpen` behind the
     effect's `active` flag so a slow search response cannot reopen the
     dropdown after the user clicked away or cleared the query.
@@ -259,6 +255,37 @@ Record every pushed commit here after each milestone.
   - Exported reset helper in `lib/stripe.ts` and removed unreachable check in `lib/correlation.ts`.
   - Reached 97.17% branch coverage and 99.65% statement coverage.
 
+## Audit fix plan (branches off main, PRs #20-#22 OPEN)
+
+Full-repo audit (4 parallel agents) produced a fix plan delivered as sequential PRs. All build on main; none merged yet.
+
+- PR #20 `fix/p0-bugs` (commit `d6e5ccd`): calendar page queries `watchlist_items` not `watchlist`; snowball dividends record actuals per year (not next-year forward rate), crossover + `finalYieldOnCost` fixed; flat-series RSI returns 50.
+- PR #21 `fix/financial-accuracy` (commit `f9588c6`): `/api/portfolio/summary` omits unpriced holdings (no `avg_cost` fabrication), `calculatePortfolioHistory` skips holdings with no candle data, `calculateWeightedBeta` returns null for empty portfolio, migration `20260812000000_harden_equity_snapshot_lock.sql` adds `pg_advisory_xact_lock` to `upsert_paper_equity_snapshot`.
+- PR #22 `fix/races-idempotency-reconnect` (commit `3867d51`): pending-state submit buttons in holding dialogs and trading; insiders + correlation page fetches moved into single effects keyed on inputs with AbortController/active guard; `useLivePrice` reconnects with capped exponential backoff (1s-30s).
+
+## Session 2026-08-13: hardening + polish (branch `fix/hardening-polish`, PR #23)
+
+PR 4 (hardening) + PR 5 (polish) from the audit plan, combined into one change set, all verified (195 tests, lint, tsc --noEmit, build all pass).
+
+- Rate limiting (best effort, per instance): proxy.ts rejects external market-data API routes over 90 req/60s per client with 429 + Retry-After.
+- Fetch timeouts (10s) on Finnhub and Twelve Data clients via `AbortSignal.timeout`.
+- Generic error messages on backtest/insiders/correlation routes (no provider error leakage); insiders sort puts malformed dates last (`parseDateTimestamp`); beta route guards `decodeURIComponent`; search query capped at 20 chars.
+- New `lib/symbol.ts` (`SYMBOL_PATTERN`, `isValidSymbol`, `normalizeSymbol`, `splitSymbols`) and `lib/parse.ts` (`isUuid`, `parseDateTimestamp`); deduped symbol regex across 14 files; strict UUID checks in alerts + portfolio actions.
+- Correlation: symbols split on whitespace too; intraday candles aggregated to daily closes before return computation.
+- Backtester sell trade-log records actual shares (was 0); screener PE sort handles all-null lists; alert distancePercent guards division by zero; calendar surfaces adjacent-year holidays (`getUpcomingHolidays`).
+- formatPrice/formatNumber render "-" for non-finite; DCF discloses default $5.00 EPS fallback; screener page has an error state with Retry.
+- Stripe single-flight `getOrCreateProPriceId`; pricing checkout button disables while pending (`components/pricing-submit-button.tsx`).
+- Ledger: pushed commit `5916152`.
+
+## Consolidation (branch `fix/combined-audit-fixes`, PR #24)
+
+PRs #20-#23 were consolidated into a single PR #24 against `main`
+(`fix/combined-audit-fixes`). Each PR's commits were preserved as merge commits
+in order (#20, #21, #22, #23); the diff is the exact union (58 files,
++819/-241, no package/config churn). Verified on the combined branch: 199
+tests, lint, `tsc --noEmit`, and build all pass. PRs #20-#23 were closed as
+superseded. Review and merge #24 instead.
+
 
 ## Session 2026-07-05 (later): port PR merged, billing IN PROGRESS
 
@@ -402,8 +429,8 @@ it was parked; this is a currency refactor wearing a feature's clothes):
 4. Portfolio, paper trading, backtest, and Monte Carlo math would silently
    mix USD and INR into one P/L number. Needs a currency per holding plus
    either base-currency conversion or portfolios segregated by market.
-5. The Finnhub websocket cannot carry NSE ticks, so Indian symbols are
-   polling only in `useLivePrice`.
+5. The server-side quote proxy currently supports the symbols accepted by the
+   Finnhub integration; symbols without provider quotes remain unavailable.
 6. Market hours (9:15 to 15:30 IST) and the NSE/BSE holiday calendar differ
    from US sessions, touching alerts, movers, and live-price status.
 7. The SEC insider tracker has no free Indian equivalent. It stays US-only.

@@ -1,4 +1,5 @@
 import type { Candle } from "./market/types";
+import { splitSymbols } from "./symbol.ts";
 
 export interface SymbolCandles {
   symbol: string;
@@ -16,22 +17,14 @@ export interface CorrelationResult {
   overlapCounts: Record<string, Record<string, number>>;
 }
 
-const SYMBOL_PATTERN = /^[A-Z0-9.^-]{1,12}$/;
-
 export function normalizeCorrelationSymbols(value: string): string[] {
-  return [
-    ...new Set(
-      value
-        .split(",")
-        .map((symbol) => symbol.trim().toUpperCase())
-        .filter((symbol) => SYMBOL_PATTERN.test(symbol))
-    ),
-  ].slice(0, 10);
+  return splitSymbols(value, 10);
 }
 
 /**
  * Calculates daily percentage returns for a list of candles.
- * Returns map of date (YYYY-MM-DD) -> return rate.
+ * Intraday candles are first aggregated to each trading day's closing price,
+ * then close-to-close returns are computed. Returns a map of date -> return rate.
  */
 export function calculateDailyReturns(candles: Candle[]): Map<string, number> {
   const returnsMap = new Map<string, number>();
@@ -44,14 +37,19 @@ export function calculateDailyReturns(candles: Candle[]): Map<string, number> {
     (a, b) => new Date(a.time).getTime() - new Date(b.time).getTime()
   );
 
-  for (let i = 1; i < sorted.length; i++) {
-    const prevClose = sorted[i - 1].close;
-    const currClose = sorted[i].close;
-    if (prevClose > 0) {
-      // Use YYYY-MM-DD part of the time string
-      const dateKey = sorted[i].time.slice(0, 10);
-      returnsMap.set(dateKey, (currClose - prevClose) / prevClose);
+  // Aggregate intraday candles to each trading day's closing price
+  const dailyCloses = new Map<string, number>();
+  for (const candle of sorted) {
+    const dateKey = candle.time.slice(0, 10);
+    dailyCloses.set(dateKey, candle.close);
+  }
+
+  let prevClose: number | null = null;
+  for (const [dateKey, close] of dailyCloses) {
+    if (prevClose !== null && prevClose > 0) {
+      returnsMap.set(dateKey, (close - prevClose) / prevClose);
     }
+    prevClose = close;
   }
 
   return returnsMap;

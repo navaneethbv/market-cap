@@ -17,6 +17,8 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { PendingSubmitButton } from "@/components/pending-submit-button";
+import { IdempotencyKeyInput } from "@/components/idempotency-key-input";
 import type { HoldingRow } from "@/lib/portfolio";
 
 function HoldingFields({
@@ -124,13 +126,14 @@ export function AddHoldingDialog({
           </DialogDescription>
         </DialogHeader>
         <form action={createHolding} className="grid gap-4">
+          <IdempotencyKeyInput />
           {next && <input type="hidden" name="next" value={next} />}
           <HoldingFields
             defaultSymbol={defaultSymbol}
             defaultAvgCost={defaultAvgCost}
           />
           <DialogFooter>
-            <Button type="submit">Save holding</Button>
+            <PendingSubmitButton>Save holding</PendingSubmitButton>
           </DialogFooter>
         </form>
       </DialogContent>
@@ -161,7 +164,7 @@ export function EditHoldingDialog({ holding }: { holding: HoldingRow }) {
         <form action={updateHolding} className="grid gap-4">
           <HoldingFields holding={holding} />
           <DialogFooter>
-            <Button type="submit">Save changes</Button>
+            <PendingSubmitButton>Save changes</PendingSubmitButton>
           </DialogFooter>
         </form>
       </DialogContent>
