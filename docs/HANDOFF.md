@@ -254,6 +254,12 @@ Record every pushed commit here after each milestone.
   - Added unit test coverage for Finnhub API fallbacks, market allocation, app origin, backtester boundary options, billing state period ends, dynamic imports, compare tool edge cases, short correlation matrices, trade status, movers edge cases, news classification fallbacks, HHI, PE null sorting, and Stripe sandboxed price lookup.
   - Exported reset helper in `lib/stripe.ts` and removed unreachable check in `lib/correlation.ts`.
   - Reached 97.17% branch coverage and 99.65% statement coverage.
+- `50d2e0a` Achieve >95% code coverage across the repository (branch `feature/code-coverage-95`, PR #26)
+  - Added new unit test files (`lib/parse.test.mjs`, `lib/proxy.test.mjs`, `lib/supabase.test.mjs`, `lib/trading-data.test.mjs`).
+  - Added edge-case test coverage for `portfolio.ts`, `paper-trading.ts`, `monte-carlo.ts`, `indicators.ts`, `billing-state.ts`, `billing.ts`, `stripe.ts`.
+  - Updated `package.json` test script to run Node `--experimental-test-coverage`.
+  - Reached 99.09% line coverage, 97.62% branch coverage, and 98.22% function coverage across 219 unit tests.
+
 
 ## Audit fix plan (branches off main, PRs #20-#22 OPEN)
 
