@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Check, Crown, Star } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { PricingSubmitButton } from "@/components/pricing-submit-button";
 import { createClient } from "@/lib/supabase/server";
 import { getBillingState } from "@/lib/billing";
 import { FREE_BILLING_STATE } from "@/lib/billing-state";
@@ -142,9 +143,9 @@ export default async function PricingPage({ searchParams }: PricingPageProps) {
               </div>
             ) : user ? (
               <form action={startProCheckout}>
-                <Button type="submit" className="w-full rounded-full">
+                <PricingSubmitButton className="w-full rounded-full" pendingLabel="Redirecting...">
                   Upgrade to Pro
-                </Button>
+                </PricingSubmitButton>
               </form>
             ) : (
               <Button className="w-full rounded-full" asChild>

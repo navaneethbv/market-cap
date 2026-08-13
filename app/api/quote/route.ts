@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { getQuote } from "@/lib/market/finnhub";
 import { buildQuotePayload } from "@/lib/quote-response";
+import { splitSymbols } from "@/lib/symbol";
 
 const MAX_SYMBOLS = 25;
 
@@ -12,14 +13,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "symbol is required" }, { status: 400 });
   }
 
-  const symbols = [
-    ...new Set(
-      param
-        .split(",")
-        .map((s) => s.trim().toUpperCase())
-        .filter((s) => /^[A-Z0-9.^-]{1,12}$/.test(s))
-    ),
-  ].slice(0, MAX_SYMBOLS);
+  const symbols = splitSymbols(param, MAX_SYMBOLS);
 
   if (symbols.length === 0) {
     return NextResponse.json({ error: "no valid symbols" }, { status: 400 });

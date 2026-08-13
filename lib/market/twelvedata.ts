@@ -3,6 +3,8 @@ import type { Candle, ChartRange } from "./types";
 
 const BASE = "https://api.twelvedata.com";
 
+const FETCH_TIMEOUT_MS = 10_000;
+
 const RANGE_CONFIG: Record<
   ChartRange,
   { interval: string; outputsize: number; revalidate: number }
@@ -39,6 +41,7 @@ export async function getCandles(
 
   const res = await fetch(`${BASE}/time_series?${qs}`, {
     next: { revalidate },
+    signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
   });
   if (!res.ok) {
     throw new Error(`Twelve Data time_series failed: ${res.status}`);

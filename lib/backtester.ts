@@ -241,7 +241,7 @@ export function runBacktest(params: BacktestParams): BacktestResult {
         type: "sell",
         time,
         price: close,
-        shares: 0,
+        shares,
         cash,
         value: cash,
       });

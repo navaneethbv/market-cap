@@ -1,4 +1,5 @@
 import type { Quote } from "./market/types";
+import { isValidSymbol, normalizeSymbol } from "./symbol.ts";
 
 export interface WatchlistItem {
   id: string;
@@ -14,11 +15,11 @@ export interface WatchlistRow {
 }
 
 export function normalizeWatchlistSymbol(value: string): string {
-  return value.trim().toUpperCase();
+  return normalizeSymbol(value);
 }
 
 export function isWatchlistSymbol(value: string): boolean {
-  return /^[A-Z0-9.^-]{1,12}$/.test(value);
+  return isValidSymbol(value);
 }
 
 export function getSafeWatchlistNextPath(value: FormDataEntryValue | null) {

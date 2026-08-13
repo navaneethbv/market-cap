@@ -5,12 +5,13 @@ import {
   runBacktest,
   type StrategyType,
 } from "@/lib/backtester";
+import { isValidSymbol } from "@/lib/symbol";
 
 export async function GET(request: NextRequest) {
   const symbol = request.nextUrl.searchParams.get("symbol")?.trim().toUpperCase();
   const strategy = request.nextUrl.searchParams.get("strategy") as StrategyType;
 
-  if (!symbol || !/^[A-Z0-9.^-]{1,12}$/.test(symbol)) {
+  if (!symbol || !isValidSymbol(symbol)) {
     return NextResponse.json({ error: "invalid symbol" }, { status: 400 });
   }
 
@@ -47,7 +48,7 @@ export async function GET(request: NextRequest) {
   } catch (err) {
     console.error("backtest route failed:", err);
     return NextResponse.json(
-      { error: err instanceof Error ? err.message : "Failed to run backtest" },
+      { error: "Failed to run backtest" },
       { status: 502 }
     );
   }

@@ -1,4 +1,5 @@
 import type { Quote } from "@/lib/market/types";
+import { isValidSymbol, normalizeSymbol } from "./symbol.ts";
 
 export type AlertDirection = "above" | "below";
 export type AlertStatus = "watching" | "triggered" | "paused" | "unavailable";
@@ -48,11 +49,9 @@ export type AlertRow = {
   error: string | null;
 };
 
-const SYMBOL_PATTERN = /^[A-Z0-9.^-]{1,12}$/;
-
 export function normalizeAlertInput(input: AlertInput): NormalizedAlertInput {
-  const symbol = input.symbol.trim().toUpperCase();
-  if (!SYMBOL_PATTERN.test(symbol)) {
+  const symbol = normalizeSymbol(input.symbol);
+  if (!isValidSymbol(symbol)) {
     throw new Error("Invalid symbol");
   }
 
@@ -96,7 +95,8 @@ export function evaluatePriceAlert(
       : alert.target_price - quote.price;
   const isTriggered = signedDistance >= 0;
   const distance = Math.abs(quote.price - alert.target_price);
-  const distancePercent = (distance / alert.target_price) * 100;
+  const distancePercent =
+    alert.target_price > 0 ? (distance / alert.target_price) * 100 : null;
 
   return {
     status: isTriggered ? "triggered" : "watching",

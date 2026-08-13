@@ -18,14 +18,26 @@ export function getStripe(): Stripe {
 }
 
 let cachedProPriceId: string | null = null;
+let proPriceIdPromise: Promise<string> | null = null;
 
 /**
  * Finds the Pro price by lookup key, creating the product and price in the
- * connected Stripe account on first use. Safe to call repeatedly.
+ * connected Stripe account on first use. Concurrent calls share a single
+ * in-flight lookup so the product and price are never created twice.
  */
 export async function getOrCreateProPriceId(): Promise<string> {
   if (cachedProPriceId) return cachedProPriceId;
+  if (proPriceIdPromise) return proPriceIdPromise;
 
+  proPriceIdPromise = resolveProPriceId();
+  try {
+    return await proPriceIdPromise;
+  } finally {
+    proPriceIdPromise = null;
+  }
+}
+
+async function resolveProPriceId(): Promise<string> {
   const stripe = getStripe();
   const existing = await stripe.prices.list({
     lookup_keys: [PRO_PRICE_LOOKUP_KEY],
@@ -55,5 +67,6 @@ export async function getOrCreateProPriceId(): Promise<string> {
 export function _resetStripeCache() {
   stripeClient = null;
   cachedProPriceId = null;
+  proPriceIdPromise = null;
 }
 

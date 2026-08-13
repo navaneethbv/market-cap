@@ -10,9 +10,9 @@ export async function GET(request: NextRequest) {
   const symbolsParam = request.nextUrl.searchParams.get("symbols") ?? "";
   const symbols = normalizeCorrelationSymbols(symbolsParam);
 
-  if (symbols.length < 2 || symbols.length > 10) {
+  if (symbols.length < 2) {
     return NextResponse.json(
-      { error: "Choose between 2 and 10 valid symbols" },
+      { error: "Choose at least 2 valid symbols" },
       { status: 400 }
     );
   }
@@ -59,10 +59,7 @@ export async function GET(request: NextRequest) {
   } catch (err) {
     console.error("correlation route failed:", err);
     return NextResponse.json(
-      {
-        error:
-          err instanceof Error ? err.message : "Failed to calculate correlation",
-      },
+      { error: "Failed to calculate correlation" },
       { status: 502 }
     );
   }

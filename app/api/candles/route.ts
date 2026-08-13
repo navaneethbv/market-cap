@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { getCandles, isChartRange } from "@/lib/market/twelvedata";
+import { isValidSymbol } from "@/lib/symbol";
 
 export async function GET(request: NextRequest) {
   const symbol = request.nextUrl.searchParams
@@ -8,7 +9,7 @@ export async function GET(request: NextRequest) {
     .toUpperCase();
   const range = request.nextUrl.searchParams.get("range") ?? "1D";
 
-  if (!symbol || !/^[A-Z0-9.^-]{1,12}$/.test(symbol)) {
+  if (!symbol || !isValidSymbol(symbol)) {
     return NextResponse.json({ error: "invalid symbol" }, { status: 400 });
   }
   if (!isChartRange(range)) {

@@ -3,8 +3,7 @@ import { Button } from "@/components/ui/button";
 import {
   buildEarningsRows,
   type EarningsRow,
-  getMarketHolidays,
-  getNextMarketEvents,
+  getUpcomingHolidays,
 } from "@/lib/calendar";
 import { getEarningsCalendar } from "@/lib/market/finnhub";
 import { createClient } from "@/lib/supabase/server";
@@ -25,8 +24,7 @@ export default async function MarketCalendarPage() {
   const today = isoDate(todayDate);
   const to = isoDate(addDays(todayDate, 21));
   const year = todayDate.getUTCFullYear();
-  const holidays = getMarketHolidays(year);
-  const upcomingHolidays = getNextMarketEvents(today, holidays);
+  const upcomingHolidays = getUpcomingHolidays(today, year);
   let earnings: EarningsRow[] = [];
   let earningsError: string | null = null;
 

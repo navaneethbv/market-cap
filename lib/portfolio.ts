@@ -1,4 +1,5 @@
 import type { Quote } from "./market/types";
+import { isValidSymbol, normalizeSymbol } from "./symbol.ts";
 
 export interface Holding {
   id: string;
@@ -52,14 +53,6 @@ function parsePositiveNumber(value: string | number, label: string): number {
     throw new Error(`${label} must be greater than zero`);
   }
   return parsed;
-}
-
-function normalizeSymbol(value: string): string {
-  return value.trim().toUpperCase();
-}
-
-function isValidSymbol(value: string): boolean {
-  return /^[A-Z0-9.^-]{1,12}$/.test(value);
 }
 
 function getQuoteError(reason: unknown): string {

@@ -25,8 +25,7 @@ import {
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import type { Quote } from "@/lib/market/types";
-
-const SYMBOL_PATTERN = /^[A-Z0-9.^-]{1,12}$/;
+import { isValidSymbol } from "@/lib/symbol";
 
 function pnlTone(value: number) {
   return value >= 0
@@ -44,7 +43,7 @@ export default async function TradingPage({ searchParams }: TradingPageProps) {
     ? params.symbol[0]
     : params.symbol;
   const prefillSymbol = (rawSymbol ?? "").trim().toUpperCase();
-  const ticketSymbol = SYMBOL_PATTERN.test(prefillSymbol) ? prefillSymbol : "";
+  const ticketSymbol = isValidSymbol(prefillSymbol) ? prefillSymbol : "";
 
   const supabase = await createClient();
   const {

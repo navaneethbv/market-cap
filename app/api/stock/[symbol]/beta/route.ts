@@ -1,16 +1,20 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { getQuote, getKeyMetrics, getProfile } from "@/lib/market/finnhub";
-
-const SYMBOL_PATTERN = /^[A-Z0-9.^-]{1,12}$/;
+import { isValidSymbol } from "@/lib/symbol";
 
 export async function GET(
   _request: NextRequest,
   { params }: { params: Promise<{ symbol: string }> }
 ) {
   const { symbol: rawSymbol } = await params;
-  const symbol = decodeURIComponent(rawSymbol).trim().toUpperCase();
+  let symbol: string;
+  try {
+    symbol = decodeURIComponent(rawSymbol).trim().toUpperCase();
+  } catch {
+    return NextResponse.json({ error: "invalid symbol" }, { status: 400 });
+  }
 
-  if (!SYMBOL_PATTERN.test(symbol)) {
+  if (!isValidSymbol(symbol)) {
     return NextResponse.json({ error: "invalid symbol" }, { status: 400 });
   }
 
