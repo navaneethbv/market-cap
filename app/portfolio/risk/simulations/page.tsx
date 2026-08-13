@@ -59,12 +59,12 @@ export default function MonteCarloPage() {
     }
   };
 
-  const capNum = Math.max(0, parseFloat(initialCapital) || 0);
-  const contrNum = Math.max(0, parseFloat(monthlyContribution) || 0);
-  const retNum = Math.max(-50, parseFloat(annualReturn) || 0) / 100;
-  const volNum = Math.max(0, parseFloat(annualVolatility) || 0) / 100;
-  const horizon = Math.max(1, parseInt(timeHorizon) || 20);
-  const targetNum = Math.max(0, parseFloat(targetValue) || 0);
+  const capNum = Math.max(0, Number.parseFloat(initialCapital) || 0);
+  const contrNum = Math.max(0, Number.parseFloat(monthlyContribution) || 0);
+  const retNum = Math.max(-50, Number.parseFloat(annualReturn) || 0) / 100;
+  const volNum = Math.max(0, Number.parseFloat(annualVolatility) || 0) / 100;
+  const horizon = Math.max(1, Number.parseInt(timeHorizon) || 20);
+  const targetNum = Math.max(0, Number.parseFloat(targetValue) || 0);
 
   // Execute simulation (runs instant ~3ms on client)
   const simulation = runMonteCarloSimulation({
@@ -107,6 +107,7 @@ export default function MonteCarloPage() {
                 <span>Simulation Parameters</span>
               </div>
               <button
+                type="button"
                 onClick={handleImportPortfolio}
                 disabled={importing}
                 className="text-xs font-semibold text-blue-500 hover:text-blue-400 flex items-center gap-1 transition-all disabled:opacity-50"
@@ -136,8 +137,9 @@ export default function MonteCarloPage() {
             {/* Starting Inputs */}
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <label className="text-xs font-medium text-muted-foreground">Starting Capital ($)</label>
+                <label htmlFor="sim-initial-capital" className="text-xs font-medium text-muted-foreground">Starting Capital ($)</label>
                 <Input
+                  id="sim-initial-capital"
                   type="number"
                   className="rounded-xl"
                   placeholder="10000"
@@ -147,8 +149,9 @@ export default function MonteCarloPage() {
                 />
               </div>
               <div className="space-y-1.5">
-                <label className="text-xs font-medium text-muted-foreground">Target Portfolio ($)</label>
+                <label htmlFor="sim-target-value" className="text-xs font-medium text-muted-foreground">Target Portfolio ($)</label>
                 <Input
+                  id="sim-target-value"
                   type="number"
                   className="rounded-xl"
                   placeholder="250000"

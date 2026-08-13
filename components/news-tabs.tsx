@@ -22,6 +22,7 @@ export function NewsTabs({ symbol, news }: NewsTabsProps) {
       <div className="flex items-center justify-between border-b pb-1.5 flex-wrap gap-2">
         <div className="flex gap-4">
           <button
+            type="button"
             onClick={() => setActiveTab("news")}
             className={`flex items-center gap-1.5 pb-2 text-sm font-semibold border-b-2 transition-colors ${
               activeTab === "news"
@@ -33,6 +34,7 @@ export function NewsTabs({ symbol, news }: NewsTabsProps) {
             Latest News
           </button>
           <button
+            type="button"
             onClick={() => setActiveTab("sentiment")}
             className={`flex items-center gap-1.5 pb-2 text-sm font-semibold border-b-2 transition-colors ${
               activeTab === "sentiment"

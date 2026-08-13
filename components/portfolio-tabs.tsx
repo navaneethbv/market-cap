@@ -50,6 +50,7 @@ export function PortfolioTabs({
       <div className="flex border-b border-border items-center justify-between flex-wrap gap-3 pb-px">
         <div className="flex gap-4">
           <button
+            type="button"
             onClick={() => setActiveTab("real")}
             className={`flex items-center gap-2 pb-3 text-sm font-semibold border-b-2 transition-colors ${
               activeTab === "real"
@@ -61,6 +62,7 @@ export function PortfolioTabs({
             Holdings
           </button>
           <button
+            type="button"
             onClick={() => setActiveTab("income")}
             className={`flex items-center gap-2 pb-3 text-sm font-semibold border-b-2 transition-colors ${
               activeTab === "income"

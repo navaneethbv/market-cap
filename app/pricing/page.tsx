@@ -73,7 +73,7 @@ export default async function PricingPage({ searchParams }: PricingPageProps) {
             Explore the market with live data.
           </p>
           <p className="mt-5 text-4xl font-bold tabular-nums">
-            $0
+            $0{" "}
             <span className="text-sm font-medium text-muted-foreground">
               /month
             </span>
@@ -112,7 +112,7 @@ export default async function PricingPage({ searchParams }: PricingPageProps) {
             Your watchlist, saved and synced.
           </p>
           <p className="mt-5 text-4xl font-bold tabular-nums">
-            $20
+            $20{" "}
             <span className="text-sm font-medium text-muted-foreground">
               /month
             </span>

@@ -61,12 +61,12 @@ export default function SnowballPage() {
     }
   };
 
-  const valNum = Math.max(0, parseFloat(initialValue) || 0);
-  const divNum = Math.max(0, parseFloat(initialDividends) || 0);
-  const contrNum = Math.max(0, parseFloat(monthlyContribution) || 0);
-  const divGrowth = Math.max(0, parseFloat(dividendGrowthRate) || 0) / 100;
-  const priceApprec = Math.max(0, parseFloat(priceAppreciation) || 0) / 100;
-  const horizon = Math.max(1, parseInt(timeHorizon) || 20);
+  const valNum = Math.max(0, Number.parseFloat(initialValue) || 0);
+  const divNum = Math.max(0, Number.parseFloat(initialDividends) || 0);
+  const contrNum = Math.max(0, Number.parseFloat(monthlyContribution) || 0);
+  const divGrowth = Math.max(0, Number.parseFloat(dividendGrowthRate) || 0) / 100;
+  const priceApprec = Math.max(0, Number.parseFloat(priceAppreciation) || 0) / 100;
+  const horizon = Math.max(1, Number.parseInt(timeHorizon) || 20);
   const annualContributions = contrNum * 12;
 
   const projection = runSnowballProjection({
@@ -106,6 +106,7 @@ export default function SnowballPage() {
                 <span>Planner Assumptions</span>
               </div>
               <button
+                type="button"
                 onClick={handleImportPortfolio}
                 disabled={importing}
                 className="text-xs font-semibold text-blue-500 hover:text-blue-400 flex items-center gap-1 transition-all disabled:opacity-50"
@@ -135,8 +136,9 @@ export default function SnowballPage() {
             {/* Initial Inputs */}
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <label className="text-xs font-medium text-muted-foreground">Portfolio Value ($)</label>
+                <label htmlFor="snowball-portfolio-value" className="text-xs font-medium text-muted-foreground">Portfolio Value ($)</label>
                 <Input
+                  id="snowball-portfolio-value"
                   type="number"
                   className="rounded-xl"
                   placeholder="10000"
@@ -146,8 +148,9 @@ export default function SnowballPage() {
                 />
               </div>
               <div className="space-y-1.5">
-                <label className="text-xs font-medium text-muted-foreground">Annual Dividends ($)</label>
+                <label htmlFor="snowball-annual-dividends" className="text-xs font-medium text-muted-foreground">Annual Dividends ($)</label>
                 <Input
+                  id="snowball-annual-dividends"
                   type="number"
                   className="rounded-xl"
                   placeholder="300"

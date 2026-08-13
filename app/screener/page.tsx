@@ -251,24 +251,28 @@ export default function ScreenerPage() {
             </span>
             <div className="flex gap-1 bg-muted p-0.5 rounded-lg text-xs font-semibold">
               <button
+                type="button"
                 onClick={() => setSortBy("marketCap")}
                 className={cn("px-2.5 py-1 rounded-md transition-all", sortBy === "marketCap" ? "bg-background shadow-xs text-foreground" : "text-muted-foreground hover:text-foreground")}
               >
                 Cap Size
               </button>
               <button
+                type="button"
                 onClick={() => setSortBy("peRatio")}
                 className={cn("px-2.5 py-1 rounded-md transition-all", sortBy === "peRatio" ? "bg-background shadow-xs text-foreground" : "text-muted-foreground hover:text-foreground")}
               >
                 P/E Ratio
               </button>
               <button
+                type="button"
                 onClick={() => setSortBy("dividendYield")}
                 className={cn("px-2.5 py-1 rounded-md transition-all", sortBy === "dividendYield" ? "bg-background shadow-xs text-foreground" : "text-muted-foreground hover:text-foreground")}
               >
                 Yield %
               </button>
               <button
+                type="button"
                 onClick={() => setSortBy("changePercent")}
                 className={cn("px-2.5 py-1 rounded-md transition-all", sortBy === "changePercent" ? "bg-background shadow-xs text-foreground" : "text-muted-foreground hover:text-foreground")}
               >

@@ -207,6 +207,7 @@ export default function CorrelationPage() {
 
                       return (
                         <button
+                          type="button"
                           key={`${symbolA}-${symbolB}`}
                           onClick={() => {
                             if (symbolA !== symbolB && overlap >= 15) {
