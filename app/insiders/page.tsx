@@ -14,6 +14,18 @@ import { formatPrice, formatCompact } from "@/lib/format";
 import type { InsiderTransaction } from "@/lib/market/types";
 import NextLink from "next/link";
 
+function getBadgeStyle(isBuy: boolean | null): string {
+  if (isBuy === true) return "bg-green-500/10 text-green-400";
+  if (isBuy === false) return "bg-red-500/10 text-red-400";
+  return "bg-zinc-500/10 text-zinc-400";
+}
+
+function getTextStyle(isBuy: boolean | null): string {
+  if (isBuy === true) return "text-green-400";
+  if (isBuy === false) return "text-red-400";
+  return "";
+}
+
 export default function InsidersPage() {
   const [symbolQuery, setSymbolQuery] = useState("");
   const [activeSymbol, setActiveSymbol] = useState("");
@@ -177,75 +189,76 @@ export default function InsidersPage() {
 
       {/* Transactions Table */}
       <section className="rounded-2xl border bg-card shadow-sm overflow-hidden">
-        {loading ? (
-          <div className="py-16 flex flex-col items-center justify-center gap-3">
-            <Loader2 className="h-8 w-8 text-muted-foreground/50 animate-spin" />
-            <span className="text-sm text-muted-foreground">Fetching transaction feed...</span>
-          </div>
-        ) : transactions.length === 0 ? (
-          <div className="py-16 text-center text-muted-foreground space-y-2">
-            <Newspaper className="h-10 w-10 mx-auto text-muted-foreground/30" />
-            <h3 className="text-sm font-semibold">No Insider Transactions Found</h3>
-            <p className="text-xs text-muted-foreground max-w-xs mx-auto">
-              Try searching a different ticker symbol or check that your watchlist contains active equities.
-            </p>
-          </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs border-collapse">
-              <thead>
-                <tr className="border-b bg-muted/20 text-muted-foreground font-medium uppercase text-[10px] tracking-wider">
-                  <th className="py-3.5 px-4.5">Ticker</th>
-                  <th className="py-3.5 px-4.5">Insider Name</th>
-                  <th className="py-3.5 px-4.5">Transaction Type</th>
-                  <th className="py-3.5 px-4.5 text-right">Shares Changed</th>
-                  <th className="py-3.5 px-4.5 text-right">Price</th>
-                  <th className="py-3.5 px-4.5 text-right">Total Size</th>
-                  <th className="py-3.5 px-4.5 text-right">Filing Date</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border">
-                {transactions.map((trade, idx) => {
-                  const action = getTransactionLabel(trade.transactionCode);
-                  const isPositive = trade.change > 0;
-                  const totalCost = Math.abs(trade.change * trade.price);
+        {(() => {
+          if (loading) {
+            return (
+              <div className="py-16 flex flex-col items-center justify-center gap-3">
+                <Loader2 className="h-8 w-8 text-muted-foreground/50 animate-spin" />
+                <span className="text-sm text-muted-foreground">Fetching transaction feed...</span>
+              </div>
+            );
+          }
+          if (transactions.length === 0) {
+            return (
+              <div className="py-16 text-center text-muted-foreground space-y-2">
+                <Newspaper className="h-10 w-10 mx-auto text-muted-foreground/30" />
+                <h3 className="text-sm font-semibold">No Insider Transactions Found</h3>
+                <p className="text-xs text-muted-foreground max-w-xs mx-auto">
+                  Try searching a different ticker symbol or check that your watchlist contains active equities.
+                </p>
+              </div>
+            );
+          }
+          return (
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs border-collapse">
+                <thead>
+                  <tr className="border-b bg-muted/20 text-muted-foreground font-medium uppercase text-[10px] tracking-wider">
+                    <th className="py-3.5 px-4.5">Ticker</th>
+                    <th className="py-3.5 px-4.5">Insider Name</th>
+                    <th className="py-3.5 px-4.5">Transaction Type</th>
+                    <th className="py-3.5 px-4.5 text-right">Shares Changed</th>
+                    <th className="py-3.5 px-4.5 text-right">Price</th>
+                    <th className="py-3.5 px-4.5 text-right">Total Size</th>
+                    <th className="py-3.5 px-4.5 text-right">Filing Date</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border">
+                  {transactions.map((trade, idx) => {
+                    const action = getTransactionLabel(trade.transactionCode);
+                    const isPositive = trade.change > 0;
+                    const totalCost = Math.abs(trade.change * trade.price);
 
-                  return (
-                    <tr key={idx} className="hover:bg-muted/20 transition-colors">
-                      <td className="py-4.5 px-4.5 font-bold">
-                        <NextLink
-                          href={`/stock/${trade.symbol}`}
-                          className="text-blue-500 hover:text-blue-400 font-bold"
-                        >
-                          {trade.symbol}
-                        </NextLink>
-                      </td>
-                      <td className="py-4.5 px-4.5 font-medium">
-                        <div>{trade.name}</div>
-                        <span className="text-[9.5px] text-muted-foreground font-normal">
-                          {trade.isDerivative ? "Derivative Security" : "Common Stock"}
-                        </span>
-                      </td>
-                      <td className="py-4.5 px-4.5">
-                        <span
-                          className={`inline-flex items-center px-2 py-0.5 rounded-full font-semibold text-[10px] uppercase ${
-                            action.isBuy === true
-                              ? "bg-green-500/10 text-green-400"
-                              : action.isBuy === false
-                              ? "bg-red-500/10 text-red-400"
-                              : "bg-zinc-500/10 text-zinc-400"
-                          }`}
-                        >
-                          {action.label}
-                        </span>
-                      </td>
-                      <td className="py-4.5 px-4.5 text-right font-medium tabular-nums">
-                        <span className={action.isBuy === true ? "text-green-400" : action.isBuy === false ? "text-red-400" : ""}>
-                          {isPositive ? "+" : ""}
-                          {trade.change.toLocaleString()}
-                        </span>
-                      </td>
-                      <td className="py-4.5 px-4.5 text-right font-medium tabular-nums">
+                    return (
+                      <tr key={`${trade.symbol}-${trade.name}-${trade.filingDate}-${idx}`} className="hover:bg-muted/20 transition-colors">
+                        <td className="py-4.5 px-4.5 font-bold">
+                          <NextLink
+                            href={`/stock/${trade.symbol}`}
+                            className="text-blue-500 hover:text-blue-400 font-bold"
+                          >
+                            {trade.symbol}
+                          </NextLink>
+                        </td>
+                        <td className="py-4.5 px-4.5 font-medium">
+                          <div>{trade.name}</div>
+                          <span className="text-[9.5px] text-muted-foreground font-normal">
+                            {trade.isDerivative ? "Derivative Security" : "Common Stock"}
+                          </span>
+                        </td>
+                        <td className="py-4.5 px-4.5">
+                          <span
+                            className={`inline-flex items-center px-2 py-0.5 rounded-full font-semibold text-[10px] uppercase ${getBadgeStyle(action.isBuy)}`}
+                          >
+                            {action.label}
+                          </span>
+                        </td>
+                        <td className="py-4.5 px-4.5 text-right font-medium tabular-nums">
+                          <span className={getTextStyle(action.isBuy)}>
+                            {isPositive ? "+" : ""}
+                            {trade.change.toLocaleString()}
+                          </span>
+                        </td>
+                        <td className="py-4.5 px-4.5 text-right font-medium tabular-nums">
                         {trade.price > 0 ? formatPrice(trade.price) : "-"}
                       </td>
                       <td className="py-4.5 px-4.5 text-right font-semibold tabular-nums">
@@ -260,8 +273,9 @@ export default function InsidersPage() {
               </tbody>
             </table>
           </div>
-        )}
-      </section>
+        );
+      })()}
+    </section>
     </div>
   );
 }

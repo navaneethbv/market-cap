@@ -6,8 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint",
-    "test": "node --conditions=react-server --experimental-strip-types --no-warnings --test \"lib/**/*.test.mjs\""
+    "lint": "eslint .",
+    "test": "node --conditions=react-server --experimental-strip-types --experimental-test-coverage --no-warnings --test \"lib/**/*.test.mjs\""
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.0",

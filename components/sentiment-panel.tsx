@@ -11,7 +11,31 @@ interface SentimentPanelProps {
   news: NewsArticle[];
 }
 
-export function SentimentPanel({ news }: SentimentPanelProps) {
+function getSentimentLabel(s: number) {
+  if (s >= 70) return { label: "Very Bullish", color: "text-emerald-600 dark:text-emerald-400" };
+  if (s >= 55) return { label: "Bullish", color: "text-emerald-500 dark:text-emerald-500" };
+  if (s >= 45) return { label: "Neutral", color: "text-amber-500 dark:text-amber-500" };
+  if (s >= 30) return { label: "Bearish", color: "text-red-500 dark:text-red-500" };
+  return { label: "Very Bearish", color: "text-red-600 dark:text-red-400" };
+}
+
+interface TooltipPayloadItem {
+  value?: number | string;
+  name?: string;
+  dataKey?: string | number;
+}
+
+function SentimentTooltip({ active, payload }: Readonly<{ active?: boolean; payload?: TooltipPayloadItem[] }>) {
+  if (!active || !payload?.length) return null;
+  const val = Number(payload[0].value);
+  return (
+    <div className="rounded-xl border bg-popover px-2.5 py-1.5 text-[10px] shadow-lg font-bold">
+      <span className="text-foreground">Score: {val}/100</span>
+    </div>
+  );
+}
+
+export function SentimentPanel({ news }: Readonly<SentimentPanelProps>) {
   const {
     score,
     trendData,
@@ -80,14 +104,6 @@ export function SentimentPanel({ news }: SentimentPanelProps) {
         No recent articles to score sentiment from.
       </div>
     );
-  }
-
-  function getSentimentLabel(s: number) {
-    if (s >= 70) return { label: "Very Bullish", color: "text-emerald-600 dark:text-emerald-400" };
-    if (s >= 55) return { label: "Bullish", color: "text-emerald-500 dark:text-emerald-500" };
-    if (s >= 45) return { label: "Neutral", color: "text-amber-500 dark:text-amber-500" };
-    if (s >= 30) return { label: "Bearish", color: "text-red-500 dark:text-red-500" };
-    return { label: "Very Bearish", color: "text-red-600 dark:text-red-400" };
   }
 
   const sentimentObj = getSentimentLabel(score);
@@ -160,17 +176,7 @@ export function SentimentPanel({ news }: SentimentPanelProps) {
                   tick={{ fill: "var(--muted-foreground)", fontSize: 10 }}
                   width={30}
                 />
-                <Tooltip
-                  content={({ active, payload }) => {
-                    if (!active || !payload?.length) return null;
-                    const val = Number(payload[0].value);
-                    return (
-                      <div className="rounded-xl border bg-popover px-2.5 py-1.5 text-[10px] shadow-lg font-bold">
-                        <span className="text-foreground">Score: {val}/100</span>
-                      </div>
-                    );
-                  }}
-                />
+                <Tooltip content={<SentimentTooltip />} />
                 <Area
                   type="monotone"
                   dataKey="score"
@@ -196,8 +202,8 @@ export function SentimentPanel({ news }: SentimentPanelProps) {
             <p className="text-xs text-muted-foreground italic font-semibold">No highly positive articles found.</p>
           ) : (
             <ul className="space-y-2 text-xs leading-relaxed font-semibold text-muted-foreground list-disc pl-4">
-              {bullishHeadlines.map((h, idx) => (
-                <li key={idx} className="hover:text-foreground transition-colors">{h}</li>
+              {bullishHeadlines.map((h) => (
+                <li key={h} className="hover:text-foreground transition-colors">{h}</li>
               ))}
             </ul>
           )}
@@ -212,8 +218,8 @@ export function SentimentPanel({ news }: SentimentPanelProps) {
             <p className="text-xs text-muted-foreground italic font-semibold">No highly negative articles found.</p>
           ) : (
             <ul className="space-y-2 text-xs leading-relaxed font-semibold text-muted-foreground list-disc pl-4">
-              {bearishHeadlines.map((h, idx) => (
-                <li key={idx} className="hover:text-foreground transition-colors">{h}</li>
+              {bearishHeadlines.map((h) => (
+                <li key={h} className="hover:text-foreground transition-colors">{h}</li>
               ))}
             </ul>
           )}

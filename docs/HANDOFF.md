@@ -254,6 +254,29 @@ Record every pushed commit here after each milestone.
   - Added unit test coverage for Finnhub API fallbacks, market allocation, app origin, backtester boundary options, billing state period ends, dynamic imports, compare tool edge cases, short correlation matrices, trade status, movers edge cases, news classification fallbacks, HHI, PE null sorting, and Stripe sandboxed price lookup.
   - Exported reset helper in `lib/stripe.ts` and removed unreachable check in `lib/correlation.ts`.
   - Reached 97.17% branch coverage and 99.65% statement coverage.
+- `50d2e0a` Achieve >95% code coverage across the repository (branch `feature/code-coverage-95`, PR #26)
+  - Added new unit test files (`lib/parse.test.mjs`, `lib/proxy.test.mjs`, `lib/supabase.test.mjs`, `lib/trading-data.test.mjs`).
+  - Added edge-case test coverage for `portfolio.ts`, `paper-trading.ts`, `monte-carlo.ts`, `indicators.ts`, `billing-state.ts`, `billing.ts`, `stripe.ts`.
+  - Updated `package.json` test script to run Node `--experimental-test-coverage`.
+  - Resolved 43 code analysis issues across 13 files (accessibility labels, `type="button"`, `Number.parseFloat`/`Number.parseInt`, `new Array()`, `reduce` initial values, `--ignore-scripts`).
+  - Reached 99.09% line coverage, 97.86% branch coverage, and 98.22% function coverage across 219 unit tests.
+- `43ca236` Resolve 127 SonarQube and linter issues across components and lib (branch `feature/code-coverage-95`, PR #26)
+  - Added `getFormString` helper to avoid object stringification warnings on `FormData.get()`.
+  - Extracted inline Tooltip components out of parent render functions in `app/compare/matrix/page.tsx`, `components/dcf-calculator.tsx`, `components/equity-chart.tsx`, `components/portfolio-history-chart.tsx`, `components/sentiment-panel.tsx`, and `components/stock-chart.tsx`.
+  - Reduced Cognitive Complexity in `app/stock/[symbol]/volatility/page.tsx`, `components/portfolio-history-chart.tsx`, `lib/backtester.ts`, `lib/portfolio-history.ts`, `lib/screener.ts`.
+  - Updated React component prop types to `Readonly<Props>` across all page and component files.
+  - Used `String.raw` for regex escaping, replaced `.match()` loops with `RegExp.exec()`, and updated array index keys to unique entity keys.
+- `6bf32de` Refactor code duplication across pages (branch `feature/code-coverage-95`, PR #26)
+  - Created `TradeLogTable` component (`components/trade-log-table.tsx`) to eliminate 31 lines of duplicated trade table UI between `app/trading/page.tsx` and `app/trading/history/page.tsx`.
+  - Created `QuotePriceChangeCells` and `StockQuoteRowCells` components (`components/stock-quote-row-cells.tsx`) to eliminate duplicated quote table cells across `app/compare/page.tsx`, `app/movers/page.tsx`, and `app/watchlist/page.tsx`.
+  - Created `usePortfolioSync` hook and `SyncPortfolioButton` component (`components/sync-portfolio-control.tsx`) to eliminate 59 lines of duplicated portfolio sync state and UI between `app/portfolio/risk/simulations/page.tsx` and `app/portfolio/snowball/page.tsx`.
+- `3bf8493` Resolve 12 SonarQube code quality issues (branch `feature/code-coverage-95`, PR #26)
+  - Refactored `evaluateSignal` in `lib/backtester.ts` to accept a single `SignalEvalOptions` object, reducing parameter count from 8 to 1.
+  - Extracted `renderButtonContent` helper in `components/sync-portfolio-control.tsx` to unnest nested ternary operators.
+  - Marked tooltip component props as `Readonly<Props>` in `app/compare/matrix/page.tsx`, `components/dcf-calculator.tsx`, `components/equity-chart.tsx`, `components/portfolio-history-chart.tsx`, `components/sentiment-panel.tsx`, and `components/stock-chart.tsx`.
+  - Added safe typeof string check for payload name property in `components/dcf-calculator.tsx`.
+
+
 
 ## Audit fix plan (branches off main, PRs #20-#22 OPEN)
 

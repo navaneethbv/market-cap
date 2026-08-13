@@ -36,8 +36,12 @@ const BEARISH_TERMS = [
 
 function countTerms(text: string, terms: string[]) {
   return terms.reduce((score, term) => {
-    const pattern = new RegExp(`\\b${term}\\b`, "gi");
-    return score + (text.match(pattern)?.length ?? 0);
+    const pattern = new RegExp(String.raw`\b${term}\b`, "gi");
+    let matches = 0;
+    while (pattern.exec(text) !== null) {
+      matches++;
+    }
+    return score + matches;
   }, 0);
 }
 

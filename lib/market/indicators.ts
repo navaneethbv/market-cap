@@ -104,7 +104,7 @@ function rsiFromAverages(avgGain: number, avgLoss: number): number {
 }
 
 export function calculateRSI(prices: number[], period = 14): (number | null)[] {
-  const rsi: (number | null)[] = Array(prices.length).fill(null);
+  const rsi: (number | null)[] = new Array(prices.length).fill(null);
   if (prices.length <= period) {
     return rsi;
   }
@@ -169,9 +169,9 @@ export function calculateMACD(
   const firstValidIndex = macdLine.findIndex((val) => val !== null);
   if (firstValidIndex === -1 || macdLine.length - firstValidIndex < signalPeriod) {
     return {
-      macdLine: Array(prices.length).fill(null),
-      signalLine: Array(prices.length).fill(null),
-      histogram: Array(prices.length).fill(null),
+      macdLine: new Array(prices.length).fill(null),
+      signalLine: new Array(prices.length).fill(null),
+      histogram: new Array(prices.length).fill(null),
     };
   }
 

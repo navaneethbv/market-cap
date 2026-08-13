@@ -95,8 +95,9 @@ export default function BacktestPage() {
             {/* Symbol & Capital */}
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <label className="text-xs font-medium text-muted-foreground">Ticker Symbol</label>
+                <label htmlFor="backtest-symbol" className="text-xs font-medium text-muted-foreground">Ticker Symbol</label>
                 <Input
+                  id="backtest-symbol"
                   className="rounded-xl uppercase"
                   placeholder="AAPL"
                   value={symbol}
@@ -105,8 +106,9 @@ export default function BacktestPage() {
                 />
               </div>
               <div className="space-y-1.5">
-                <label className="text-xs font-medium text-muted-foreground">Starting Capital ($)</label>
+                <label htmlFor="backtest-capital" className="text-xs font-medium text-muted-foreground">Starting Capital ($)</label>
                 <Input
+                  id="backtest-capital"
                   type="number"
                   className="rounded-xl"
                   placeholder="10000"
@@ -120,8 +122,9 @@ export default function BacktestPage() {
 
             {/* Strategy Selector */}
             <div className="space-y-1.5">
-              <label className="text-xs font-medium text-muted-foreground">Strategy Type</label>
+              <label htmlFor="backtest-strategy" className="text-xs font-medium text-muted-foreground">Strategy Type</label>
               <select
+                id="backtest-strategy"
                 value={strategy}
                 onChange={(e) => setStrategy(e.target.value as StrategyType)}
                 className="border-input bg-background focus-visible:ring-ring flex h-10 w-full rounded-xl border px-3 text-sm focus-visible:ring-2 focus-visible:outline-none"
@@ -350,7 +353,7 @@ export default function BacktestPage() {
                       </thead>
                       <tbody>
                         {result.trades.map((trade, idx) => (
-                          <tr key={idx} className="border-b hover:bg-muted/30">
+                          <tr key={`${trade.time}-${trade.type}-${trade.price}-${idx}`} className="border-b hover:bg-muted/30">
                             <td className="py-2.5 font-medium">{trade.time}</td>
                             <td className="py-2.5">
                               <span

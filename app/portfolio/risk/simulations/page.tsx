@@ -3,13 +3,15 @@
 import { useState } from "react";
 import {
   Sliders,
-  Loader2,
   ArrowLeft,
-  CheckCircle,
   HelpCircle,
   BarChart,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import {
+  usePortfolioSync,
+  SyncPortfolioButton,
+} from "@/components/sync-portfolio-control";
 import { formatPrice } from "@/lib/format";
 import {
   ResponsiveContainer,
@@ -33,38 +35,17 @@ export default function MonteCarloPage() {
   const [timeHorizon, setTimeHorizon] = useState("20");
   const [targetValue, setTargetValue] = useState("250000");
 
-  const [importing, setImporting] = useState(false);
-  const [importSuccess, setImportSuccess] = useState(false);
-  const [importError, setImportError] = useState<string | null>(null);
-
-  const handleImportPortfolio = async () => {
-    setImporting(true);
-    setImportSuccess(false);
-    setImportError(null);
-
-    try {
-      const res = await fetch("/api/portfolio/summary");
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data.error ?? "Failed to import portfolio");
-      }
+  const { importing, importSuccess, importError, handleImportPortfolio } =
+    usePortfolioSync((data) => {
       setInitialCapital(String(data.portfolioValue));
-      setImportSuccess(true);
-      setTimeout(() => setImportSuccess(false), 3000);
-    } catch (err) {
-      console.error(err);
-      setImportError("Could not retrieve active portfolio value");
-    } finally {
-      setImporting(false);
-    }
-  };
+    });
 
-  const capNum = Math.max(0, parseFloat(initialCapital) || 0);
-  const contrNum = Math.max(0, parseFloat(monthlyContribution) || 0);
-  const retNum = Math.max(-50, parseFloat(annualReturn) || 0) / 100;
-  const volNum = Math.max(0, parseFloat(annualVolatility) || 0) / 100;
-  const horizon = Math.max(1, parseInt(timeHorizon) || 20);
-  const targetNum = Math.max(0, parseFloat(targetValue) || 0);
+  const capNum = Math.max(0, Number.parseFloat(initialCapital) || 0);
+  const contrNum = Math.max(0, Number.parseFloat(monthlyContribution) || 0);
+  const retNum = Math.max(-50, Number.parseFloat(annualReturn) || 0) / 100;
+  const volNum = Math.max(0, Number.parseFloat(annualVolatility) || 0) / 100;
+  const horizon = Math.max(1, Number.parseInt(timeHorizon) || 20);
+  const targetNum = Math.max(0, Number.parseFloat(targetValue) || 0);
 
   // Execute simulation (runs instant ~3ms on client)
   const simulation = runMonteCarloSimulation({
@@ -106,25 +87,11 @@ export default function MonteCarloPage() {
                 <Sliders className="h-4 w-4" />
                 <span>Simulation Parameters</span>
               </div>
-              <button
+              <SyncPortfolioButton
+                importing={importing}
+                importSuccess={importSuccess}
                 onClick={handleImportPortfolio}
-                disabled={importing}
-                className="text-xs font-semibold text-blue-500 hover:text-blue-400 flex items-center gap-1 transition-all disabled:opacity-50"
-              >
-                {importing ? (
-                  <>
-                    <Loader2 className="h-3 w-3 animate-spin" />
-                    <span>Syncing...</span>
-                  </>
-                ) : importSuccess ? (
-                  <>
-                    <CheckCircle className="h-3 w-3 text-green-400" />
-                    <span className="text-green-400">Synced!</span>
-                  </>
-                ) : (
-                  <span>Sync Portfolio</span>
-                )}
-              </button>
+              />
             </div>
 
             {importError && (
@@ -136,8 +103,9 @@ export default function MonteCarloPage() {
             {/* Starting Inputs */}
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <label className="text-xs font-medium text-muted-foreground">Starting Capital ($)</label>
+                <label htmlFor="sim-initial-capital" className="text-xs font-medium text-muted-foreground">Starting Capital ($)</label>
                 <Input
+                  id="sim-initial-capital"
                   type="number"
                   className="rounded-xl"
                   placeholder="10000"
@@ -147,8 +115,9 @@ export default function MonteCarloPage() {
                 />
               </div>
               <div className="space-y-1.5">
-                <label className="text-xs font-medium text-muted-foreground">Target Portfolio ($)</label>
+                <label htmlFor="sim-target-value" className="text-xs font-medium text-muted-foreground">Target Portfolio ($)</label>
                 <Input
+                  id="sim-target-value"
                   type="number"
                   className="rounded-xl"
                   placeholder="250000"

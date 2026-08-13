@@ -53,7 +53,7 @@ export interface NormalizedBacktestOptions {
 function parsePositiveNumber(value: string | null, fallback: number, label: string): number {
   const parsed = value === null ? fallback : Number(value);
   if (!Number.isFinite(parsed) || parsed <= 0) {
-    throw new Error(`invalid ${label}`);
+    throw new TypeError(`invalid ${label}`);
   }
   return parsed;
 }
@@ -61,7 +61,7 @@ function parsePositiveNumber(value: string | null, fallback: number, label: stri
 function parsePositiveInteger(value: string | null, fallback: number, label: string): number {
   const parsed = parsePositiveNumber(value, fallback, label);
   if (!Number.isInteger(parsed)) {
-    throw new Error(`invalid ${label}`);
+    throw new TypeError(`invalid ${label}`);
   }
   return parsed;
 }
@@ -116,6 +116,59 @@ export function normalizeBacktestOptions(input: {
   };
 }
 
+interface SignalEvalOptions {
+  strategy: StrategyType;
+  i: number;
+  startIdx: number;
+  shortSma: (number | null)[];
+  longSma: (number | null)[];
+  rsi: (number | null)[];
+  rsiOversold: number;
+  rsiOverbought: number;
+}
+
+function evaluateSignal(options: Readonly<SignalEvalOptions>): "buy" | "sell" | "hold" {
+  const {
+    strategy,
+    i,
+    startIdx,
+    shortSma,
+    longSma,
+    rsi,
+    rsiOversold,
+    rsiOverbought,
+  } = options;
+
+  if (i <= startIdx) return "hold";
+
+  if (strategy === "sma_crossover") {
+    const prevShort = shortSma[i - 1];
+    const prevLong = longSma[i - 1];
+    const currShort = shortSma[i];
+    const currLong = longSma[i];
+
+    if (
+      prevShort !== null &&
+      prevLong !== null &&
+      currShort !== null &&
+      currLong !== null
+    ) {
+      if (prevShort <= prevLong && currShort > currLong) return "buy";
+      if (prevShort >= prevLong && currShort < currLong) return "sell";
+    }
+  } else if (strategy === "rsi_threshold") {
+    const prevRsi = rsi[i - 1];
+    const currRsi = rsi[i];
+
+    if (prevRsi !== null && currRsi !== null) {
+      if (prevRsi >= rsiOversold && currRsi < rsiOversold) return "buy";
+      if (prevRsi <= rsiOverbought && currRsi > rsiOverbought) return "sell";
+    }
+  }
+
+  return "hold";
+}
+
 export function runBacktest(params: BacktestParams): BacktestResult {
   const {
     candles,
@@ -158,7 +211,6 @@ export function runBacktest(params: BacktestParams): BacktestResult {
   const trades: TradeLog[] = [];
   const points: BacktestPoint[] = [];
 
-  // Determine starting index where indicators are valid
   let startIdx = 0;
   if (strategy === "sma_crossover") {
     startIdx = Math.max(smaShort - 1, smaLong - 1);
@@ -166,7 +218,6 @@ export function runBacktest(params: BacktestParams): BacktestResult {
     startIdx = rsiPeriod;
   }
 
-  // If data length is too short to calculate indicators, return static holds
   if (startIdx >= candles.length) {
     startIdx = 0;
   }
@@ -179,7 +230,6 @@ export function runBacktest(params: BacktestParams): BacktestResult {
   let bahPeak = initialCapital;
   let bahMaxDd = 0;
 
-  // Track round-trip trades for win rate calculation
   const buyPriceHistory: number[] = [];
   let profitableTrades = 0;
   let closedTradesCount = 0;
@@ -189,40 +239,17 @@ export function runBacktest(params: BacktestParams): BacktestResult {
     const close = candle.close;
     const time = candle.time;
 
-    let signal: "buy" | "sell" | "hold" = "hold";
+    const signal = evaluateSignal({
+      strategy,
+      i,
+      startIdx,
+      shortSma,
+      longSma,
+      rsi,
+      rsiOversold,
+      rsiOverbought,
+    });
 
-    if (strategy === "sma_crossover" && i > startIdx) {
-      const prevShort = shortSma[i - 1];
-      const prevLong = longSma[i - 1];
-      const currShort = shortSma[i];
-      const currLong = longSma[i];
-
-      if (
-        prevShort !== null &&
-        prevLong !== null &&
-        currShort !== null &&
-        currLong !== null
-      ) {
-        if (prevShort <= prevLong && currShort > currLong) {
-          signal = "buy";
-        } else if (prevShort >= prevLong && currShort < currLong) {
-          signal = "sell";
-        }
-      }
-    } else if (strategy === "rsi_threshold" && i > startIdx) {
-      const prevRsi = rsi[i - 1];
-      const currRsi = rsi[i];
-
-      if (prevRsi !== null && currRsi !== null) {
-        if (prevRsi >= rsiOversold && currRsi < rsiOversold) {
-          signal = "buy";
-        } else if (prevRsi <= rsiOverbought && currRsi > rsiOverbought) {
-          signal = "sell";
-        }
-      }
-    }
-
-    // Execute signals
     if (signal === "buy" && cash > 0) {
       shares = cash / close;
       cash = 0;
@@ -247,7 +274,6 @@ export function runBacktest(params: BacktestParams): BacktestResult {
       });
       shares = 0;
 
-      // Win rate math: compare close price to last buy price
       const lastBuyPrice = buyPriceHistory.pop();
       if (lastBuyPrice !== undefined) {
         closedTradesCount++;
@@ -260,7 +286,6 @@ export function runBacktest(params: BacktestParams): BacktestResult {
     const currentStrategyValue = cash + shares * close;
     const currentBahValue = buyAndHoldShares * close;
 
-    // Track Peak & Drawdown for Strategy
     if (currentStrategyValue > strategyPeak) {
       strategyPeak = currentStrategyValue;
     }
@@ -269,7 +294,6 @@ export function runBacktest(params: BacktestParams): BacktestResult {
       strategyMaxDd = strategyDd;
     }
 
-    // Track Peak & Drawdown for Buy & Hold
     if (currentBahValue > bahPeak) {
       bahPeak = currentBahValue;
     }
@@ -286,8 +310,8 @@ export function runBacktest(params: BacktestParams): BacktestResult {
     });
   }
 
-  const finalStrategyValue = points[points.length - 1]?.strategyValue ?? initialCapital;
-  const finalBahValue = points[points.length - 1]?.buyAndHoldValue ?? initialCapital;
+  const finalStrategyValue = points.at(-1)?.strategyValue ?? initialCapital;
+  const finalBahValue = points.at(-1)?.buyAndHoldValue ?? initialCapital;
 
   const totalReturn = ((finalStrategyValue - initialCapital) / initialCapital) * 100;
   const buyAndHoldReturn = ((finalBahValue - initialCapital) / initialCapital) * 100;

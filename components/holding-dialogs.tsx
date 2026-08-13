@@ -25,11 +25,11 @@ function HoldingFields({
   holding,
   defaultSymbol,
   defaultAvgCost,
-}: {
+}: Readonly<{
   holding?: HoldingRow;
   defaultSymbol?: string;
   defaultAvgCost?: number;
-}) {
+}>) {
   const today = new Date().toISOString().slice(0, 10);
   return (
     <>
@@ -98,14 +98,14 @@ export function AddHoldingDialog({
   defaultAvgCost,
   next,
   trigger,
-}: {
+}: Readonly<{
   defaultSymbol?: string;
   defaultAvgCost?: number;
   /** Same-origin path to land on after saving (e.g. /portfolio) */
   next?: string;
   /** Custom trigger button; defaults to the portfolio page's Add holding */
   trigger?: React.ReactNode;
-} = {}) {
+}> = {}) {
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -141,7 +141,7 @@ export function AddHoldingDialog({
   );
 }
 
-export function EditHoldingDialog({ holding }: { holding: HoldingRow }) {
+export function EditHoldingDialog({ holding }: Readonly<{ holding: HoldingRow }>) {
   return (
     <Dialog>
       <DialogTrigger asChild>

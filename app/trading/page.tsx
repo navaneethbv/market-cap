@@ -7,6 +7,7 @@ import { ChangeChip } from "@/components/change-chip";
 import { ResetAccountDialog } from "@/components/reset-account-dialog";
 import { TradeTicketButtons, SellAllButton } from "@/components/trade-submit-buttons";
 import { IdempotencyKeyInput } from "@/components/idempotency-key-input";
+import { TradeLogTable } from "@/components/trade-log-table";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -312,54 +313,7 @@ export default async function TradingPage({ searchParams }: TradingPageProps) {
               <Link href="/trading/history">Full history</Link>
             </Button>
           </div>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Symbol</TableHead>
-                <TableHead>Side</TableHead>
-                <TableHead className="text-right">Shares</TableHead>
-                <TableHead className="text-right">Price</TableHead>
-                <TableHead className="hidden text-right sm:table-cell">
-                  Total
-                </TableHead>
-                <TableHead className="hidden text-right md:table-cell">
-                  Executed
-                </TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {recentTrades.map((trade) => (
-                <TableRow key={trade.id}>
-                  <TableCell>
-                    <Link
-                      href={`/stock/${trade.symbol}`}
-                      className="font-semibold text-foreground hover:text-primary"
-                    >
-                      {trade.symbol}
-                    </Link>
-                  </TableCell>
-                  <TableCell className="capitalize">{trade.side}</TableCell>
-                  <TableCell className="text-right tabular-nums">
-                    {formatNumber(trade.shares, 0)}
-                  </TableCell>
-                  <TableCell className="text-right tabular-nums">
-                    {formatPrice(trade.price)}
-                  </TableCell>
-                  <TableCell className="hidden text-right tabular-nums sm:table-cell">
-                    {formatPrice(trade.shares * trade.price)}
-                  </TableCell>
-                  <TableCell className="hidden text-right text-sm text-muted-foreground md:table-cell">
-                    {new Date(trade.executed_at).toLocaleString("en-US", {
-                      month: "short",
-                      day: "numeric",
-                      hour: "numeric",
-                      minute: "2-digit",
-                    })}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+          <TradeLogTable trades={recentTrades} />
         </section>
       )}
     </div>

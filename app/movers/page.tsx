@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ArrowDown, ArrowUp, Activity } from "lucide-react";
 import { ChangeChip } from "@/components/change-chip";
+import { QuotePriceChangeCells } from "@/components/stock-quote-row-cells";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -33,11 +34,11 @@ function MoverCard({
   title,
   rows,
   icon,
-}: {
+}: Readonly<{
   title: string;
   rows: ReturnType<typeof getTopMovers>["gainers"];
   icon: "up" | "down";
-}) {
+}>) {
   const Icon = icon === "up" ? ArrowUp : ArrowDown;
   return (
     <section className="rounded-2xl border bg-card p-5 shadow-sm">
@@ -66,7 +67,7 @@ function MoverCard({
   );
 }
 
-export default async function MoversPage({ searchParams }: MoversPageProps) {
+export default async function MoversPage({ searchParams }: Readonly<MoversPageProps>) {
   const params = await searchParams;
   const basket = getMoverBasket(basketParam(params.basket));
   const quoteResults = await Promise.allSettled(
@@ -188,27 +189,7 @@ export default async function MoversPage({ searchParams }: MoversPageProps) {
                       : row.direction}
                   </Badge>
                 </TableCell>
-                <TableCell className="text-right font-semibold tabular-nums">
-                  {row.quote ? formatPrice(row.quote.price) : "-"}
-                </TableCell>
-                <TableCell>
-                  {row.quote ? (
-                    <ChangeChip value={row.quote.changePercent} />
-                  ) : (
-                    <span className="text-sm text-muted-foreground">-</span>
-                  )}
-                </TableCell>
-                <TableCell className="hidden text-right tabular-nums md:table-cell">
-                  {row.quote ? formatPrice(row.quote.open) : "-"}
-                </TableCell>
-                <TableCell className="hidden text-right tabular-nums md:table-cell">
-                  {row.quote ? formatPrice(row.quote.prevClose) : "-"}
-                </TableCell>
-                <TableCell className="hidden text-right text-sm tabular-nums text-muted-foreground lg:table-cell">
-                  {row.quote
-                    ? `${formatPrice(row.quote.low)} / ${formatPrice(row.quote.high)}`
-                    : "-"}
-                </TableCell>
+                <QuotePriceChangeCells quote={row.quote} />
               </TableRow>
             ))}
           </TableBody>

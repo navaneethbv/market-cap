@@ -85,8 +85,10 @@ export function deriveBillingState(input: {
     return FREE_BILLING_STATE;
   }
 
-  const best = proSubs.reduce((a, b) =>
-    (subscriptionPeriodEnd(b) ?? 0) > (subscriptionPeriodEnd(a) ?? 0) ? b : a
+  const best = proSubs.reduce(
+    (a, b) =>
+      (subscriptionPeriodEnd(b) ?? 0) > (subscriptionPeriodEnd(a) ?? 0) ? b : a,
+    proSubs[0]
   );
   const periodEnd = subscriptionPeriodEnd(best);
 

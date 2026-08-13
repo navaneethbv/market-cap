@@ -44,6 +44,27 @@ export const SCREENER_CATALOG = [
   { symbol: "GE", name: "General Electric Co.", sector: "Industrials" },
 ];
 
+function matchesSector(stockSector: string, sectorFilter?: string): boolean {
+  if (!sectorFilter || sectorFilter === "All") return true;
+  return stockSector === sectorFilter;
+}
+
+function matchesMarketCap(marketCap: number, capFilter?: string): boolean {
+  if (!capFilter || capFilter === "All") return true;
+  if (capFilter === "Mega") return marketCap >= 100;
+  if (capFilter === "Large") return marketCap >= 10 && marketCap < 100;
+  if (capFilter === "MidSmall") return marketCap < 10;
+  return true;
+}
+
+function matchesValuation(peRatio: number | null, dividendYield: number | null, valuationFilter?: string): boolean {
+  if (!valuationFilter || valuationFilter === "All") return true;
+  if (valuationFilter === "Growth") return peRatio !== null && peRatio > 30;
+  if (valuationFilter === "Value") return peRatio !== null && peRatio < 15;
+  if (valuationFilter === "Income") return dividendYield !== null && dividendYield > 2.0;
+  return true;
+}
+
 export function filterScreenerStocks(
   stocks: ScreenerStock[],
   filters: {
@@ -53,28 +74,9 @@ export function filterScreenerStocks(
   }
 ): ScreenerStock[] {
   return stocks.filter((stock) => {
-    // 1. Sector filter
-    if (filters.sector && filters.sector !== "All") {
-      if (stock.sector !== filters.sector) return false;
-    }
-
-    // 2. Market Cap filter
-    if (filters.marketCap && filters.marketCap !== "All") {
-      const capInBillions = stock.marketCap;
-      if (filters.marketCap === "Mega" && capInBillions < 100) return false;
-      if (filters.marketCap === "Large" && (capInBillions < 10 || capInBillions >= 100)) return false;
-      if (filters.marketCap === "MidSmall" && capInBillions >= 10) return false;
-    }
-
-    // 3. Valuation filter
-    if (filters.valuation && filters.valuation !== "All") {
-      const pe = stock.peRatio;
-      const yieldPct = stock.dividendYield;
-      if (filters.valuation === "Growth" && (pe === null || pe <= 30)) return false;
-      if (filters.valuation === "Value" && (pe === null || pe >= 15)) return false;
-      if (filters.valuation === "Income" && (yieldPct === null || yieldPct <= 2.0)) return false;
-    }
-
+    if (!matchesSector(stock.sector, filters.sector)) return false;
+    if (!matchesMarketCap(stock.marketCap, filters.marketCap)) return false;
+    if (!matchesValuation(stock.peRatio, stock.dividendYield, filters.valuation)) return false;
     return true;
   });
 }

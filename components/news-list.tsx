@@ -25,10 +25,10 @@ const SENTIMENT_CLASSES: Record<Exclude<NewsSentiment, "all">, string> = {
 export function NewsList({
   articles,
   emptyMessage = "No news available right now.",
-}: {
+}: Readonly<{
   articles: NewsArticle[];
   emptyMessage?: string;
-}) {
+}>) {
   const visibleArticles = articles.filter((article) => {
     return article.headline && article.url;
   });

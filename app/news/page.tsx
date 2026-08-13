@@ -21,7 +21,7 @@ const FILTERS: { value: NewsSentiment; label: string }[] = [
   { value: "neutral", label: "Neutral" },
 ];
 
-export default async function NewsPage({ searchParams }: NewsPageProps) {
+export default async function NewsPage({ searchParams }: Readonly<NewsPageProps>) {
   const params = await searchParams;
   const activeSentiment = normalizeNewsSentiment(params.sentiment);
   let articles: NewsArticle[] = [];

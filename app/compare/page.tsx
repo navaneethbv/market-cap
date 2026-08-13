@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowRightLeft, Save, Trophy } from "lucide-react";
 import { createSavedComparison } from "@/app/compare/saved/actions";
 import { ChangeChip } from "@/components/change-chip";
+import { StockQuoteRowCells } from "@/components/stock-quote-row-cells";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -16,7 +17,7 @@ import {
   calculateComparisonSummary,
   normalizeComparisonSymbols,
 } from "@/lib/compare";
-import { formatNumber, formatPrice } from "@/lib/format";
+import { formatNumber } from "@/lib/format";
 import { getQuote } from "@/lib/market/finnhub";
 import { createClient } from "@/lib/supabase/server";
 
@@ -28,7 +29,7 @@ function symbolsParam(value: string | string[] | undefined) {
   return Array.isArray(value) ? value.join(",") : value;
 }
 
-export default async function ComparePage({ searchParams }: ComparePageProps) {
+export default async function ComparePage({ searchParams }: Readonly<ComparePageProps>) {
   const params = await searchParams;
   const symbols = normalizeComparisonSymbols(symbolsParam(params.symbols));
   const quoteResults = await Promise.allSettled(
@@ -185,40 +186,7 @@ export default async function ComparePage({ searchParams }: ComparePageProps) {
                     (row.rank ?? "-")
                   )}
                 </TableCell>
-                <TableCell>
-                  <Link
-                    href={`/stock/${row.symbol}`}
-                    className="font-semibold text-foreground hover:text-primary"
-                  >
-                    {row.symbol}
-                  </Link>
-                  {row.error && (
-                    <p className="mt-1 text-xs text-muted-foreground">
-                      {row.error}
-                    </p>
-                  )}
-                </TableCell>
-                <TableCell className="text-right font-semibold tabular-nums">
-                  {row.quote ? formatPrice(row.quote.price) : "-"}
-                </TableCell>
-                <TableCell>
-                  {row.quote ? (
-                    <ChangeChip value={row.quote.changePercent} />
-                  ) : (
-                    <span className="text-sm text-muted-foreground">-</span>
-                  )}
-                </TableCell>
-                <TableCell className="hidden text-right tabular-nums md:table-cell">
-                  {row.quote ? formatPrice(row.quote.open) : "-"}
-                </TableCell>
-                <TableCell className="hidden text-right tabular-nums md:table-cell">
-                  {row.quote ? formatPrice(row.quote.prevClose) : "-"}
-                </TableCell>
-                <TableCell className="hidden text-right text-sm tabular-nums text-muted-foreground lg:table-cell">
-                  {row.quote
-                    ? `${formatPrice(row.quote.low)} / ${formatPrice(row.quote.high)}`
-                    : "-"}
-                </TableCell>
+                <StockQuoteRowCells row={row} />
               </TableRow>
             ))}
           </TableBody>

@@ -20,6 +20,12 @@ import { buildWatchlistRows, type WatchlistItem } from "@/lib/watchlist";
 
 const INDEX_SYMBOLS = ["SPY", "QQQ", "DIA"];
 
+function getIndexLabel(symbol: string): string {
+  if (symbol === "SPY") return "S&P 500";
+  if (symbol === "QQQ") return "Nasdaq 100";
+  return "Dow 30";
+}
+
 async function getWatchlistRows(userId: string | null) {
   if (!userId) return [];
 
@@ -124,11 +130,7 @@ export default async function HomePage() {
               <div>
                 <p className="text-sm font-bold">{quote.symbol}</p>
                 <p className="text-xs text-muted-foreground">
-                  {quote.symbol === "SPY"
-                    ? "S&P 500"
-                    : quote.symbol === "QQQ"
-                      ? "Nasdaq 100"
-                      : "Dow 30"}
+                  {getIndexLabel(quote.symbol)}
                 </p>
               </div>
               <ChangeChip value={quote.changePercent} />

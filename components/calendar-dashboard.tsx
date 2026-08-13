@@ -19,7 +19,7 @@ export function CalendarDashboard({
   earnings,
   upcomingHolidays,
   watchlistSymbols,
-}: CalendarDashboardProps) {
+}: Readonly<CalendarDashboardProps>) {
   const [searchQuery, setSearchQuery] = useState("");
   const [filterWatchlist, setFilterWatchlist] = useState(false);
 
@@ -47,6 +47,7 @@ export function CalendarDashboard({
 
         {watchlistSymbols.length > 0 && (
           <button
+            type="button"
             onClick={() => setFilterWatchlist(!filterWatchlist)}
             className="flex items-center gap-2 text-xs font-bold text-muted-foreground hover:text-foreground transition-all"
           >

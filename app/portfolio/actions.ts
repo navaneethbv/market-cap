@@ -6,6 +6,11 @@ import { createClient } from "@/lib/supabase/server";
 import { normalizeHoldingInput } from "@/lib/portfolio";
 import { isUuid } from "@/lib/parse";
 
+function getFormString(formData: FormData, name: string): string {
+  const value = formData.get(name);
+  return typeof value === "string" ? value : "";
+}
+
 async function requireUser() {
   const supabase = await createClient();
   const {
@@ -22,14 +27,12 @@ async function requireUser() {
 export async function createHolding(formData: FormData) {
   const { supabase, user } = await requireUser();
   const input = normalizeHoldingInput({
-    symbol: String(formData.get("symbol") ?? ""),
-    shares: String(formData.get("shares") ?? ""),
-    avgCost: String(formData.get("avgCost") ?? ""),
-    purchasedAt: String(formData.get("purchasedAt") ?? ""),
+    symbol: getFormString(formData, "symbol"),
+    shares: getFormString(formData, "shares"),
+    avgCost: getFormString(formData, "avgCost"),
+    purchasedAt: getFormString(formData, "purchasedAt"),
   });
-  const rawIdempotencyKey = formData.get("idempotencyKey");
-  const idempotencyKey =
-    typeof rawIdempotencyKey === "string" ? rawIdempotencyKey : "";
+  const idempotencyKey = getFormString(formData, "idempotencyKey");
   if (!isUuid(idempotencyKey)) {
     throw new Error("Idempotency key is required");
   }
@@ -99,14 +102,14 @@ export async function createHolding(formData: FormData) {
 }
 
 function redirectToNext(formData: FormData): never | void {
-  const next = String(formData.get("next") ?? "");
+  const next = getFormString(formData, "next");
   if (next.startsWith("/") && !next.startsWith("//")) {
     redirect(next);
   }
 }
 
 function getHoldingId(formData: FormData) {
-  const id = String(formData.get("id") ?? "");
+  const id = getFormString(formData, "id");
   if (!isUuid(id)) {
     throw new Error("Invalid holding id");
   }
@@ -118,10 +121,10 @@ export async function updateHolding(formData: FormData) {
 
   const { supabase, user } = await requireUser();
   const input = normalizeHoldingInput({
-    symbol: String(formData.get("symbol") ?? ""),
-    shares: String(formData.get("shares") ?? ""),
-    avgCost: String(formData.get("avgCost") ?? ""),
-    purchasedAt: String(formData.get("purchasedAt") ?? ""),
+    symbol: getFormString(formData, "symbol"),
+    shares: getFormString(formData, "shares"),
+    avgCost: getFormString(formData, "avgCost"),
+    purchasedAt: getFormString(formData, "purchasedAt"),
   });
 
   const { error } = await supabase

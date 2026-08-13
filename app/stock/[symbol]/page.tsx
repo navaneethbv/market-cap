@@ -53,9 +53,9 @@ function isValidSymbol(symbol: string): boolean {
 
 export default async function StockPage({
   params,
-}: {
+}: Readonly<{
   params: Promise<{ symbol: string }>;
-}) {
+}>) {
   const { symbol: rawSymbol } = await params;
   const symbol = decodeURIComponent(rawSymbol).trim().toUpperCase();
 

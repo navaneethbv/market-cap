@@ -149,6 +149,12 @@ export function validatePaperTrade({
   return null;
 }
 
+function getRejectionErrorMessage(result?: PromiseSettledResult<Quote>): string | null {
+  if (result?.status !== "rejected") return null;
+  if (result.reason instanceof Error) return result.reason.message;
+  return "Quote unavailable";
+}
+
 export function buildPaperPositionRows(
   positions: PaperPosition[],
   quoteResults: PromiseSettledResult<Quote>[]
@@ -156,9 +162,10 @@ export function buildPaperPositionRows(
   return positions.map((position, index) => {
     const result = quoteResults[index];
     const quote = result?.status === "fulfilled" ? result.value : null;
-    const marketValue = quote ? position.shares * quote.price : null;
+    const marketValue =
+      quote !== null ? position.shares * quote.price : null;
     const unrealizedPnl =
-      marketValue === null ? null : marketValue - position.costBasis;
+      marketValue !== null ? marketValue - position.costBasis : null;
 
     return {
       ...position,
@@ -169,12 +176,7 @@ export function buildPaperPositionRows(
         unrealizedPnl === null || position.costBasis === 0
           ? null
           : (unrealizedPnl / position.costBasis) * 100,
-      error:
-        result?.status === "rejected"
-          ? result.reason instanceof Error
-            ? result.reason.message
-            : "Quote unavailable"
-          : null,
+      error: getRejectionErrorMessage(result),
     };
   });
 }

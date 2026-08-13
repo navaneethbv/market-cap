@@ -31,18 +31,18 @@ interface PortfolioTabsProps {
   }[];
 }
 
+function summaryTone(value: number) {
+  return value >= 0
+    ? "text-emerald-600 dark:text-emerald-400"
+    : "text-red-600 dark:text-red-400";
+}
+
 export function PortfolioTabs({
   realRows,
   realSummary,
   incomeMetrics,
-}: PortfolioTabsProps) {
+}: Readonly<PortfolioTabsProps>) {
   const [activeTab, setActiveTab] = useState<"real" | "income">("real");
-
-  function summaryTone(value: number) {
-    return value >= 0
-      ? "text-emerald-600 dark:text-emerald-400"
-      : "text-red-600 dark:text-red-400";
-  }
 
   return (
     <div className="space-y-6">
@@ -50,6 +50,7 @@ export function PortfolioTabs({
       <div className="flex border-b border-border items-center justify-between flex-wrap gap-3 pb-px">
         <div className="flex gap-4">
           <button
+            type="button"
             onClick={() => setActiveTab("real")}
             className={`flex items-center gap-2 pb-3 text-sm font-semibold border-b-2 transition-colors ${
               activeTab === "real"
@@ -61,6 +62,7 @@ export function PortfolioTabs({
             Holdings
           </button>
           <button
+            type="button"
             onClick={() => setActiveTab("income")}
             className={`flex items-center gap-2 pb-3 text-sm font-semibold border-b-2 transition-colors ${
               activeTab === "income"

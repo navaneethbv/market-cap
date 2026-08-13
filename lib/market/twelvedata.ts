@@ -68,11 +68,11 @@ export async function getCandles(
   return raw.values
     .map((v) => ({
       time: v.datetime,
-      open: parseFloat(v.open),
-      high: parseFloat(v.high),
-      low: parseFloat(v.low),
-      close: parseFloat(v.close),
-      volume: v.volume ? parseFloat(v.volume) : 0,
+      open: Number.parseFloat(v.open),
+      high: Number.parseFloat(v.high),
+      low: Number.parseFloat(v.low),
+      close: Number.parseFloat(v.close),
+      volume: v.volume ? Number.parseFloat(v.volume) : 0,
     }))
     .reverse();
 }
