@@ -258,7 +258,9 @@ Record every pushed commit here after each milestone.
   - Added new unit test files (`lib/parse.test.mjs`, `lib/proxy.test.mjs`, `lib/supabase.test.mjs`, `lib/trading-data.test.mjs`).
   - Added edge-case test coverage for `portfolio.ts`, `paper-trading.ts`, `monte-carlo.ts`, `indicators.ts`, `billing-state.ts`, `billing.ts`, `stripe.ts`.
   - Updated `package.json` test script to run Node `--experimental-test-coverage`.
-  - Reached 99.09% line coverage, 97.62% branch coverage, and 98.22% function coverage across 219 unit tests.
+  - Resolved 43 code analysis issues across 13 files (accessibility labels, `type="button"`, `Number.parseFloat`/`Number.parseInt`, `new Array()`, `reduce` initial values, `--ignore-scripts`).
+  - Reached 99.09% line coverage, 97.86% branch coverage, and 98.22% function coverage across 219 unit tests.
+
 
 
 ## Audit fix plan (branches off main, PRs #20-#22 OPEN)
