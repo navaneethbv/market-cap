@@ -38,14 +38,14 @@ export function calculatePortfolioHistory(
 
   const history: PortfolioHistoryPoint[] = [];
 
-  const getPriceOnOrBefore = (symbol: string, time: string): number => {
+  const getPriceOnOrBefore = (symbol: string, time: string): number | null => {
     const directPrice = priceMap[symbol]?.get(time);
     if (directPrice !== undefined) return directPrice;
 
     const symbolCandles = candlesMap[symbol] ?? [];
     const targetTime = new Date(time).getTime();
 
-    let lastKnownPrice = 0;
+    let lastKnownPrice: number | null = null;
     for (const candle of symbolCandles) {
       const candleTime = new Date(candle.time).getTime();
       if (candleTime <= targetTime) {
@@ -66,6 +66,10 @@ export function calculatePortfolioHistory(
     for (const holding of holdings) {
       if (holding.purchased_at <= candleDateStr) {
         const price = getPriceOnOrBefore(holding.symbol, time);
+        // Skip holdings with no candle data (failed fetch, delisted symbol)
+        // rather than valuing them at $0, which would drag the whole chart
+        // toward zero and show artificial losses.
+        if (price === null) continue;
         totalValue += holding.shares * price;
         totalCost += holding.shares * holding.avg_cost;
       }

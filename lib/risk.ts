@@ -4,9 +4,11 @@ export interface RiskAsset {
   beta: number;
 }
 
-export function calculateWeightedBeta(assets: RiskAsset[]): number {
+export function calculateWeightedBeta(assets: RiskAsset[]): number | null {
   const totalValue = assets.reduce((sum, a) => sum + a.value, 0);
-  if (totalValue === 0) return 1.0;
+  // No assets (or a zero-value portfolio) has no measurable beta. Returning
+  // 1.0 here would fabricate a "market-like" risk profile from no data.
+  if (totalValue === 0) return null;
 
   const weightedSum = assets.reduce((sum, a) => sum + a.value * a.beta, 0);
   return weightedSum / totalValue;
