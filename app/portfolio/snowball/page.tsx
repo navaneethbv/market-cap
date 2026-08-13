@@ -4,12 +4,15 @@ import { useState } from "react";
 import {
   TrendingUp,
   Sliders,
-  Loader2,
   ArrowLeft,
   CheckCircle,
   HelpCircle,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import {
+  usePortfolioSync,
+  SyncPortfolioButton,
+} from "@/components/sync-portfolio-control";
 import { formatPrice } from "@/lib/format";
 import {
   ResponsiveContainer,
@@ -34,32 +37,13 @@ export default function SnowballPage() {
   const [priceAppreciation, setPriceAppreciation] = useState("6.0");
   const [timeHorizon, setTimeHorizon] = useState("20");
 
-  const [importing, setImporting] = useState(false);
-  const [importSuccess, setImportSuccess] = useState(false);
-  const [importError, setImportError] = useState<string | null>(null);
-
-  const handleImportPortfolio = async () => {
-    setImporting(true);
-    setImportSuccess(false);
-    setImportError(null);
-
-    try {
-      const res = await fetch("/api/portfolio/summary");
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data.error ?? "Failed to import portfolio");
-      }
+  const { importing, importSuccess, importError, handleImportPortfolio } =
+    usePortfolioSync((data) => {
       setInitialValue(String(data.portfolioValue));
-      setInitialDividends(String(data.annualDividends));
-      setImportSuccess(true);
-      setTimeout(() => setImportSuccess(false), 3000);
-    } catch (err) {
-      console.error(err);
-      setImportError("Could not retrieve active portfolio data");
-    } finally {
-      setImporting(false);
-    }
-  };
+      if (data.annualDividends !== undefined) {
+        setInitialDividends(String(data.annualDividends));
+      }
+    });
 
   const valNum = Math.max(0, Number.parseFloat(initialValue) || 0);
   const divNum = Math.max(0, Number.parseFloat(initialDividends) || 0);
@@ -105,26 +89,11 @@ export default function SnowballPage() {
                 <Sliders className="h-4 w-4" />
                 <span>Planner Assumptions</span>
               </div>
-              <button
-                type="button"
+              <SyncPortfolioButton
+                importing={importing}
+                importSuccess={importSuccess}
                 onClick={handleImportPortfolio}
-                disabled={importing}
-                className="text-xs font-semibold text-blue-500 hover:text-blue-400 flex items-center gap-1 transition-all disabled:opacity-50"
-              >
-                {importing ? (
-                  <>
-                    <Loader2 className="h-3 w-3 animate-spin" />
-                    <span>Syncing...</span>
-                  </>
-                ) : importSuccess ? (
-                  <>
-                    <CheckCircle className="h-3 w-3 text-green-400" />
-                    <span className="text-green-400">Synced!</span>
-                  </>
-                ) : (
-                  <span>Sync Portfolio</span>
-                )}
-              </button>
+              />
             </div>
 
             {importError && (

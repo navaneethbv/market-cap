@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ArrowDown, ArrowUp, Activity } from "lucide-react";
 import { ChangeChip } from "@/components/change-chip";
+import { QuotePriceChangeCells } from "@/components/stock-quote-row-cells";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -188,27 +189,7 @@ export default async function MoversPage({ searchParams }: Readonly<MoversPagePr
                       : row.direction}
                   </Badge>
                 </TableCell>
-                <TableCell className="text-right font-semibold tabular-nums">
-                  {row.quote ? formatPrice(row.quote.price) : "-"}
-                </TableCell>
-                <TableCell>
-                  {row.quote ? (
-                    <ChangeChip value={row.quote.changePercent} />
-                  ) : (
-                    <span className="text-sm text-muted-foreground">-</span>
-                  )}
-                </TableCell>
-                <TableCell className="hidden text-right tabular-nums md:table-cell">
-                  {row.quote ? formatPrice(row.quote.open) : "-"}
-                </TableCell>
-                <TableCell className="hidden text-right tabular-nums md:table-cell">
-                  {row.quote ? formatPrice(row.quote.prevClose) : "-"}
-                </TableCell>
-                <TableCell className="hidden text-right text-sm tabular-nums text-muted-foreground lg:table-cell">
-                  {row.quote
-                    ? `${formatPrice(row.quote.low)} / ${formatPrice(row.quote.high)}`
-                    : "-"}
-                </TableCell>
+                <QuotePriceChangeCells quote={row.quote} />
               </TableRow>
             ))}
           </TableBody>

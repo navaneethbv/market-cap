@@ -3,15 +3,8 @@ import { redirect } from "next/navigation";
 import { fetchAllPaperTrades } from "@/app/trading/data";
 import { EquityChart, type EquityPoint } from "@/components/equity-chart";
 import { Button } from "@/components/ui/button";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { formatNumber, formatPrice } from "@/lib/format";
+import { TradeLogTable } from "@/components/trade-log-table";
+import { formatPrice } from "@/lib/format";
 import {
   buildPaperPortfolio,
   DEFAULT_STARTING_CASH,
@@ -144,54 +137,7 @@ export default async function TradingHistoryPage() {
             No trades yet. Place your first order on the trading page.
           </div>
         ) : (
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Symbol</TableHead>
-                <TableHead>Side</TableHead>
-                <TableHead className="text-right">Shares</TableHead>
-                <TableHead className="text-right">Price</TableHead>
-                <TableHead className="hidden text-right sm:table-cell">
-                  Total
-                </TableHead>
-                <TableHead className="hidden text-right md:table-cell">
-                  Executed
-                </TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {tradesNewestFirst.map((trade) => (
-                <TableRow key={trade.id}>
-                  <TableCell>
-                    <Link
-                      href={`/stock/${trade.symbol}`}
-                      className="font-semibold text-foreground hover:text-primary"
-                    >
-                      {trade.symbol}
-                    </Link>
-                  </TableCell>
-                  <TableCell className="capitalize">{trade.side}</TableCell>
-                  <TableCell className="text-right tabular-nums">
-                    {formatNumber(trade.shares, 0)}
-                  </TableCell>
-                  <TableCell className="text-right tabular-nums">
-                    {formatPrice(trade.price)}
-                  </TableCell>
-                  <TableCell className="hidden text-right tabular-nums sm:table-cell">
-                    {formatPrice(trade.shares * trade.price)}
-                  </TableCell>
-                  <TableCell className="hidden text-right text-sm text-muted-foreground md:table-cell">
-                    {new Date(trade.executed_at).toLocaleString("en-US", {
-                      month: "short",
-                      day: "numeric",
-                      hour: "numeric",
-                      minute: "2-digit",
-                    })}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+          <TradeLogTable trades={tradesNewestFirst} />
         )}
       </section>
     </div>
