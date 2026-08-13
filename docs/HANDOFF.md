@@ -259,6 +259,28 @@ Record every pushed commit here after each milestone.
   - Exported reset helper in `lib/stripe.ts` and removed unreachable check in `lib/correlation.ts`.
   - Reached 97.17% branch coverage and 99.65% statement coverage.
 
+## Audit fix plan (branches off main, PRs #20-#22 OPEN)
+
+Full-repo audit (4 parallel agents) produced a fix plan delivered as sequential PRs. All build on main; none merged yet.
+
+- PR #20 `fix/p0-bugs` (commit `d6e5ccd`): calendar page queries `watchlist_items` not `watchlist`; snowball dividends record actuals per year (not next-year forward rate), crossover + `finalYieldOnCost` fixed; flat-series RSI returns 50.
+- PR #21 `fix/financial-accuracy` (commit `f9588c6`): `/api/portfolio/summary` omits unpriced holdings (no `avg_cost` fabrication), `calculatePortfolioHistory` skips holdings with no candle data, `calculateWeightedBeta` returns null for empty portfolio, migration `20260812000000_harden_equity_snapshot_lock.sql` adds `pg_advisory_xact_lock` to `upsert_paper_equity_snapshot`.
+- PR #22 `fix/races-idempotency-reconnect` (commit `3867d51`): pending-state submit buttons in holding dialogs and trading; insiders + correlation page fetches moved into single effects keyed on inputs with AbortController/active guard; `useLivePrice` reconnects with capped exponential backoff (1s-30s).
+
+## Session 2026-08-13: hardening + polish (branch `fix/hardening-polish`, PR #23)
+
+PR 4 (hardening) + PR 5 (polish) from the audit plan, combined into one change set, all verified (195 tests, lint, tsc --noEmit, build all pass).
+
+- Rate limiting (best effort, per instance): proxy.ts rejects external market-data API routes over 90 req/60s per client with 429 + Retry-After.
+- Fetch timeouts (10s) on Finnhub and Twelve Data clients via `AbortSignal.timeout`.
+- Generic error messages on backtest/insiders/correlation routes (no provider error leakage); insiders sort puts malformed dates last (`parseDateTimestamp`); beta route guards `decodeURIComponent`; search query capped at 20 chars.
+- New `lib/symbol.ts` (`SYMBOL_PATTERN`, `isValidSymbol`, `normalizeSymbol`, `splitSymbols`) and `lib/parse.ts` (`isUuid`, `parseDateTimestamp`); deduped symbol regex across 14 files; strict UUID checks in alerts + portfolio actions.
+- Correlation: symbols split on whitespace too; intraday candles aggregated to daily closes before return computation.
+- Backtester sell trade-log records actual shares (was 0); screener PE sort handles all-null lists; alert distancePercent guards division by zero; calendar surfaces adjacent-year holidays (`getUpcomingHolidays`).
+- formatPrice/formatNumber render "-" for non-finite; DCF discloses default $5.00 EPS fallback; screener page has an error state with Retry.
+- Stripe single-flight `getOrCreateProPriceId`; pricing checkout button disables while pending (`components/pricing-submit-button.tsx`).
+- Ledger: pushed commit `5916152`.
+
 
 ## Session 2026-07-05 (later): port PR merged, billing IN PROGRESS
 
