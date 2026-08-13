@@ -260,6 +260,12 @@ Record every pushed commit here after each milestone.
   - Updated `package.json` test script to run Node `--experimental-test-coverage`.
   - Resolved 43 code analysis issues across 13 files (accessibility labels, `type="button"`, `Number.parseFloat`/`Number.parseInt`, `new Array()`, `reduce` initial values, `--ignore-scripts`).
   - Reached 99.09% line coverage, 97.86% branch coverage, and 98.22% function coverage across 219 unit tests.
+- `43ca236` Resolve 127 SonarQube and linter issues across components and lib (branch `feature/code-coverage-95`, PR #26)
+  - Added `getFormString` helper to avoid object stringification warnings on `FormData.get()`.
+  - Extracted inline Tooltip components out of parent render functions in `app/compare/matrix/page.tsx`, `components/dcf-calculator.tsx`, `components/equity-chart.tsx`, `components/portfolio-history-chart.tsx`, `components/sentiment-panel.tsx`, and `components/stock-chart.tsx`.
+  - Reduced Cognitive Complexity in `app/stock/[symbol]/volatility/page.tsx`, `components/portfolio-history-chart.tsx`, `lib/backtester.ts`, `lib/portfolio-history.ts`, `lib/screener.ts`.
+  - Updated React component prop types to `Readonly<Props>` across all page and component files.
+  - Used `String.raw` for regex escaping, replaced `.match()` loops with `RegExp.exec()`, and updated array index keys to unique entity keys.
 
 
 
