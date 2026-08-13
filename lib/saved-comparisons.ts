@@ -1,5 +1,4 @@
 import { isValidSymbol } from "./symbol.ts";
-import { isUuid } from "./parse.ts";
 
 const MAX_SYMBOLS = 5;
 export const MAX_COMPARISON_NAME_LENGTH = 60;
@@ -56,4 +55,4 @@ export function normalizeSavedComparisonInput(
   return { name, symbols };
 }
 
-export { isUuid };
+export { isUuid } from "./parse.ts";

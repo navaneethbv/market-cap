@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { Search, Loader2, ArrowUpDown, Layers } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -59,6 +59,104 @@ export default function ScreenerPage() {
 
   // Apply sorting
   const sorted = sortScreenerStocks(filtered, sortBy);
+
+  let resultsContent: ReactNode;
+  if (loading) {
+    resultsContent = (
+      <div className="flex items-center justify-center py-20">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  } else if (error) {
+    resultsContent = (
+      <div className="rounded-2xl border border-red-500/20 bg-red-500/5 p-12 text-center shadow-sm">
+        <p className="text-sm text-red-600 dark:text-red-400 font-semibold">
+          {error}
+        </p>
+        <Button
+          variant="outline"
+          size="sm"
+          className="mt-4 rounded-xl"
+          onClick={loadStocks}
+        >
+          Retry
+        </Button>
+      </div>
+    );
+  } else if (sorted.length === 0) {
+    resultsContent = (
+      <div className="rounded-2xl border bg-card p-12 text-center shadow-sm">
+        <p className="text-sm text-muted-foreground font-semibold">
+          No stock listings match your filter selections. Try relaxing the query constraints!
+        </p>
+      </div>
+    );
+  } else {
+    resultsContent = (
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {sorted.map((stock) => (
+          <div key={stock.symbol} className="group relative rounded-2xl border bg-card p-4 shadow-sm transition-all hover:shadow-md hover:border-primary/20 flex flex-col justify-between min-h-[185px]">
+            <div>
+              <div className="flex items-start justify-between">
+                <div className="space-y-1">
+                  <span className="text-[10px] font-bold tracking-wider text-primary uppercase bg-primary/10 px-2 py-0.5 rounded-full">
+                    {stock.sector}
+                  </span>
+                  <h3 className="text-lg font-bold group-hover:text-primary transition-colors flex items-center gap-1.5 pt-1">
+                    {stock.symbol}
+                  </h3>
+                  <p className="text-xs text-muted-foreground font-semibold line-clamp-1">
+                    {stock.name}
+                  </p>
+                </div>
+                <div className="flex flex-col items-end gap-1 text-right">
+                  <span className="text-base font-bold tabular-nums">
+                    {formatPrice(stock.price)}
+                  </span>
+                  <ChangeChip value={stock.changePercent} />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-x-4 gap-y-2 border-t pt-3 mt-4 text-xs font-semibold">
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Market Cap:</span>
+                  <span className="tabular-nums font-bold text-foreground">
+                    {formatCompact(stock.marketCap * 1_000_000_000)}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">P/E Ratio:</span>
+                  <span className="tabular-nums font-bold text-foreground">
+                    {stock.peRatio !== null ? stock.peRatio.toFixed(1) : "-"}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Yield %:</span>
+                  <span className="tabular-nums font-bold text-foreground">
+                    {stock.dividendYield !== null ? `${stock.dividendYield.toFixed(2)}%` : "-"}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Beta (Risk):</span>
+                  <span className="tabular-nums font-bold text-foreground">
+                    {stock.beta !== null ? stock.beta.toFixed(2) : "-"}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div className="pt-4 mt-2">
+              <Button asChild variant="outline" size="sm" className="w-full rounded-xl hover:bg-primary hover:text-white transition-colors">
+                <Link href={`/stock/${stock.symbol}`}>
+                  View Details
+                </Link>
+              </Button>
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  }
 
   const sectorsList = [
     "All",
@@ -182,94 +280,7 @@ export default function ScreenerPage() {
       </section>
 
       {/* Screener Results */}
-      {loading ? (
-        <div className="flex items-center justify-center py-20">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        </div>
-      ) : error ? (
-        <div className="rounded-2xl border border-red-500/20 bg-red-500/5 p-12 text-center shadow-sm">
-          <p className="text-sm text-red-600 dark:text-red-400 font-semibold">
-            {error}
-          </p>
-          <Button
-            variant="outline"
-            size="sm"
-            className="mt-4 rounded-xl"
-            onClick={loadStocks}
-          >
-            Retry
-          </Button>
-        </div>
-      ) : sorted.length === 0 ? (
-        <div className="rounded-2xl border bg-card p-12 text-center shadow-sm">
-          <p className="text-sm text-muted-foreground font-semibold">
-            No stock listings match your filter selections. Try relaxing the query constraints!
-          </p>
-        </div>
-      ) : (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {sorted.map((stock) => (
-            <div key={stock.symbol} className="group relative rounded-2xl border bg-card p-4 shadow-sm transition-all hover:shadow-md hover:border-primary/20 flex flex-col justify-between min-h-[185px]">
-              <div>
-                <div className="flex items-start justify-between">
-                  <div className="space-y-1">
-                    <span className="text-[10px] font-bold tracking-wider text-primary uppercase bg-primary/10 px-2 py-0.5 rounded-full">
-                      {stock.sector}
-                    </span>
-                    <h3 className="text-lg font-bold group-hover:text-primary transition-colors flex items-center gap-1.5 pt-1">
-                      {stock.symbol}
-                    </h3>
-                    <p className="text-xs text-muted-foreground font-semibold line-clamp-1">
-                      {stock.name}
-                    </p>
-                  </div>
-                  <div className="flex flex-col items-end gap-1 text-right">
-                    <span className="text-base font-bold tabular-nums">
-                      {formatPrice(stock.price)}
-                    </span>
-                    <ChangeChip value={stock.changePercent} />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-x-4 gap-y-2 border-t pt-3 mt-4 text-xs font-semibold">
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Market Cap:</span>
-                    <span className="tabular-nums font-bold text-foreground">
-                      {formatCompact(stock.marketCap * 1_000_000_000)}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">P/E Ratio:</span>
-                    <span className="tabular-nums font-bold text-foreground">
-                      {stock.peRatio !== null ? stock.peRatio.toFixed(1) : "-"}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Yield %:</span>
-                    <span className="tabular-nums font-bold text-foreground">
-                      {stock.dividendYield !== null ? `${stock.dividendYield.toFixed(2)}%` : "-"}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Beta (Risk):</span>
-                    <span className="tabular-nums font-bold text-foreground">
-                      {stock.beta !== null ? stock.beta.toFixed(2) : "-"}
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="pt-4 mt-2">
-                <Button asChild variant="outline" size="sm" className="w-full rounded-xl hover:bg-primary hover:text-white transition-colors">
-                  <Link href={`/stock/${stock.symbol}`}>
-                    View Details
-                  </Link>
-                </Button>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
+      {resultsContent}
     </div>
   );
 }

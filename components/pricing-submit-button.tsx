@@ -7,11 +7,11 @@ export function PricingSubmitButton({
   children,
   className,
   pendingLabel,
-}: {
+}: Readonly<{
   children: React.ReactNode;
   className?: string;
   pendingLabel?: string;
-}) {
+}>) {
   const { pending } = useFormStatus();
   return (
     <Button type="submit" className={className} disabled={pending}>

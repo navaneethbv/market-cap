@@ -30,7 +30,7 @@ export function TradeTicketButtons() {
   );
 }
 
-export function SellAllButton({ symbol }: { symbol: string }) {
+export function SellAllButton({ symbol }: Readonly<{ symbol: string }>) {
   const { pending } = useFormStatus();
   return (
     <Button
