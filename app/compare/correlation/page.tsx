@@ -26,6 +26,9 @@ import { alignReturns, type AlignedReturnPoint } from "@/lib/correlation.ts";
 
 export default function CorrelationPage() {
   const [symbolsInput, setSymbolsInput] = useState("AAPL,MSFT,GOOGL,AMZN,TSLA");
+  const [requestedSymbols, setRequestedSymbols] = useState(
+    "AAPL,MSFT,GOOGL,AMZN,TSLA"
+  );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -36,39 +39,56 @@ export default function CorrelationPage() {
 
   const [selectedCell, setSelectedCell] = useState<{ symbolA: string; symbolB: string } | null>(null);
 
-  const fetchCorrelation = async () => {
-    if (!symbolsInput) return;
-    setLoading(true);
-    setError(null);
-    setSelectedCell(null);
-
-    try {
-      const res = await fetch(`/api/correlation?symbols=${encodeURIComponent(symbolsInput)}`);
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data.error ?? "Failed to fetch correlation matrix");
-      }
-      setSymbols(data.symbols);
-      setMatrix(data.matrix);
-      setOverlapCounts(data.overlapCounts);
-      setReturns(data.returns);
-
-      if (data.symbols.length >= 2) {
-        setSelectedCell({ symbolA: data.symbols[0], symbolB: data.symbols[1] });
-      }
-    } catch (err) {
-      console.error(err);
-      setError(err instanceof Error ? err.message : "Error calculating correlations");
-    } finally {
-      setLoading(false);
-    }
-  };
-
+  // Single fetch path owned by the effect. Every change to requestedSymbols
+  // (initial mount, or the Analyze button) aborts any in-flight request and
+  // starts a new one, so a slow older response can never overwrite the newer
+  // matrix for a different symbol set.
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    fetchCorrelation();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    let active = true;
+    const controller = new AbortController();
+
+    async function load() {
+      setLoading(true);
+      setError(null);
+      setSelectedCell(null);
+      try {
+        const res = await fetch(
+          `/api/correlation?symbols=${encodeURIComponent(requestedSymbols)}`,
+          { signal: controller.signal }
+        );
+        const data = await res.json();
+        if (!res.ok) {
+          throw new Error(data.error ?? "Failed to fetch correlation matrix");
+        }
+        if (active) {
+          setSymbols(data.symbols);
+          setMatrix(data.matrix);
+          setOverlapCounts(data.overlapCounts);
+          setReturns(data.returns);
+
+          if (data.symbols.length >= 2) {
+            setSelectedCell({ symbolA: data.symbols[0], symbolB: data.symbols[1] });
+          }
+        }
+      } catch (err) {
+        if (!controller.signal.aborted && active) {
+          console.error(err);
+          setError(err instanceof Error ? err.message : "Error calculating correlations");
+        }
+      } finally {
+        if (active) {
+          setLoading(false);
+        }
+      }
+    }
+
+    void load();
+
+    return () => {
+      active = false;
+      controller.abort();
+    };
+  }, [requestedSymbols]);
 
   const getHeatmapColor = (val: number | null) => {
     if (val === null) return "bg-zinc-800/40 text-muted-foreground";
@@ -113,7 +133,7 @@ export default function CorrelationPage() {
             />
           </div>
           <Button
-            onClick={fetchCorrelation}
+            onClick={() => setRequestedSymbols(symbolsInput.trim().toUpperCase())}
             disabled={loading}
             className="rounded-xl flex items-center justify-center gap-1.5 bg-blue-600 hover:bg-blue-500 text-white font-medium px-5 shrink-0"
           >

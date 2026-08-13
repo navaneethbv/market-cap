@@ -5,6 +5,7 @@ import { placePaperTrade } from "@/app/trading/actions";
 import { fetchAllPaperTrades } from "@/app/trading/data";
 import { ChangeChip } from "@/components/change-chip";
 import { ResetAccountDialog } from "@/components/reset-account-dialog";
+import { TradeTicketButtons, SellAllButton } from "@/components/trade-submit-buttons";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -223,25 +224,7 @@ export default async function TradingPage({ searchParams }: TradingPageProps) {
               className="border-input bg-background ring-offset-background focus-visible:ring-ring h-10 w-28 rounded-full border px-4 text-sm shadow-xs focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
             />
           </div>
-          <div className="flex gap-2">
-            <Button
-              type="submit"
-              name="side"
-              value="buy"
-              className="rounded-full"
-            >
-              Buy
-            </Button>
-            <Button
-              type="submit"
-              name="side"
-              value="sell"
-              variant="outline"
-              className="rounded-full"
-            >
-              Sell
-            </Button>
-          </div>
+          <TradeTicketButtons />
         </form>
       </section>
 
@@ -328,16 +311,7 @@ export default async function TradingPage({ searchParams }: TradingPageProps) {
                     <form action={placePaperTrade} className="flex justify-end">
                       <input type="hidden" name="symbol" value={row.symbol} />
                       <input type="hidden" name="shares" value={row.shares} />
-                      <Button
-                        type="submit"
-                        name="side"
-                        value="sell"
-                        variant="ghost"
-                        size="sm"
-                        aria-label={`Sell all ${row.symbol}`}
-                      >
-                        Sell all
-                      </Button>
+                      <SellAllButton symbol={row.symbol} />
                     </form>
                   </TableCell>
                 </TableRow>

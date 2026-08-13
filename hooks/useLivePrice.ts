@@ -37,6 +37,8 @@ export function useLivePrice({
   useEffect(() => {
     let active = true;
     let socket: WebSocket | null = null;
+    let reconnectTimer: number | null = null;
+    let reconnectAttempts = 0;
     const controller = new AbortController();
     const token = process.env.NEXT_PUBLIC_FINNHUB_API_KEY;
 
@@ -54,10 +56,24 @@ export function useLivePrice({
       }
     }, FALLBACK_POLL_INTERVAL_MS);
 
-    if (token) {
+    function scheduleReconnect() {
+      if (!active || reconnectTimer !== null) return;
+      // Capped exponential backoff so a brief network blip recovers the
+      // live stream without hammering the websocket endpoint.
+      const delay = Math.min(1000 * 2 ** reconnectAttempts, 30000);
+      reconnectAttempts += 1;
+      reconnectTimer = window.setTimeout(() => {
+        reconnectTimer = null;
+        connect();
+      }, delay);
+    }
+
+    function connect() {
+      if (!active || !token) return;
       socket = new WebSocket(`wss://ws.finnhub.io?token=${token}`);
       socket.addEventListener("open", () => {
         if (!active || !socket) return;
+        reconnectAttempts = 0;
         setConnected(true);
         setFallback(false);
         socket.send(JSON.stringify({ type: "subscribe", symbol }));
@@ -83,13 +99,19 @@ export function useLivePrice({
         setConnected(false);
         setFallback(true);
         void poll();
+        scheduleReconnect();
       });
       socket.addEventListener("error", () => {
         if (!active) return;
         setConnected(false);
         setFallback(true);
         void poll();
+        // A close event always follows an error and schedules the reconnect.
       });
+    }
+
+    if (token) {
+      connect();
     } else {
       void poll();
     }
@@ -98,6 +120,9 @@ export function useLivePrice({
       active = false;
       controller.abort();
       window.clearInterval(interval);
+      if (reconnectTimer !== null) {
+        window.clearTimeout(reconnectTimer);
+      }
       if (socket && socket.readyState === WebSocket.OPEN) {
         socket.send(JSON.stringify({ type: "unsubscribe", symbol }));
       }
