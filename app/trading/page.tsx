@@ -6,6 +6,7 @@ import { fetchAllPaperTrades } from "@/app/trading/data";
 import { ChangeChip } from "@/components/change-chip";
 import { ResetAccountDialog } from "@/components/reset-account-dialog";
 import { TradeTicketButtons, SellAllButton } from "@/components/trade-submit-buttons";
+import { IdempotencyKeyInput } from "@/components/idempotency-key-input";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -23,7 +24,6 @@ import {
   buildPaperSummary,
   DEFAULT_STARTING_CASH,
 } from "@/lib/paper-trading";
-import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import type { Quote } from "@/lib/market/types";
 import { isValidSymbol } from "@/lib/symbol";
@@ -86,29 +86,6 @@ export default async function TradingPage({ searchParams }: TradingPageProps) {
   });
 
   const ticketQuote = await ticketQuotePromise;
-
-  const hasQuoteFailures = positionRows.some((row) => row.error !== null);
-
-  // Record today's equity so the history page can chart it. Best effort:
-  // a failed snapshot must not break the page.
-  // Skip when any quote failed so a cost-basis approximation never
-  // overwrites an accurate snapshot for the same day
-  if (account && trades.length > 0 && !hasQuoteFailures) {
-    try {
-      const { error: snapshotError } = await createAdminClient().rpc(
-        "upsert_paper_equity_snapshot",
-        {
-          p_user_id: user.id,
-          p_equity: Math.max(0, summary.equity),
-        }
-      );
-      if (snapshotError) {
-        console.error("equity snapshot failed:", snapshotError.message);
-      }
-    } catch (err) {
-      console.error("equity snapshot failed:", err);
-    }
-  }
 
   const recentTrades = [...trades].reverse().slice(0, 10);
 
@@ -194,6 +171,7 @@ export default async function TradingPage({ searchParams }: TradingPageProps) {
           action={placePaperTrade}
           className="flex flex-col gap-3 sm:flex-row sm:items-end"
         >
+          <IdempotencyKeyInput />
           <div className="grid gap-1.5">
             <label htmlFor="trade-symbol" className="text-xs font-medium">
               Symbol
@@ -308,6 +286,7 @@ export default async function TradingPage({ searchParams }: TradingPageProps) {
                   </TableCell>
                   <TableCell>
                     <form action={placePaperTrade} className="flex justify-end">
+                      <IdempotencyKeyInput />
                       <input type="hidden" name="symbol" value={row.symbol} />
                       <input type="hidden" name="shares" value={row.shares} />
                       <SellAllButton symbol={row.symbol} />

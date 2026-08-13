@@ -41,15 +41,16 @@ function computeDCF(eps: number, growth: number, discount: number, terminal: num
 }
 
 export function DCFCalculator({ currentPrice, initialEps }: DCFCalculatorProps) {
-  const eps = initialEps !== null && initialEps > 0 ? initialEps : 5.0;
-  const usingFallbackEps = eps === 5.0 && initialEps !== 5.0;
+  const eps = initialEps !== null && initialEps > 0 ? initialEps : null;
 
   // Sliders state
   const [growthRate, setGrowthRate] = useState(10);
   const [discountRate, setDiscountRate] = useState(9);
   const [terminalGrowth, setTerminalGrowth] = useState(2.5);
 
-  const { intrinsicValue, safetyMargin, status, chartData } = useMemo(() => {
+  const valuation = useMemo(() => {
+    if (eps === null) return null;
+
     const baseValue = computeDCF(eps, growthRate, discountRate, terminalGrowth);
     
     // Bull: +4% growth, -1% WACC
@@ -152,45 +153,53 @@ export function DCFCalculator({ currentPrice, initialEps }: DCFCalculatorProps) 
 
         {/* Right Side: Results */}
         <div className="flex flex-col justify-between rounded-xl border bg-muted/10 p-4 space-y-4">
-          {usingFallbackEps && (
-            <p className="text-[10px] leading-snug font-semibold text-muted-foreground bg-background border rounded-lg px-2.5 py-1.5">
-              Using a default EPS of $5.00 because trailing EPS is unavailable for this stock.
-            </p>
-          )}
-          <div className="text-center py-2 space-y-1">
-            <h4 className="text-xs font-bold text-muted-foreground uppercase">Estimated Fair Value</h4>
-            <div className="text-3xl font-extrabold tabular-nums text-foreground">
-              {formatPrice(intrinsicValue)}
-            </div>
-          </div>
+          {valuation ? (
+            <>
+              <div className="text-center py-2 space-y-1">
+                <h4 className="text-xs font-bold text-muted-foreground uppercase">Estimated Fair Value</h4>
+                <div className="text-3xl font-extrabold tabular-nums text-foreground">
+                  {formatPrice(valuation.intrinsicValue)}
+                </div>
+              </div>
 
-          <div className="border-t pt-3 flex flex-col items-center text-center space-y-2">
-            <h5 className="text-xs font-bold text-muted-foreground">Valuation Verdict</h5>
-            <span
-              className={cn(
-                "px-3 py-1 rounded-full text-xs font-extrabold border shadow-inner",
-                status === "UNDER"
-                  ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-600 dark:text-emerald-400"
-                  : "bg-red-500/10 border-red-500/30 text-red-600 dark:text-red-400"
-              )}
-            >
-              {status === "UNDER" ? "Under-valued" : "Over-valued"} by {safetyMargin}%
-            </span>
-            <p className="text-[11px] leading-normal text-muted-foreground font-semibold max-w-xs mt-1">
-              {status === "UNDER"
-                ? `The stock has a positive margin of safety of ${safetyMargin}%, indicating it may be trading below its calculated fair value.`
-                : `The stock is trading at a premium of ${safetyMargin}% above its calculated fair value based on these growth inputs.`}
-            </p>
-          </div>
+              <div className="border-t pt-3 flex flex-col items-center text-center space-y-2">
+                <h5 className="text-xs font-bold text-muted-foreground">Valuation Verdict</h5>
+                <span
+                  className={cn(
+                    "px-3 py-1 rounded-full text-xs font-extrabold border shadow-inner",
+                    valuation.status === "UNDER"
+                      ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-600 dark:text-emerald-400"
+                      : "bg-red-500/10 border-red-500/30 text-red-600 dark:text-red-400"
+                  )}
+                >
+                  {valuation.status === "UNDER" ? "Under-valued" : "Over-valued"} by {valuation.safetyMargin}%
+                </span>
+                <p className="text-[11px] leading-normal text-muted-foreground font-semibold max-w-xs mt-1">
+                  {valuation.status === "UNDER"
+                    ? `The stock has a positive margin of safety of ${valuation.safetyMargin}%, indicating it may be trading below its calculated fair value.`
+                    : `The stock is trading at a premium of ${valuation.safetyMargin}% above its calculated fair value based on these growth inputs.`}
+                </p>
+              </div>
+            </>
+          ) : (
+            <div className="flex min-h-40 flex-col items-center justify-center text-center">
+              <h4 className="text-sm font-bold text-muted-foreground">Valuation unavailable</h4>
+              <p className="mt-2 max-w-xs text-xs leading-5 text-muted-foreground">
+                Trailing EPS is unavailable for this stock, so a fair value and
+                valuation verdict cannot be calculated.
+              </p>
+            </div>
+          )}
         </div>
       </div>
 
       {/* Scenario Bar Chart */}
-      <div className="border-t pt-5 space-y-3">
-        <h4 className="text-xs font-bold text-muted-foreground uppercase">Scenario Analysis</h4>
-        <div className="h-40 w-full">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={chartData} margin={{ top: 10, right: 10, left: -25, bottom: 5 }}>
+      {valuation && (
+        <div className="border-t pt-5 space-y-3">
+          <h4 className="text-xs font-bold text-muted-foreground uppercase">Scenario Analysis</h4>
+          <div className="h-40 w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={valuation.chartData} margin={{ top: 10, right: 10, left: -25, bottom: 5 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" opacity={0.3} />
               <XAxis
                 dataKey="name"
@@ -221,14 +230,15 @@ export function DCFCalculator({ currentPrice, initialEps }: DCFCalculatorProps) 
                 }}
               />
               <Bar dataKey="value" radius={[4, 4, 0, 0]}>
-                {chartData.map((entry, index) => (
+                {valuation.chartData.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={entry.fill} />
                 ))}
               </Bar>
-            </BarChart>
-          </ResponsiveContainer>
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

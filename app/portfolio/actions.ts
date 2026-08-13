@@ -27,6 +27,35 @@ export async function createHolding(formData: FormData) {
     avgCost: String(formData.get("avgCost") ?? ""),
     purchasedAt: String(formData.get("purchasedAt") ?? ""),
   });
+  const idempotencyKey = String(formData.get("idempotencyKey") ?? "");
+  if (!isUuid(idempotencyKey)) {
+    throw new Error("Idempotency key is required");
+  }
+
+  const existing = await supabase
+    .from("holdings")
+    .select("symbol,shares,avg_cost,purchased_at")
+    .eq("user_id", user.id)
+    .eq("idempotency_key", idempotencyKey)
+    .maybeSingle();
+
+  if (existing.error) {
+    throw new Error(existing.error.message);
+  }
+
+  if (existing.data) {
+    if (
+      existing.data.symbol !== input.symbol ||
+      Number(existing.data.shares) !== input.shares ||
+      Number(existing.data.avg_cost) !== input.avgCost ||
+      existing.data.purchased_at !== input.purchasedAt
+    ) {
+      throw new Error("Idempotency key was already used for another holding");
+    }
+    revalidatePath("/portfolio");
+    redirectToNext(formData);
+    return;
+  }
 
   const { error } = await supabase.from("holdings").insert({
     user_id: user.id,
@@ -34,9 +63,29 @@ export async function createHolding(formData: FormData) {
     shares: input.shares,
     avg_cost: input.avgCost,
     purchased_at: input.purchasedAt,
+    idempotency_key: idempotencyKey,
   });
 
   if (error) {
+    if (error.code === "23505") {
+      const duplicate = await supabase
+        .from("holdings")
+        .select("symbol,shares,avg_cost,purchased_at")
+        .eq("user_id", user.id)
+        .eq("idempotency_key", idempotencyKey)
+        .maybeSingle();
+      if (
+        !duplicate.error &&
+        duplicate.data?.symbol === input.symbol &&
+        Number(duplicate.data.shares) === input.shares &&
+        Number(duplicate.data.avg_cost) === input.avgCost &&
+        duplicate.data.purchased_at === input.purchasedAt
+      ) {
+        revalidatePath("/portfolio");
+        redirectToNext(formData);
+        return;
+      }
+    }
     throw new Error(error.message);
   }
 
@@ -44,6 +93,10 @@ export async function createHolding(formData: FormData) {
 
   // Optional post-save destination (used by the stock page dialog);
   // same-origin relative paths only to prevent open redirects
+  redirectToNext(formData);
+}
+
+function redirectToNext(formData: FormData): never | void {
   const next = String(formData.get("next") ?? "");
   if (next.startsWith("/") && !next.startsWith("//")) {
     redirect(next);

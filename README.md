@@ -7,8 +7,8 @@ and a market calendar for US stocks.
 ## Features
 
 - **Dashboard** (`/`): SPY/QQQ/DIA index cards, watchlist preview, market news
-- **Stock detail** (`/stock/[symbol]`): live price (Finnhub websocket with
-  polling fallback), range chart with SMA/EMA/Bollinger/RSI/MACD overlays,
+- **Stock detail** (`/stock/[symbol]`): live price through the server quote
+  proxy, range chart with SMA/EMA/Bollinger/RSI/MACD overlays,
   key stats, company news, a DCF calculator, and a beta-based volatility
   simulator (`/stock/[symbol]/volatility`); Watch, Trade, and Add to
   portfolio buttons
@@ -45,8 +45,8 @@ signed-in user; everything else is public.
 - Next.js 16 (App Router, TypeScript) deployed to Vercel
 - Tailwind CSS v4 + shadcn/ui, Recharts for charts
 - Supabase for auth (email/password) and Postgres with row level security
-- Market data: Finnhub (quotes, search, profiles, news, earnings calendar,
-  websocket) and Twelve Data (chart candles), both on free tiers
+- Market data: Finnhub (quotes, search, profiles, news, earnings calendar)
+  and Twelve Data (chart candles), both on free tiers
 - Stripe for the Pro subscription ($20/month); see
   [docs/PAYMENTS.md](docs/PAYMENTS.md)
 
@@ -65,7 +65,7 @@ signed-in user; everything else is public.
    NEXT_PUBLIC_SUPABASE_ANON_KEY=...
    SUPABASE_SERVICE_ROLE_KEY=...     # server-only, used for locked paper-trading writes
    FINNHUB_API_KEY=...
-   NEXT_PUBLIC_FINNHUB_API_KEY=...   # same Finnhub key, used by the client websocket
+   # No client-side Finnhub key is required. Live prices use /api/quote.
    TWELVEDATA_API_KEY=...
    STRIPE_SECRET_KEY=sk_test_...     # Stripe sandbox key for the Pro plan
    NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_...
@@ -103,7 +103,7 @@ signed-in user; everything else is public.
 - `components/` - app components plus `components/ui/` (shadcn)
 - `lib/` - pure helpers with unit tests beside them; `lib/market/` wraps the
   Finnhub and Twelve Data APIs (server only)
-- `hooks/useLivePrice.ts` - Finnhub websocket with polling fallback
+- `hooks/useLivePrice.ts` - server-side quote polling for live prices
 - `proxy.ts` - Next middleware: Supabase session refresh + protected routes
 - `supabase/migrations/` - database schema (RLS on every table)
 - `docs/` - project docs, including the session handoff (`docs/HANDOFF.md`)
@@ -115,6 +115,6 @@ GitHub Actions (`.github/workflows/ci.yml`) runs lint, tests, and build on
 pushes and pull requests to `main`. A final "Run smoke" step boots the
 production server and checks it serves `/login`; it is skipped until the
 repo secrets `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`,
-`SUPABASE_SERVICE_ROLE_KEY`, `FINNHUB_API_KEY`,
-`NEXT_PUBLIC_FINNHUB_API_KEY`, and `TWELVEDATA_API_KEY` are configured
+`SUPABASE_SERVICE_ROLE_KEY`, `FINNHUB_API_KEY`, and
+`TWELVEDATA_API_KEY` are configured
 (Settings -> Secrets and variables -> Actions).

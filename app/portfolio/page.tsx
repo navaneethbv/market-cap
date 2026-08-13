@@ -77,7 +77,7 @@ export default async function PortfolioPage() {
     return {
       symbol: h.symbol,
       shares: h.shares,
-      price: quote ? quote.price : h.avg_cost,
+      price: quote?.price ?? null,
       avgCost: h.avg_cost,
       dividendYield: metrics?.dividendYield ? Number(metrics.dividendYield) : 0,
     };

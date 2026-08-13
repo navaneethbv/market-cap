@@ -41,14 +41,13 @@ US stocks only, free API tiers.
 ```
 Finnhub (server)  ──lib/market/finnhub.ts──►  server components / API routes
 Twelve Data       ──lib/market/twelvedata.ts──►  /api/candles ──► StockChart
-Finnhub websocket ──hooks/useLivePrice.ts──►  LivePriceDisplay (client)
+Finnhub API ──/api/quote──►  useLivePrice (client)
 Supabase          ──lib/supabase/{server,client}.ts──►  pages + server actions
 ```
 
 - `lib/market/*` is `server-only` (API keys stay server side). The client
   reaches market data through `/api/quote`, `/api/search`, `/api/candles`.
-  Exception: the Finnhub websocket uses `NEXT_PUBLIC_FINNHUB_API_KEY`
-  directly (accepted trade-off, documented in the handoff).
+  Live prices use the server-side `/api/quote` proxy, so the Finnhub key stays server-only.
 - Quote fan-outs use `Promise.allSettled`; `build*Rows(items, quoteResults)`
   helpers in `lib/` pair items with settled results by index and carry
   per-row `error` strings instead of failing the page.
@@ -62,10 +61,10 @@ Supabase          ──lib/supabase/{server,client}.ts──►  pages + server
   helper that throws on bad input, mutate scoped by `.eq("user_id", user.id)`,
   then `revalidatePath`. Forms mirror validation with `required`/`maxLength`
   attributes so bad input rarely reaches the throwing server action.
-- `hooks/useLivePrice.ts`: websocket with a 15 s polling fallback. Its effect
-  deliberately depends only on `symbol`; do NOT add `initialQuote` to the
-  deps or every server re-render (any `revalidatePath`) reconnects the
-  socket. `LivePriceDisplay` is keyed by symbol at the call site.
+- `hooks/useLivePrice.ts`: server-side quote polling every 15 seconds. Its
+  effect deliberately depends only on `symbol`; do NOT add `initialQuote` to
+  the deps or every server re-render (any `revalidatePath`) restarts polling.
+  `LivePriceDisplay` is keyed by symbol at the call site.
 - Symbol validation is the shared regex `^[A-Z0-9.^-]{1,12}$` (app code and
   SQL checks); comparison helpers also strip SQL-ish RESERVED_WORDS.
 - Open-redirect guard everywhere a `next` path is honored: only accept

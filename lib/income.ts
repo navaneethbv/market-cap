@@ -1,7 +1,7 @@
 export interface IncomeMetric {
   symbol: string;
   shares: number;
-  price: number;
+  price: number | null;
   avgCost: number;
   dividendYield: number;
 }
@@ -16,12 +16,22 @@ export interface IncomeSummary {
 
 export function calculateIncomeSummary(metrics: IncomeMetric[]): IncomeSummary {
   const annualIncome = metrics.reduce(
-    (total, h) => total + h.shares * h.price * (h.dividendYield / 100),
+    (total, h) =>
+      h.price === null
+        ? total
+        : total + h.shares * h.price * (h.dividendYield / 100),
     0
   );
 
-  const totalCostBasis = metrics.reduce((total, h) => total + h.shares * h.avgCost, 0);
-  const totalMarketValue = metrics.reduce((total, h) => total + h.shares * h.price, 0);
+  const totalCostBasis = metrics.reduce(
+    (total, h) =>
+      h.price === null ? total : total + h.shares * h.avgCost,
+    0
+  );
+  const totalMarketValue = metrics.reduce(
+    (total, h) => (h.price === null ? total : total + h.shares * h.price),
+    0
+  );
 
   const portfolioYield = totalMarketValue === 0 ? 0 : (annualIncome / totalMarketValue) * 100;
   const yieldOnCost = totalCostBasis === 0 ? 0 : (annualIncome / totalCostBasis) * 100;

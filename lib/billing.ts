@@ -7,15 +7,10 @@ import {
 } from "./billing-state.ts";
 import { getOrCreateProPriceId, getStripe } from "./stripe.ts";
 
-const CACHE_TTL_MS = 60_000;
-// Short TTL after a Stripe failure so an outage neither hammers the API nor
-// pins users to a stale answer for a full minute
-const ERROR_TTL_MS = 5_000;
-
-const cache = new Map<string, { state: BillingState; expires: number }>();
-
+// Billing state is read from Stripe on every check so cancellation and
+// payment-status changes are not hidden by a process-local cache.
 export function invalidateBillingCache(userId: string) {
-  cache.delete(userId);
+  void userId;
 }
 
 /**
@@ -25,22 +20,12 @@ export function invalidateBillingCache(userId: string) {
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function getBillingState(userId: string, supabaseClient?: any): Promise<BillingState> {
-  const hit = cache.get(userId);
-  if (hit && hit.expires > Date.now()) {
-    return hit.state;
-  }
-
-  let state = FREE_BILLING_STATE;
-  let ttl = CACHE_TTL_MS;
   try {
-    state = await fetchBillingState(userId, supabaseClient);
+    return await fetchBillingState(userId, supabaseClient);
   } catch (err) {
     console.error("billing state lookup failed:", err);
-    ttl = ERROR_TTL_MS;
+    return FREE_BILLING_STATE;
   }
-
-  cache.set(userId, { state, expires: Date.now() + ttl });
-  return state;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

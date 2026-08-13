@@ -25,7 +25,7 @@ interface PortfolioTabsProps {
   incomeMetrics: {
     symbol: string;
     shares: number;
-    price: number;
+    price: number | null;
     avgCost: number;
     dividendYield: number;
   }[];

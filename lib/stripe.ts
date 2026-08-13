@@ -49,17 +49,23 @@ async function resolveProPriceId(): Promise<string> {
     return cachedProPriceId;
   }
 
-  const product = await stripe.products.create({
-    name: "MarketCap Pro",
-    description: "Save stocks to your watchlist and unlock future Pro features.",
-  });
-  const price = await stripe.prices.create({
-    product: product.id,
-    unit_amount: PRO_PRICE_USD_CENTS,
-    currency: "usd",
-    recurring: { interval: "month" },
-    lookup_key: PRO_PRICE_LOOKUP_KEY,
-  });
+  const product = await stripe.products.create(
+    {
+      name: "MarketCap Pro",
+      description: "Save stocks to your watchlist and unlock future Pro features.",
+    },
+    { idempotencyKey: "marketcap-pro-product" }
+  );
+  const price = await stripe.prices.create(
+    {
+      product: product.id,
+      unit_amount: PRO_PRICE_USD_CENTS,
+      currency: "usd",
+      recurring: { interval: "month" },
+      lookup_key: PRO_PRICE_LOOKUP_KEY,
+    },
+    { idempotencyKey: "marketcap-pro-price" }
+  );
   cachedProPriceId = price.id;
   return cachedProPriceId;
 }
@@ -69,4 +75,3 @@ export function _resetStripeCache() {
   cachedProPriceId = null;
   proPriceIdPromise = null;
 }
-

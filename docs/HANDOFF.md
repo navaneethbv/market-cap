@@ -13,11 +13,10 @@ Tailwind v4 + shadcn/ui (radix-nova preset), Supabase (auth + Postgres + RLS),
 Recharts, deploy target Vercel. US stocks only, free API tiers.
 
 Data providers:
-- Finnhub (quotes, search, profile, metrics, news, websocket). 60 calls/min.
+- Finnhub (quotes, search, profile, metrics, news). 60 calls/min.
 - Twelve Data (chart candles). 8 credits/min, 800/day.
-- Keys are filled in `.env.local` (gitignored). Finnhub key duplicated as
-  NEXT_PUBLIC_FINNHUB_API_KEY for the future client-side websocket (accepted
-  trade-off, noted in plan).
+- Keys are filled in `.env.local` (gitignored). The Finnhub key remains
+  server-only, and live prices use the `/api/quote` proxy.
 
 ## Design direction (user-approved)
 
@@ -62,10 +61,9 @@ Reference images in `img/` (committed). Blend of two dribbble shots:
   `create_holdings`, `drop_unused_holdings_symbol_idx`, and
   `default_holdings_purchased_at`. Authenticated CRUD, cross-user insert
   rejection, and signed-in app route smoke tests were run with the test account.
-- Phase 6 DONE in current working tree: `hooks/useLivePrice.ts` connects to the
-  Finnhub websocket using `NEXT_PUBLIC_FINNHUB_API_KEY`, merges trade ticks into
-  quote state, and falls back to `/api/quote` polling every 15 seconds. Stock
-  detail page now shows the live price status.
+- Phase 6 DONE in current working tree: `hooks/useLivePrice.ts` polls the
+  server-side `/api/quote` proxy every 15 seconds. Stock detail page now shows
+  the live price status without exposing the Finnhub key to clients.
 - Phase 7 DONE in current working tree: dashboard home page now shows SPY/QQQ/DIA
   cards, watchlist summary, and market news using existing market helpers.
 - Price alerts feature DONE on main: `price_alerts` migration with RLS and
@@ -101,11 +99,9 @@ Reference images in `img/` (committed). Blend of two dribbble shots:
   theme-toggle button attribute mismatches. Playwright recheck showed no console
   errors afterward.
 - Review and hardening pass DONE in current working tree (2026-07-04):
-  - `hooks/useLivePrice.ts`: dropped `initialQuote` from the effect deps (it
-    is not read inside the effect) so server re-renders such as a Watch
-    toggle no longer tear down and reconnect the Finnhub websocket; wrapped
-    the websocket `JSON.parse` in try/catch so a malformed frame cannot throw
-    an uncaught error.
+  - `hooks/useLivePrice.ts`: dropped `initialQuote` from the effect deps and
+    uses the server-side quote proxy for polling, so server re-renders such as
+    a Watch toggle do not restart live-price polling.
   - `components/search-box.tsx`: guarded `setResults`/`setOpen` behind the
     effect's `active` flag so a slow search response cannot reopen the
     dropdown after the user clicked away or cleared the query.
@@ -433,8 +429,8 @@ it was parked; this is a currency refactor wearing a feature's clothes):
 4. Portfolio, paper trading, backtest, and Monte Carlo math would silently
    mix USD and INR into one P/L number. Needs a currency per holding plus
    either base-currency conversion or portfolios segregated by market.
-5. The Finnhub websocket cannot carry NSE ticks, so Indian symbols are
-   polling only in `useLivePrice`.
+5. The server-side quote proxy currently supports the symbols accepted by the
+   Finnhub integration; symbols without provider quotes remain unavailable.
 6. Market hours (9:15 to 15:30 IST) and the NSE/BSE holiday calendar differ
    from US sessions, touching alerts, movers, and live-price status.
 7. The SEC insider tracker has no free Indian equivalent. It stays US-only.
