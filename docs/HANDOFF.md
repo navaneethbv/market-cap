@@ -281,6 +281,15 @@ PR 4 (hardening) + PR 5 (polish) from the audit plan, combined into one change s
 - Stripe single-flight `getOrCreateProPriceId`; pricing checkout button disables while pending (`components/pricing-submit-button.tsx`).
 - Ledger: pushed commit `5916152`.
 
+## Consolidation (branch `fix/combined-audit-fixes`, PR #24)
+
+PRs #20-#23 were consolidated into a single PR #24 against `main`
+(`fix/combined-audit-fixes`). Each PR's commits were preserved as merge commits
+in order (#20, #21, #22, #23); the diff is the exact union (58 files,
++819/-241, no package/config churn). Verified on the combined branch: 199
+tests, lint, `tsc --noEmit`, and build all pass. PRs #20-#23 were closed as
+superseded. Review and merge #24 instead.
+
 
 ## Session 2026-07-05 (later): port PR merged, billing IN PROGRESS
 
