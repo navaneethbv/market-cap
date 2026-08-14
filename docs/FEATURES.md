@@ -153,14 +153,73 @@ This document covers all features, analytical modules, data workflows, and test 
 
 ---
 
-## 10. Quality & Test Coverage Standards
+## 10. Market Sector Heatmap & Treemap (`/heatmap`)
+
+- **Overview**: Interactive equity treemap grouping market leaders by industry sector, sized by market capitalization and colored by 1-day percentage change.
+- **Key Capabilities**:
+  - Sector filtering buttons and market capitalization aggregation.
+  - Smooth color mapping from deep red (-3% or worse) to vibrant emerald green (+3% or better).
+- **Code Locations**:
+  - Logic: [lib/heatmap.ts](file:///Users/navaneethbv/Desktop/Projects/market-cap/lib/heatmap.ts)
+  - UI Component: [components/market-heatmap.tsx](file:///Users/navaneethbv/Desktop/Projects/market-cap/components/market-heatmap.tsx)
+  - Page: [app/heatmap/page.tsx](file:///Users/navaneethbv/Desktop/Projects/market-cap/app/heatmap/page.tsx)
+  - Unit Tests: [lib/heatmap.test.mjs](file:///Users/navaneethbv/Desktop/Projects/market-cap/lib/heatmap.test.mjs)
+
+---
+
+## 11. Options Strategy Payoff Visualizer (`/options`)
+
+- **Overview**: Visual risk/reward simulator across standard options trading strategies at expiration.
+- **Supported Strategies**: Long Call, Long Put, Covered Call, Cash-Secured Put, Bull Call Spread, Bear Put Spread.
+- **Key Capabilities**:
+  - Interactive parameter inputs (Spot Price, Strike Price, Secondary Strike, Premium, Contracts count).
+  - Calculates Max Profit, Max Loss, Breakeven Prices, and P&L across a price spectrum.
+- **Code Locations**:
+  - Logic: [lib/options-payoff.ts](file:///Users/navaneethbv/Desktop/Projects/market-cap/lib/options-payoff.ts)
+  - UI Component: [components/options-calculator.tsx](file:///Users/navaneethbv/Desktop/Projects/market-cap/components/options-calculator.tsx)
+  - Page: [app/options/page.tsx](file:///Users/navaneethbv/Desktop/Projects/market-cap/app/options/page.tsx)
+  - Unit Tests: [lib/options-payoff.test.mjs](file:///Users/navaneethbv/Desktop/Projects/market-cap/lib/options-payoff.test.mjs)
+
+---
+
+## 12. Portfolio Tax-Loss Harvesting Assistant (`/portfolio/tax-loss`)
+
+- **Overview**: Scans user holdings for unrealized loss positions to offset taxable capital gains while avoiding wash sale penalties.
+- **Key Capabilities**:
+  - Computes total harvestable capital losses and estimated tax savings across customizable tax brackets (15%, 20%, 24%, 37%).
+  - Recommends non-substantially identical substitute sector ETFs (e.g. NVDA $\rightarrow$ `SMH`, `SOXX`).
+  - Educational IRS 30-day Wash Sale rule guidance.
+- **Code Locations**:
+  - Logic: [lib/tax-harvesting.ts](file:///Users/navaneethbv/Desktop/Projects/market-cap/lib/tax-harvesting.ts)
+  - UI Component: [components/tax-loss-assistant.tsx](file:///Users/navaneethbv/Desktop/Projects/market-cap/components/tax-loss-assistant.tsx)
+  - Page: [app/portfolio/tax-loss/page.tsx](file:///Users/navaneethbv/Desktop/Projects/market-cap/app/portfolio/tax-loss/page.tsx)
+  - Unit Tests: [lib/tax-harvesting.test.mjs](file:///Users/navaneethbv/Desktop/Projects/market-cap/lib/tax-harvesting.test.mjs)
+
+---
+
+## 13. Monthly Dividend Cash Flow Calendar (`/portfolio/income`)
+
+- **Overview**: Projects 12-month expected passive cash flow schedule from dividend-paying holdings.
+- **Key Capabilities**:
+  - 12-month bar chart visualizer distributing quarterly payout cycles.
+  - Portfolio Yield on Cost (YOC) vs Current Market Yield metrics.
+  - Asset income breakdown table.
+- **Code Locations**:
+  - Logic: [lib/dividend-forecast.ts](file:///Users/navaneethbv/Desktop/Projects/market-cap/lib/dividend-forecast.ts)
+  - UI Component: [components/dividend-calendar.tsx](file:///Users/navaneethbv/Desktop/Projects/market-cap/components/dividend-calendar.tsx)
+  - Page: [app/portfolio/income/page.tsx](file:///Users/navaneethbv/Desktop/Projects/market-cap/app/portfolio/income/page.tsx)
+  - Unit Tests: [lib/dividend-forecast.test.mjs](file:///Users/navaneethbv/Desktop/Projects/market-cap/lib/dividend-forecast.test.mjs)
+
+---
+
+## 14. Quality & Test Coverage Standards
 
 All pure modules adhere to **>95% code coverage** requirements:
 
 ```bash
 npm test
 ```
-- **242 / 242 unit tests passed (100%)**
-- **99.14% Line Coverage**
-- **98.52% Function Coverage**
-- **94.95% Branch Coverage**
+- **256 / 256 unit tests passed (100%)**
+- **>99% Line Coverage**
+- **>98% Function Coverage**
+

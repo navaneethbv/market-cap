@@ -79,11 +79,18 @@ export function PortfolioTabs({
             Dividend Income
           </button>
           <Link
+            href="/portfolio/income"
+            className="flex items-center gap-2 pb-3 text-sm font-semibold border-b-2 border-transparent text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <DollarSign className="h-4 w-4" />
+            Income Forecast
+          </Link>
+          <Link
             href="/portfolio/snowball"
             className="flex items-center gap-2 pb-3 text-sm font-semibold border-b-2 border-transparent text-muted-foreground hover:text-foreground transition-colors"
           >
             <TrendingUp className="h-4 w-4" />
-            Snowball Planner
+            Snowball
           </Link>
           <Link
             href="/portfolio/rebalance"
@@ -91,6 +98,13 @@ export function PortfolioTabs({
           >
             <Scale className="h-4 w-4" />
             Rebalance
+          </Link>
+          <Link
+            href="/portfolio/tax-loss"
+            className="flex items-center gap-2 pb-3 text-sm font-semibold border-b-2 border-transparent text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <Briefcase className="h-4 w-4 text-red-500/80" />
+            Tax-Loss Harvest
           </Link>
         </div>
 
