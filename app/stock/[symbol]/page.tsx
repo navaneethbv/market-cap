@@ -1,15 +1,18 @@
-/* eslint-disable @next/next/no-img-element */
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Briefcase, ExternalLink, Star } from "lucide-react";
-import { toggleWatchlistItem } from "@/app/watchlist/actions";
-import { DCFCalculator } from "@/components/dcf-calculator";
-import { AddHoldingDialog } from "@/components/holding-dialogs";
-import { LivePriceDisplay } from "@/components/live-price-display";
-import { NewsTabs } from "@/components/news-tabs";
-import { StockChart } from "@/components/stock-chart";
+import {
+  ExternalLink,
+  Star,
+  Briefcase,
+} from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { ChangeChip } from "@/components/change-chip";
+import { DCFCalculator } from "@/components/dcf-calculator";
+import { AddHoldingDialog } from "@/components/holding-dialogs";
+import { StockChart } from "@/components/stock-chart";
+import { EarningsHistory } from "@/components/earnings-history";
+import { toggleWatchlistItem } from "@/app/watchlist/actions";
 import {
   getCompanyNews,
   getKeyMetrics,
@@ -17,22 +20,17 @@ import {
   getQuote,
   getEarningsSurprises,
 } from "@/lib/market/finnhub";
-import type {
-  CompanyProfile,
-  KeyMetrics,
-  NewsArticle,
-} from "@/lib/market/types";
-import { EarningsHistory } from "@/components/earnings-history";
+import type { KeyMetrics, NewsArticle, CompanyProfile } from "@/lib/market/types";
 import { buildStockStats } from "@/lib/stock-display";
 import { createClient } from "@/lib/supabase/server";
 
 const EMPTY_METRICS: KeyMetrics = {
+  peRatio: null,
+  epsTTM: null,
+  dividendYield: null,
   high52: null,
   low52: null,
-  peRatio: null,
   beta: null,
-  dividendYield: null,
-  epsTTM: null,
 };
 
 function emptyProfile(symbol: string): CompanyProfile {
@@ -53,6 +51,52 @@ function isValidSymbol(symbol: string): boolean {
   return /^[A-Z0-9.^-]{1,12}$/.test(symbol);
 }
 
+async function loadStockData(symbol: string) {
+  const [profileResult, quoteResult, metricsResult, newsResult, earningsResult] =
+    await Promise.allSettled([
+      getProfile(symbol),
+      getQuote(symbol),
+      getKeyMetrics(symbol),
+      getCompanyNews(symbol),
+      getEarningsSurprises(symbol),
+    ]);
+
+  if (quoteResult.status !== "fulfilled") {
+    return null;
+  }
+
+  const quote = quoteResult.value;
+  const profile =
+    profileResult.status === "fulfilled"
+      ? profileResult.value
+      : emptyProfile(symbol);
+  const metrics =
+    metricsResult.status === "fulfilled" ? metricsResult.value : EMPTY_METRICS;
+  const news: NewsArticle[] =
+    newsResult.status === "fulfilled" ? newsResult.value : [];
+  const earnings =
+    earningsResult.status === "fulfilled" ? earningsResult.value : [];
+
+  return { quote, profile, metrics, news, earnings };
+}
+
+type SupabaseServerClient = Awaited<ReturnType<typeof createClient>>;
+
+async function getWatchlistItem(
+  supabase: SupabaseServerClient,
+  userId: string | undefined,
+  symbol: string
+) {
+  if (!userId) return null;
+  const { data } = await supabase
+    .from("watchlist_items")
+    .select("id")
+    .eq("user_id", userId)
+    .eq("symbol", symbol)
+    .maybeSingle();
+  return data;
+}
+
 export default async function StockPage({
   params,
 }: Readonly<{
@@ -70,38 +114,13 @@ export default async function StockPage({
     data: { user },
   } = await supabase.auth.getUser();
 
-  const [profileResult, quoteResult, metricsResult, newsResult, earningsResult] =
-    await Promise.allSettled([
-      getProfile(symbol),
-      getQuote(symbol),
-      getKeyMetrics(symbol),
-      getCompanyNews(symbol),
-      getEarningsSurprises(symbol),
-    ]);
-
-  if (quoteResult.status !== "fulfilled") {
+  const data = await loadStockData(symbol);
+  if (!data) {
     notFound();
   }
 
-  const quote = quoteResult.value;
-  const profile =
-    profileResult.status === "fulfilled"
-      ? profileResult.value
-      : emptyProfile(symbol);
-  const metrics =
-    metricsResult.status === "fulfilled" ? metricsResult.value : EMPTY_METRICS;
-  const news: NewsArticle[] =
-    newsResult.status === "fulfilled" ? newsResult.value : [];
-  const earnings =
-    earningsResult.status === "fulfilled" ? earningsResult.value : [];
-  const { data: watchlistItem } = user
-    ? await supabase
-        .from("watchlist_items")
-        .select("id")
-        .eq("user_id", user.id)
-        .eq("symbol", symbol)
-        .maybeSingle()
-    : { data: null };
+  const { quote, profile, metrics, news, earnings } = data;
+  const watchlistItem = await getWatchlistItem(supabase, user?.id, symbol);
   const stats = buildStockStats({ quote, profile, metrics });
   const title = profile.name || symbol;
 
@@ -140,42 +159,46 @@ export default async function StockPage({
                 <Button
                   variant="link"
                   size="sm"
-                  className="mt-2 h-auto p-0"
+                  className="h-auto p-0 text-xs"
                   asChild
                 >
-                  <Link href={profile.weburl} target="_blank" rel="noreferrer">
-                    Company site
-                    <ExternalLink className="h-3.5 w-3.5" />
-                  </Link>
+                  <a
+                    href={profile.weburl}
+                    target="_blank"
+                    rel="noreferrer noopener"
+                    className="inline-flex items-center gap-1"
+                  >
+                    <span>Website</span>
+                    <ExternalLink className="h-3 w-3" />
+                  </a>
                 </Button>
               )}
             </div>
           </div>
 
-          <div className="flex flex-col items-start gap-3 lg:items-end lg:text-right">
-            <LivePriceDisplay
-              key={symbol}
-              symbol={symbol}
-              initialQuote={quote}
-            />
+          <div className="flex flex-wrap items-center gap-3">
+            <div className="text-right">
+              <div className="text-3xl font-bold tracking-tight">
+                ${quote.price.toFixed(2)}
+              </div>
+              <div className="mt-1 flex items-center justify-end gap-2 text-xs">
+                <ChangeChip value={quote.changePercent} />
+                <span className="text-muted-foreground">
+                  {quote.change >= 0 ? "+" : ""}
+                  {quote.change.toFixed(2)} today
+                </span>
+              </div>
+            </div>
+
             {user ? (
-              <div className="flex flex-wrap items-center gap-2">
-                <Button asChild variant="outline" size="sm" className="rounded-full">
-                  <Link href={`/stock/${symbol}/volatility`}>
-                    Volatility Simulator
-                  </Link>
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="rounded-full"
-                  asChild
-                >
-                  <Link href={`/trading?symbol=${symbol}`}>Trade</Link>
-                </Button>
+              <div className="flex items-center gap-2">
                 <form action={toggleWatchlistItem}>
                   <input type="hidden" name="symbol" value={symbol} />
-                  <input type="hidden" name="next" value={`/stock/${symbol}`} />
+                  <input
+                    type="hidden"
+                    name="next"
+                    value={`/stock/${symbol}`}
+                  />
                   <Button
                     type="submit"
                     variant={watchlistItem ? "secondary" : "outline"}
@@ -230,32 +253,69 @@ export default async function StockPage({
         initialEps={metrics.epsTTM || null}
       />
 
-      <section className="grid gap-6 lg:grid-cols-[1fr_1.15fr]">
-        <div className="rounded-2xl border bg-card p-5 shadow-sm">
-          <div className="mb-4">
-            <h2 className="text-base font-semibold">Key stats</h2>
-            <p className="text-sm text-muted-foreground">
-              Latest quote and company metrics
+      <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {stats.map((stat) => (
+          <div
+            key={stat.label}
+            className="rounded-3xl border bg-card p-5 shadow-sm"
+          >
+            <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              {stat.label}
+            </p>
+            <p className="mt-2 text-2xl font-bold tracking-tight">
+              {stat.value}
             </p>
           </div>
-          <dl className="grid grid-cols-2 gap-px overflow-hidden rounded-xl border bg-border">
-            {stats.map((stat) => (
-              <div key={stat.label} className="bg-card p-3">
-                <dt className="text-xs font-medium text-muted-foreground">
-                  {stat.label}
-                </dt>
-                <dd className="mt-1 text-sm font-semibold tabular-nums">
-                  {stat.value}
-                </dd>
-              </div>
-            ))}
-          </dl>
-        </div>
-
-        <div>
-          <NewsTabs symbol={symbol} news={news} />
-        </div>
+        ))}
       </section>
+
+      {news.length > 0 && (
+        <section className="rounded-3xl border bg-card p-5 shadow-sm sm:p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-xl font-bold tracking-tight">Recent news</h2>
+              <p className="text-xs text-muted-foreground">
+                Headlines and coverage for {symbol}
+              </p>
+            </div>
+          </div>
+
+          <div className="mt-5 divide-y">
+            {news.map((item) => (
+              <article
+                key={item.id}
+                className="flex flex-col gap-2 py-4 first:pt-0 last:pb-0"
+              >
+                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                  <span className="font-semibold text-foreground">
+                    {item.source}
+                  </span>
+                  <span>-</span>
+                  <time dateTime={new Date(item.datetime * 1000).toISOString()}>
+                    {new Date(item.datetime * 1000).toLocaleDateString()}
+                  </time>
+                </div>
+                <h3 className="font-semibold leading-snug tracking-tight hover:underline">
+                  <a
+                    href={item.url}
+                    target="_blank"
+                    rel="noreferrer noopener"
+                    className="inline-flex items-start gap-1"
+                  >
+                    <span>{item.headline}</span>
+                    <ExternalLink className="mt-1 h-3 w-3 shrink-0 text-muted-foreground" />
+                  </a>
+                </h3>
+                {item.summary && (
+                  <p className="line-clamp-2 text-sm text-muted-foreground">
+                    {item.summary}
+                  </p>
+                )}
+              </article>
+            ))}
+          </div>
+        </section>
+      )}
     </div>
   );
 }

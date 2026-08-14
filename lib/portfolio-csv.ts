@@ -27,6 +27,40 @@ export function generatePortfolioCsv(
   return [headers.join(","), ...rows.map((row) => row.join(","))].join("\n");
 }
 
+function parseCsvRow(
+  line: string,
+  rowIndex: number
+): NormalizedHoldingInput | null {
+  const parts = line.split(",").map((p) => p.trim().replaceAll('"', ""));
+  if (parts.length < 3) return null;
+
+  const rawSymbol = parts[0];
+  const symbol = normalizeSymbol(rawSymbol);
+  if (!isValidSymbol(symbol)) {
+    throw new Error(`Row ${rowIndex}: Invalid ticker symbol "${rawSymbol}"`);
+  }
+
+  const shares = Number(parts[1]);
+  if (!Number.isFinite(shares) || shares <= 0) {
+    throw new Error(`Row ${rowIndex}: Shares must be a positive number`);
+  }
+
+  const avgCost = Number(parts[2]);
+  if (!Number.isFinite(avgCost) || avgCost <= 0) {
+    throw new Error(`Row ${rowIndex}: Avg Cost must be a positive number`);
+  }
+
+  let purchasedAt = new Date().toISOString();
+  if (parts[3]) {
+    const parsedDate = new Date(parts[3]);
+    if (!Number.isNaN(parsedDate.getTime())) {
+      purchasedAt = parsedDate.toISOString();
+    }
+  }
+
+  return { symbol, shares, avgCost, purchasedAt };
+}
+
 export function parsePortfolioCsv(csvText: string): NormalizedHoldingInput[] {
   const lines = csvText
     .split(/\r?\n/)
@@ -42,34 +76,10 @@ export function parsePortfolioCsv(csvText: string): NormalizedHoldingInput[] {
   const startIndex = firstCol === "symbol" || firstCol === "ticker" ? 1 : 0;
 
   for (let i = startIndex; i < lines.length; i++) {
-    const parts = lines[i].split(",").map((p) => p.trim().replaceAll('"', ""));
-    if (parts.length < 3) continue;
-
-    const rawSymbol = parts[0];
-    const symbol = normalizeSymbol(rawSymbol);
-    if (!isValidSymbol(symbol)) {
-      throw new Error(`Row ${i + 1}: Invalid ticker symbol "${rawSymbol}"`);
+    const row = parseCsvRow(lines[i], i + 1);
+    if (row) {
+      results.push(row);
     }
-
-    const shares = Number(parts[1]);
-    if (!Number.isFinite(shares) || shares <= 0) {
-      throw new Error(`Row ${i + 1}: Shares must be a positive number`);
-    }
-
-    const avgCost = Number(parts[2]);
-    if (!Number.isFinite(avgCost) || avgCost <= 0) {
-      throw new Error(`Row ${i + 1}: Avg Cost must be a positive number`);
-    }
-
-    let purchasedAt = new Date().toISOString();
-    if (parts[3]) {
-      const parsedDate = new Date(parts[3]);
-      if (!Number.isNaN(parsedDate.getTime())) {
-        purchasedAt = parsedDate.toISOString();
-      }
-    }
-
-    results.push({ symbol, shares, avgCost, purchasedAt });
   }
 
   return results;

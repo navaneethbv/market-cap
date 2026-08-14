@@ -3,6 +3,7 @@
 import { Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { exportTradesToCsv, type PaperTrade } from "@/lib/paper-trading";
+import { downloadCsvFile } from "@/lib/download-csv";
 
 export function ExportTradesButton({
   trades,
@@ -12,18 +13,8 @@ export function ExportTradesButton({
   function handleExport() {
     if (trades.length === 0) return;
     const csvContent = exportTradesToCsv(trades);
-    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.setAttribute("href", url);
-    link.setAttribute(
-      "download",
-      `marketcap-paper-trades-${new Date().toISOString().slice(0, 10)}.csv`
-    );
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
+    const filename = `marketcap-paper-trades-${new Date().toISOString().slice(0, 10)}.csv`;
+    downloadCsvFile(csvContent, filename);
   }
 
   return (

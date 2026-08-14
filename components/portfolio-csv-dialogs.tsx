@@ -19,6 +19,8 @@ import { importHoldingsFromCsv } from "@/app/portfolio/actions";
 import type { NormalizedHoldingInput } from "@/lib/portfolio";
 import { formatPrice } from "@/lib/format";
 
+import { downloadCsvFile } from "@/lib/download-csv";
+
 export function ExportPortfolioCsvButton({
   holdings,
 }: Readonly<{
@@ -27,18 +29,8 @@ export function ExportPortfolioCsvButton({
   function handleExport() {
     if (holdings.length === 0) return;
     const csvContent = generatePortfolioCsv(holdings);
-    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.setAttribute("href", url);
-    link.setAttribute(
-      "download",
-      `marketcap-portfolio-${new Date().toISOString().slice(0, 10)}.csv`
-    );
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
+    const filename = `marketcap-portfolio-${new Date().toISOString().slice(0, 10)}.csv`;
+    downloadCsvFile(csvContent, filename);
   }
 
   return (
@@ -64,16 +56,16 @@ export function ImportPortfolioCsvDialog() {
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
-  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+  async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const text = String(event.target?.result ?? "");
+    try {
+      const text = await file.text();
       setCsvText(text);
       tryParse(text);
-    };
-    reader.readAsText(file);
+    } catch {
+      setError("Failed to read CSV file.");
+    }
   }
 
   function tryParse(text: string) {

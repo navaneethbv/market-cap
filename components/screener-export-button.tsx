@@ -3,6 +3,7 @@
 import { Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { exportScreenerToCsv, type ScreenerStock } from "@/lib/screener";
+import { downloadCsvFile } from "@/lib/download-csv";
 
 export function ScreenerExportButton({
   stocks,
@@ -12,13 +13,8 @@ export function ScreenerExportButton({
   function handleExport() {
     if (stocks.length === 0) return;
     const csv = exportScreenerToCsv(stocks);
-    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `marketcap-screener-${new Date().toISOString().slice(0, 10)}.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
+    const filename = `marketcap-screener-${new Date().toISOString().slice(0, 10)}.csv`;
+    downloadCsvFile(csv, filename);
   }
 
   return (

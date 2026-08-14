@@ -99,6 +99,7 @@ export function getEqualWeights(
     result[symbols[i]] = weight;
     sum += weight;
   }
-  result[symbols[symbols.length - 1]] = Number((100 - sum).toFixed(2));
+  const lastSymbol = symbols.at(-1)!;
+  result[lastSymbol] = Number((100 - sum).toFixed(2));
   return result;
 }

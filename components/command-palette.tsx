@@ -257,15 +257,15 @@ export function CommandPalette() {
   }
 
   return (
-    <div
-      role="dialog"
-      aria-modal="true"
-      className="fixed inset-0 z-50 flex items-start justify-center bg-background/80 p-4 pt-[12vh] backdrop-blur-sm animate-in fade-in-0"
-      onClick={(e) => {
-        if (e.target === e.currentTarget) closePalette();
-      }}
-    >
-      <div className="relative w-full max-w-xl overflow-hidden rounded-2xl border bg-card shadow-2xl transition-all">
+    <div className="fixed inset-0 z-50 flex items-start justify-center p-4 pt-[12vh] animate-in fade-in-0">
+      <button
+        type="button"
+        tabIndex={-1}
+        aria-label="Close command palette backdrop"
+        className="fixed inset-0 bg-background/80 backdrop-blur-sm cursor-default"
+        onClick={closePalette}
+      />
+      <div className="relative z-10 w-full max-w-xl overflow-hidden rounded-2xl border bg-card shadow-2xl transition-all">
         {/* Search header */}
         <div className="flex items-center border-b px-4">
           <Search className="h-4 w-4 text-muted-foreground shrink-0" />

@@ -14,80 +14,86 @@ export interface RadarDataPoint {
   [symbol: string]: string | number;
 }
 
+function calculateValuationScore(pe?: number | null): number {
+  if (pe === null || pe === undefined || !Number.isFinite(pe) || pe <= 0) {
+    return 50;
+  }
+  if (pe < 12) return 95;
+  if (pe < 18) return 85;
+  if (pe < 25) return 70;
+  if (pe < 35) return 50;
+  if (pe < 50) return 35;
+  return 20;
+}
+
+function calculateProfitabilityScore(
+  eps?: number | null,
+  divYield?: number | null
+): number {
+  let score = 50;
+  if (eps !== null && eps !== undefined && Number.isFinite(eps)) {
+    score = eps > 0 ? 70 : 30;
+  }
+  if (divYield !== null && divYield !== undefined && Number.isFinite(divYield) && divYield > 0) {
+    score = Math.min(100, score + (divYield > 2 ? 25 : 15));
+  }
+  return score;
+}
+
+function calculateStabilityScore(beta?: number | null): number {
+  if (beta === null || beta === undefined || !Number.isFinite(beta)) {
+    return 50;
+  }
+  if (beta <= 0.6) return 95;
+  if (beta <= 0.9) return 85;
+  if (beta <= 1.2) return 75;
+  if (beta <= 1.6) return 55;
+  return 35;
+}
+
+function calculateMomentumScore(
+  price?: number,
+  high52?: number | null,
+  low52?: number | null
+): number {
+  if (
+    price === undefined ||
+    high52 === null ||
+    high52 === undefined ||
+    low52 === null ||
+    low52 === undefined ||
+    high52 <= low52
+  ) {
+    return 50;
+  }
+  const rangePos = ((price - low52) / (high52 - low52)) * 100;
+  return Math.max(10, Math.min(100, Math.round(rangePos)));
+}
+
+function calculateGrowthScore(eps?: number | null, price?: number): number {
+  if (eps === null || eps === undefined || !price || price <= 0) {
+    return 50;
+  }
+  const earningsYield = (eps / price) * 100;
+  if (earningsYield > 6) return 85;
+  if (earningsYield > 4) return 75;
+  if (earningsYield > 2) return 60;
+  if (earningsYield > 0) return 45;
+  return 25;
+}
+
 export function computeStockDimensions(
   symbol: string,
   metrics: Partial<KeyMetrics> | null,
   quote: Partial<Quote> | null
 ): StockDimensionScores {
-  // 1. Valuation Score (0-100): Lower P/E gives higher value score
-  let valuation = 50;
-  const pe = metrics?.peRatio;
-  if (pe !== null && pe !== undefined && Number.isFinite(pe) && pe > 0) {
-    if (pe < 12) valuation = 95;
-    else if (pe < 18) valuation = 85;
-    else if (pe < 25) valuation = 70;
-    else if (pe < 35) valuation = 50;
-    else if (pe < 50) valuation = 35;
-    else valuation = 20;
-  }
-
-  // 2. Profitability Score (0-100): Based on positive EPS and Dividend Yield
-  let profitability = 50;
-  const eps = metrics?.epsTTM;
-  const divYield = metrics?.dividendYield;
-  if (eps !== null && eps !== undefined && Number.isFinite(eps)) {
-    profitability = eps > 0 ? 70 : 30;
-  }
-  if (divYield !== null && divYield !== undefined && Number.isFinite(divYield) && divYield > 0) {
-    profitability = Math.min(100, profitability + (divYield > 2 ? 25 : 15));
-  }
-
-  // 3. Stability Score (0-100): Lower/Moderate Beta gives higher stability
-  let stability = 50;
-  const beta = metrics?.beta;
-  if (beta !== null && beta !== undefined && Number.isFinite(beta)) {
-    if (beta <= 0.6) stability = 95;
-    else if (beta <= 0.9) stability = 85;
-    else if (beta <= 1.2) stability = 75;
-    else if (beta <= 1.6) stability = 55;
-    else stability = 35;
-  }
-
-  // 4. Momentum Score (0-100): Position within 52-week High/Low range
-  let momentum = 50;
-  const price = quote?.price;
-  const high52 = metrics?.high52;
-  const low52 = metrics?.low52;
-  if (
-    price !== undefined &&
-    high52 !== null &&
-    high52 !== undefined &&
-    low52 !== null &&
-    low52 !== undefined &&
-    high52 > low52
-  ) {
-    const rangePos = ((price - low52) / (high52 - low52)) * 100;
-    momentum = Math.max(10, Math.min(100, Math.round(rangePos)));
-  }
-
-  // 5. Growth Score (0-100): Derived from EPS magnitude relative to price & valuation
-  let growth = 50;
-  if (eps !== null && eps !== undefined && price && price > 0) {
-    const earningsYield = (eps / price) * 100;
-    if (earningsYield > 6) growth = 85;
-    else if (earningsYield > 4) growth = 75;
-    else if (earningsYield > 2) growth = 60;
-    else if (earningsYield > 0) growth = 45;
-    else growth = 25;
-  }
-
   return {
     symbol,
-    valuation,
-    profitability,
-    stability,
-    momentum,
-    growth,
+    valuation: calculateValuationScore(metrics?.peRatio),
+    profitability: calculateProfitabilityScore(metrics?.epsTTM, metrics?.dividendYield),
+    stability: calculateStabilityScore(metrics?.beta),
+    momentum: calculateMomentumScore(quote?.price, metrics?.high52, metrics?.low52),
+    growth: calculateGrowthScore(metrics?.epsTTM, quote?.price),
   };
 }
 

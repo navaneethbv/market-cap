@@ -1,23 +1,15 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
-import { getQuote } from "@/lib/market/finnhub";
-import {
-  buildPaperPortfolio,
-  buildPaperPositionRows,
-  buildPaperSummary,
-  DEFAULT_STARTING_CASH,
-  normalizePaperTradeInput,
-} from "@/lib/paper-trading";
-import { fetchAllPaperTrades } from "@/app/trading/data";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
+import { getQuote } from "@/lib/market/finnhub";
 import { isUuid } from "@/lib/parse";
+import { normalizePaperTradeInput } from "@/lib/paper-trading";
 
-function getFormString(formData: FormData, name: string): string {
-  const value = formData.get(name);
-  return typeof value === "string" ? value : "";
+function getFormString(formData: FormData, key: string): string {
+  const val = formData.get(key);
+  return typeof val === "string" ? val : "";
 }
 
 async function requireUser() {
@@ -25,47 +17,82 @@ async function requireUser() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-
   if (!user) {
-    redirect("/login?next=/trading");
+    throw new Error("Unauthorized");
   }
-
   return user;
 }
 
 async function recordPaperEquitySnapshot(userId: string) {
-  try {
-    const admin = createAdminClient();
-    const [{ data: account }, trades] = await Promise.all([
-      admin
-        .from("paper_accounts")
-        .select("starting_cash")
-        .eq("user_id", userId)
-        .maybeSingle(),
-      fetchAllPaperTrades(admin, userId),
-    ]);
-    const portfolio = buildPaperPortfolio(trades);
-    const quoteResults = await Promise.allSettled(
-      portfolio.positions.map((position) => getQuote(position.symbol))
-    );
-    const positionRows = buildPaperPositionRows(
-      portfolio.positions,
-      quoteResults
-    );
-    if (positionRows.some((row) => row.error !== null)) return;
+  const admin = createAdminClient();
+  const { data: account, error: accError } = await admin
+    .from("paper_accounts")
+    .select("cash_balance")
+    .eq("user_id", userId)
+    .single();
 
-    const summary = buildPaperSummary({
-      startingCash: account ? Number(account.starting_cash) : DEFAULT_STARTING_CASH,
-      portfolio,
-      positionRows,
+  if (accError || !account) {
+    return;
+  }
+
+  const { data: positions, error: posError } = await admin
+    .from("paper_positions")
+    .select("symbol,shares")
+    .eq("user_id", userId);
+
+  if (posError) {
+    return;
+  }
+
+  let totalPortfolioValue = Number(account.cash_balance);
+  const posList = positions ?? [];
+
+  if (posList.length > 0) {
+    const quotes = await Promise.allSettled(
+      posList.map((p) => getQuote(p.symbol))
+    );
+
+    posList.forEach((pos, idx) => {
+      const qRes = quotes[idx];
+      if (qRes.status === "fulfilled") {
+        totalPortfolioValue += Number(pos.shares) * qRes.value.price;
+      }
     });
-    const { error } = await admin.rpc("upsert_paper_equity_snapshot", {
-      p_user_id: userId,
-      p_equity: Math.max(0, summary.equity),
-    });
-    if (error) console.error("equity snapshot failed:", error.message);
-  } catch (error) {
-    console.error("equity snapshot failed:", error);
+  }
+
+  await admin.from("paper_equity_snapshots").insert({
+    user_id: userId,
+    total_value: Number(totalPortfolioValue.toFixed(2)),
+  });
+}
+
+function validateOrderThresholds(
+  orderType: string,
+  side: "buy" | "sell",
+  quotePrice: number,
+  limitPriceStr: string | null,
+  stopPriceStr: string | null
+): void {
+  if (orderType === "limit" && limitPriceStr) {
+    const limitPrice = Number(limitPriceStr);
+    const isUnmetBuy = side === "buy" && quotePrice > limitPrice;
+    const isUnmetSell = side === "sell" && quotePrice < limitPrice;
+    if (isUnmetBuy || isUnmetSell) {
+      throw new Error(
+        `Limit price $${limitPrice.toFixed(2)} not met. Current price is $${quotePrice.toFixed(2)}.`
+      );
+    }
+  }
+
+  if (orderType === "stop" && stopPriceStr) {
+    const stopPrice = Number(stopPriceStr);
+    const isUntriggeredBuy = side === "buy" && quotePrice < stopPrice;
+    const isUntriggeredSell = side === "sell" && quotePrice > stopPrice;
+    if (isUntriggeredBuy || isUntriggeredSell) {
+      throw new Error(
+        `Stop price $${stopPrice.toFixed(2)} not triggered. Current price is $${quotePrice.toFixed(2)}.`
+      );
+    }
   }
 }
 
@@ -93,33 +120,13 @@ export async function placePaperTrade(formData: FormData) {
   const limitPriceStr = getFormString(formData, "limitPrice");
   const stopPriceStr = getFormString(formData, "stopPrice");
 
-  if (orderType === "limit" && limitPriceStr) {
-    const limitPrice = Number(limitPriceStr);
-    if (input.side === "buy" && quotePrice > limitPrice) {
-      throw new Error(
-        `Limit price $${limitPrice.toFixed(2)} not met. Current price is $${quotePrice.toFixed(2)}.`
-      );
-    }
-    if (input.side === "sell" && quotePrice < limitPrice) {
-      throw new Error(
-        `Limit price $${limitPrice.toFixed(2)} not met. Current price is $${quotePrice.toFixed(2)}.`
-      );
-    }
-  }
-
-  if (orderType === "stop" && stopPriceStr) {
-    const stopPrice = Number(stopPriceStr);
-    if (input.side === "buy" && quotePrice < stopPrice) {
-      throw new Error(
-        `Stop price $${stopPrice.toFixed(2)} not triggered. Current price is $${quotePrice.toFixed(2)}.`
-      );
-    }
-    if (input.side === "sell" && quotePrice > stopPrice) {
-      throw new Error(
-        `Stop price $${stopPrice.toFixed(2)} not triggered. Current price is $${quotePrice.toFixed(2)}.`
-      );
-    }
-  }
+  validateOrderThresholds(
+    orderType,
+    input.side,
+    quotePrice,
+    limitPriceStr,
+    stopPriceStr
+  );
 
   const { error } = await createAdminClient().rpc("place_paper_trade", {
     p_user_id: user.id,
@@ -142,6 +149,7 @@ export async function placePaperTrade(formData: FormData) {
 
 export async function resetPaperAccount() {
   const user = await requireUser();
+
   const { error } = await createAdminClient().rpc("reset_paper_account", {
     p_user_id: user.id,
   });

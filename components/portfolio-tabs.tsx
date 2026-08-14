@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Briefcase, DollarSign, Trash2, TrendingUp } from "lucide-react";
+import { Briefcase, DollarSign, Scale, Trash2, TrendingUp } from "lucide-react";
 import { ChangeChip } from "@/components/change-chip";
 import { Button } from "@/components/ui/button";
 import {
@@ -22,7 +22,6 @@ import {
   ExportPortfolioCsvButton,
   ImportPortfolioCsvDialog,
 } from "@/components/portfolio-csv-dialogs";
-import { Scale } from "lucide-react";
 
 interface PortfolioTabsProps {
   realRows: HoldingRow[];
