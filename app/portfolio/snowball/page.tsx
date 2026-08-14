@@ -62,6 +62,7 @@ export default function SnowballPage() {
     expectedPriceAppreciation: priceApprec,
     timeHorizonYears: horizon,
   });
+  const finalProjectionPoint = projection.points.at(-1);
 
   return (
     <div className="space-y-6">
@@ -221,7 +222,7 @@ export default function SnowballPage() {
               <span className="text-[11px] font-medium text-muted-foreground uppercase">Projected Portfolio</span>
               <div className="mt-1 flex items-baseline gap-1.5">
                 <span className="text-base font-semibold">
-                  {formatPrice(projection.points[projection.points.length - 1]?.portfolioValue ?? 0)}
+                  {formatPrice(finalProjectionPoint?.portfolioValue ?? 0)}
                 </span>
               </div>
             </div>
@@ -230,7 +231,7 @@ export default function SnowballPage() {
               <span className="text-[11px] font-medium text-muted-foreground uppercase">Projected Dividends</span>
               <div className="mt-1 flex items-baseline gap-1.5">
                 <span className="text-base font-semibold">
-                  {formatPrice(projection.points[projection.points.length - 1]?.annualDividends ?? 0)}
+                  {formatPrice(finalProjectionPoint?.annualDividends ?? 0)}
                 </span>
                 <span className="text-xs text-muted-foreground">/yr</span>
               </div>
