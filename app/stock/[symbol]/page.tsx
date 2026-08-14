@@ -15,12 +15,14 @@ import {
   getKeyMetrics,
   getProfile,
   getQuote,
+  getEarningsSurprises,
 } from "@/lib/market/finnhub";
 import type {
   CompanyProfile,
   KeyMetrics,
   NewsArticle,
 } from "@/lib/market/types";
+import { EarningsHistory } from "@/components/earnings-history";
 import { buildStockStats } from "@/lib/stock-display";
 import { createClient } from "@/lib/supabase/server";
 
@@ -68,12 +70,13 @@ export default async function StockPage({
     data: { user },
   } = await supabase.auth.getUser();
 
-  const [profileResult, quoteResult, metricsResult, newsResult] =
+  const [profileResult, quoteResult, metricsResult, newsResult, earningsResult] =
     await Promise.allSettled([
       getProfile(symbol),
       getQuote(symbol),
       getKeyMetrics(symbol),
       getCompanyNews(symbol),
+      getEarningsSurprises(symbol),
     ]);
 
   if (quoteResult.status !== "fulfilled") {
@@ -89,6 +92,8 @@ export default async function StockPage({
     metricsResult.status === "fulfilled" ? metricsResult.value : EMPTY_METRICS;
   const news: NewsArticle[] =
     newsResult.status === "fulfilled" ? newsResult.value : [];
+  const earnings =
+    earningsResult.status === "fulfilled" ? earningsResult.value : [];
   const { data: watchlistItem } = user
     ? await supabase
         .from("watchlist_items")
@@ -217,6 +222,8 @@ export default async function StockPage({
       </section>
 
       <StockChart symbol={symbol} />
+
+      <EarningsHistory surprises={earnings} symbol={symbol} />
 
       <DCFCalculator
         currentPrice={quote.price}

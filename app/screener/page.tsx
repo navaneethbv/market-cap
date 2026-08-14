@@ -6,6 +6,7 @@ import { Search, Loader2, ArrowUpDown, Layers } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ChangeChip } from "@/components/change-chip";
+import { ScreenerExportButton } from "@/components/screener-export-button";
 import {
   filterScreenerStocks,
   sortScreenerStocks,
@@ -22,6 +23,7 @@ export default function ScreenerPage() {
   const [sector, setSector] = useState("All");
   const [marketCap, setMarketCap] = useState("All");
   const [valuation, setValuation] = useState("All");
+  const [betaRange, setBetaRange] = useState("All");
   const [sortBy, setSortBy] = useState("marketCap");
 
   const loadStocks = async () => {
@@ -52,9 +54,15 @@ export default function ScreenerPage() {
   }, []);
 
   // Apply filters
-  const filtered = filterScreenerStocks(allStocks, { sector, marketCap, valuation }).filter((s) =>
-    s.symbol.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    s.name.toLowerCase().includes(searchQuery.toLowerCase())
+  const filtered = filterScreenerStocks(allStocks, {
+    sector,
+    marketCap,
+    valuation,
+    betaRange,
+  }).filter(
+    (s) =>
+      s.symbol.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      s.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   // Apply sorting
@@ -181,7 +189,7 @@ export default function ScreenerPage() {
 
       {/* Filter and Control Bar */}
       <section className="rounded-2xl border bg-card p-4.5 shadow-sm space-y-4">
-        <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-4">
+        <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-5">
           {/* Search Input */}
           <div className="relative">
             <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -236,13 +244,30 @@ export default function ScreenerPage() {
               <option value="Income">High Yield (&gt; 2.0%)</option>
             </select>
           </div>
+
+          {/* Beta Risk Filter */}
+          <div className="flex flex-col gap-1.5">
+            <select
+              value={betaRange}
+              onChange={(e) => setBetaRange(e.target.value)}
+              className="border-input bg-background focus-visible:ring-ring flex h-10 w-full rounded-xl border px-3 text-sm focus-visible:ring-2 focus-visible:outline-none"
+            >
+              <option value="All">All Beta (Risk)</option>
+              <option value="Low">Low Volatility (&lt; 0.8)</option>
+              <option value="Market">Market Standard (0.8 - 1.2)</option>
+              <option value="High">High Beta (&gt; 1.2)</option>
+            </select>
+          </div>
         </div>
 
         {/* Sort Controls Bar */}
         <div className="flex flex-wrap items-center justify-between gap-3 border-t pt-3 mt-1.5">
-          <div className="flex items-center gap-1 text-xs text-muted-foreground font-semibold">
-            <Layers className="h-3.5 w-3.5" />
-            Showing {sorted.length} matches
+          <div className="flex items-center gap-3 text-xs text-muted-foreground font-semibold">
+            <span className="flex items-center gap-1">
+              <Layers className="h-3.5 w-3.5" />
+              Showing {sorted.length} matches
+            </span>
+            <ScreenerExportButton stocks={sorted} />
           </div>
           <div className="flex items-center gap-2">
             <span className="text-xs text-muted-foreground font-semibold flex items-center gap-1">

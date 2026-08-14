@@ -162,3 +162,30 @@ export async function deleteHolding(formData: FormData) {
 
   revalidatePath("/portfolio");
 }
+
+export async function importHoldingsFromCsv(csvContent: string) {
+  const { supabase, user } = await requireUser();
+  const { parsePortfolioCsv } = await import("@/lib/portfolio-csv");
+  const inputs = parsePortfolioCsv(csvContent);
+
+  if (inputs.length === 0) {
+    throw new Error("No valid holdings found in CSV");
+  }
+
+  const rows = inputs.map((input) => ({
+    user_id: user.id,
+    symbol: input.symbol,
+    shares: input.shares,
+    avg_cost: input.avgCost,
+    purchased_at: input.purchasedAt,
+  }));
+
+  const { error } = await supabase.from("holdings").insert(rows);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  revalidatePath("/portfolio");
+}
+

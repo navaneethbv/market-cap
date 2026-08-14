@@ -18,7 +18,9 @@ import {
   normalizeComparisonSymbols,
 } from "@/lib/compare";
 import { formatNumber } from "@/lib/format";
-import { getQuote } from "@/lib/market/finnhub";
+import { getQuote, getKeyMetrics } from "@/lib/market/finnhub";
+import { computeStockDimensions } from "@/lib/stock-radar";
+import { StockRadarChart } from "@/components/stock-radar-chart";
 import { createClient } from "@/lib/supabase/server";
 
 type ComparePageProps = {
@@ -32,11 +34,19 @@ function symbolsParam(value: string | string[] | undefined) {
 export default async function ComparePage({ searchParams }: Readonly<ComparePageProps>) {
   const params = await searchParams;
   const symbols = normalizeComparisonSymbols(symbolsParam(params.symbols));
-  const quoteResults = await Promise.allSettled(
-    symbols.map((symbol) => getQuote(symbol))
-  );
+  const [quoteResults, metricsResults] = await Promise.all([
+    Promise.allSettled(symbols.map((symbol) => getQuote(symbol))),
+    Promise.allSettled(symbols.map((symbol) => getKeyMetrics(symbol))),
+  ]);
+
   const rows = buildComparisonRows(symbols, quoteResults);
   const summary = calculateComparisonSummary(rows);
+  const scores = symbols.map((symbol, idx) => {
+    const q = quoteResults[idx]?.status === "fulfilled" ? quoteResults[idx].value : null;
+    const m = metricsResults[idx]?.status === "fulfilled" ? metricsResults[idx].value : null;
+    return computeStockDimensions(symbol, m, q);
+  });
+
   const supabase = await createClient();
   const {
     data: { user },
@@ -192,6 +202,8 @@ export default async function ComparePage({ searchParams }: Readonly<ComparePage
           </TableBody>
         </Table>
       </section>
+
+      <StockRadarChart scores={scores} />
 
       <div className="flex justify-end">
         <Button asChild variant="outline" className="rounded-full">

@@ -18,6 +18,11 @@ import type { HoldingRow, PortfolioSummary } from "@/lib/portfolio";
 import { AddHoldingDialog, EditHoldingDialog } from "@/components/holding-dialogs";
 import { deleteHolding } from "@/app/portfolio/actions";
 import { IncomeTab } from "@/components/income-tab";
+import {
+  ExportPortfolioCsvButton,
+  ImportPortfolioCsvDialog,
+} from "@/components/portfolio-csv-dialogs";
+import { Scale } from "lucide-react";
 
 interface PortfolioTabsProps {
   realRows: HoldingRow[];
@@ -80,9 +85,22 @@ export function PortfolioTabs({
             <TrendingUp className="h-4 w-4" />
             Snowball Planner
           </Link>
+          <Link
+            href="/portfolio/rebalance"
+            className="flex items-center gap-2 pb-3 text-sm font-semibold border-b-2 border-transparent text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <Scale className="h-4 w-4" />
+            Rebalance
+          </Link>
         </div>
 
-        {activeTab === "real" && <AddHoldingDialog />}
+        {activeTab === "real" && (
+          <div className="flex items-center gap-2 pb-2">
+            <ImportPortfolioCsvDialog />
+            <ExportPortfolioCsvButton holdings={realRows} />
+            <AddHoldingDialog />
+          </div>
+        )}
       </div>
 
       {/* 1. Holdings Tab */}

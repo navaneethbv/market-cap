@@ -7,7 +7,7 @@ import { IdempotencyKeyInput } from "@/components/idempotency-key-input";
 import { createClient } from "@/lib/supabase/server";
 import { getBillingState } from "@/lib/billing";
 import { FREE_BILLING_STATE } from "@/lib/billing-state";
-import { startProCheckout } from "./actions";
+import { startProCheckout, openCustomerPortal } from "./actions";
 
 export const metadata = {
   title: "Pricing - MarketCap",
@@ -129,11 +129,20 @@ export default async function PricingPage({ searchParams }: Readonly<PricingPage
             {(() => {
               if (billing.isPro) {
                 return (
-                  <div className="space-y-2">
+                  <div className="space-y-3">
                     <Button className="w-full rounded-full" disabled>
                       <Star className="h-4 w-4" />
                       You are on Pro
                     </Button>
+                    <form action={openCustomerPortal}>
+                      <Button
+                        type="submit"
+                        variant="outline"
+                        className="w-full rounded-full text-xs"
+                      >
+                        Manage Subscription & Invoices
+                      </Button>
+                    </form>
                     {billing.currentPeriodEnd && (
                       <p className="text-center text-xs text-muted-foreground">
                         {billing.cancelAtPeriodEnd ? "Ends" : "Renews"} on{" "}

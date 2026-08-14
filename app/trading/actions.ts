@@ -89,6 +89,38 @@ export async function placePaperTrade(formData: FormData) {
     throw new Error(`No live quote available for ${input.symbol}`);
   }
 
+  const orderType = getFormString(formData, "orderType") || "market";
+  const limitPriceStr = getFormString(formData, "limitPrice");
+  const stopPriceStr = getFormString(formData, "stopPrice");
+
+  if (orderType === "limit" && limitPriceStr) {
+    const limitPrice = Number(limitPriceStr);
+    if (input.side === "buy" && quotePrice > limitPrice) {
+      throw new Error(
+        `Limit price $${limitPrice.toFixed(2)} not met. Current price is $${quotePrice.toFixed(2)}.`
+      );
+    }
+    if (input.side === "sell" && quotePrice < limitPrice) {
+      throw new Error(
+        `Limit price $${limitPrice.toFixed(2)} not met. Current price is $${quotePrice.toFixed(2)}.`
+      );
+    }
+  }
+
+  if (orderType === "stop" && stopPriceStr) {
+    const stopPrice = Number(stopPriceStr);
+    if (input.side === "buy" && quotePrice < stopPrice) {
+      throw new Error(
+        `Stop price $${stopPrice.toFixed(2)} not triggered. Current price is $${quotePrice.toFixed(2)}.`
+      );
+    }
+    if (input.side === "sell" && quotePrice > stopPrice) {
+      throw new Error(
+        `Stop price $${stopPrice.toFixed(2)} not triggered. Current price is $${quotePrice.toFixed(2)}.`
+      );
+    }
+  }
+
   const { error } = await createAdminClient().rpc("place_paper_trade", {
     p_user_id: user.id,
     p_symbol: input.symbol,

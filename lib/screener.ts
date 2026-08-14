@@ -65,18 +65,29 @@ function matchesValuation(peRatio: number | null, dividendYield: number | null, 
   return true;
 }
 
+function matchesBeta(beta: number | null, betaFilter?: string): boolean {
+  if (!betaFilter || betaFilter === "All") return true;
+  if (beta === null) return false;
+  if (betaFilter === "Low") return beta < 0.8;
+  if (betaFilter === "Market") return beta >= 0.8 && beta <= 1.2;
+  if (betaFilter === "High") return beta > 1.2;
+  return true;
+}
+
 export function filterScreenerStocks(
   stocks: ScreenerStock[],
   filters: {
     sector?: string;
     marketCap?: string;
     valuation?: string;
+    betaRange?: string;
   }
 ): ScreenerStock[] {
   return stocks.filter((stock) => {
     if (!matchesSector(stock.sector, filters.sector)) return false;
     if (!matchesMarketCap(stock.marketCap, filters.marketCap)) return false;
     if (!matchesValuation(stock.peRatio, stock.dividendYield, filters.valuation)) return false;
+    if (!matchesBeta(stock.beta, filters.betaRange)) return false;
     return true;
   });
 }
@@ -98,3 +109,32 @@ export function sortScreenerStocks(
   }
   return sorted;
 }
+
+export function exportScreenerToCsv(stocks: readonly ScreenerStock[]): string {
+  const headers = ["Symbol", "Name", "Sector", "Market Cap ($B)", "Price", "Change %", "P/E", "Div Yield %", "Beta"];
+  const rows = stocks.map((s) => [
+    s.symbol,
+    s.name,
+    s.sector,
+    s.marketCap.toFixed(2),
+    s.price.toFixed(2),
+    s.changePercent.toFixed(2),
+    s.peRatio !== null ? s.peRatio.toFixed(1) : "-",
+    s.dividendYield !== null ? s.dividendYield.toFixed(2) : "-",
+    s.beta !== null ? s.beta.toFixed(2) : "-",
+  ]);
+
+  return [
+    headers.join(","),
+    ...rows.map((row) =>
+      row
+        .map((val) =>
+          val.includes(",") || val.includes('"')
+            ? `"${val.replaceAll('"', '""')}"`
+            : val
+        )
+        .join(",")
+    ),
+  ].join("\n");
+}
+
