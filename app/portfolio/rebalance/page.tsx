@@ -1,39 +1,18 @@
 import Link from "next/link";
-import { redirect } from "next/navigation";
 import { Scale } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { getQuote } from "@/lib/market/finnhub";
-import { createClient } from "@/lib/supabase/server";
-import { enrichHoldingsMarketData } from "@/lib/portfolio";
+import { fetchUserPortfolioMarketData } from "@/lib/portfolio-server";
 import { RebalanceCalculator } from "@/components/rebalance-calculator";
 import type { RebalanceInputHolding } from "@/lib/rebalancer";
 
+export const metadata = {
+  title: "Portfolio Rebalancer - MarketCap",
+  description: "Calculate exact buy and sell orders needed to achieve your target asset allocation.",
+};
+
 export default async function PortfolioRebalancePage() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const enriched = await fetchUserPortfolioMarketData("/portfolio/rebalance");
 
-  if (!user) {
-    redirect("/login?next=/portfolio/rebalance");
-  }
-
-  const { data: holdingsData, error: holdingsError } = await supabase
-    .from("holdings")
-    .select("symbol,shares,avg_cost")
-    .eq("user_id", user.id);
-
-  if (holdingsError) {
-    throw new Error(holdingsError.message);
-  }
-
-  const rawHoldings = holdingsData ?? [];
-  const uniqueSymbols = Array.from(new Set(rawHoldings.map((h) => h.symbol)));
-  const quoteResults = await Promise.allSettled(
-    uniqueSymbols.map((sym) => getQuote(sym))
-  );
-
-  const enriched = enrichHoldingsMarketData(rawHoldings, quoteResults, undefined, uniqueSymbols);
   const rebalanceHoldings: RebalanceInputHolding[] = enriched.map((h) => ({
     symbol: h.symbol,
     shares: h.shares,

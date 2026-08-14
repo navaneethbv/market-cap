@@ -1,8 +1,5 @@
-import { redirect } from "next/navigation";
 import { DollarSign } from "lucide-react";
-import { getQuote, getKeyMetrics } from "@/lib/market/finnhub";
-import { createClient } from "@/lib/supabase/server";
-import { enrichHoldingsMarketData } from "@/lib/portfolio";
+import { fetchUserPortfolioMarketData } from "@/lib/portfolio-server";
 import { DividendCalendar } from "@/components/dividend-calendar";
 
 export const metadata = {
@@ -11,38 +8,7 @@ export const metadata = {
 };
 
 export default async function PortfolioIncomePage() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    redirect("/login?next=/portfolio/income");
-  }
-
-  const { data: holdingsData, error: holdingsError } = await supabase
-    .from("holdings")
-    .select("symbol,shares,avg_cost")
-    .eq("user_id", user.id);
-
-  if (holdingsError) {
-    throw new Error(holdingsError.message);
-  }
-
-  const rawHoldings = holdingsData ?? [];
-  const uniqueSymbols = Array.from(new Set(rawHoldings.map((h) => h.symbol)));
-
-  const [quoteResults, metricsResults] = await Promise.all([
-    Promise.allSettled(uniqueSymbols.map((sym) => getQuote(sym))),
-    Promise.allSettled(uniqueSymbols.map((sym) => getKeyMetrics(sym))),
-  ]);
-
-  const holdingForecastInputs = enrichHoldingsMarketData(
-    rawHoldings,
-    quoteResults,
-    metricsResults,
-    uniqueSymbols
-  );
+  const holdingForecastInputs = await fetchUserPortfolioMarketData("/portfolio/income", true);
 
   return (
     <div className="space-y-6">
