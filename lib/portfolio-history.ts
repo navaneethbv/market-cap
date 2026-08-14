@@ -44,54 +44,62 @@ function getPriceOnOrBefore(
   return lastKnownPrice;
 }
 
+function getSortedCandleTimes(candlesMap: Record<string, Candle[]>): string[] {
+  const allTimes = new Set<string>();
+  for (const symbol in candlesMap) {
+    for (const candle of candlesMap[symbol]) {
+      allTimes.add(candle.time);
+    }
+  }
+
+  return Array.from(allTimes).sort(
+    (a, b) => new Date(a).getTime() - new Date(b).getTime()
+  );
+}
+
+function buildHistoryPoint(
+  time: string,
+  holdings: Holding[],
+  priceMap: Record<string, Map<string, number>>,
+  candlesMap: Record<string, Candle[]>
+): PortfolioHistoryPoint {
+  let totalValue = 0;
+  let totalCost = 0;
+  const candleDate = time.slice(0, 10);
+
+  for (const holding of holdings) {
+    if (holding.purchased_at > candleDate) continue;
+
+    const price = getPriceOnOrBefore(holding.symbol, time, priceMap, candlesMap);
+    if (price === null) continue;
+
+    totalValue += holding.shares * price;
+    totalCost += holding.shares * holding.avg_cost;
+  }
+
+  const profitLoss = totalValue - totalCost;
+  const profitLossPercent = totalCost === 0 ? 0 : (profitLoss / totalCost) * 100;
+
+  return {
+    time,
+    value: totalValue,
+    costBasis: totalCost,
+    profitLoss,
+    profitLossPercent,
+  };
+}
+
 export function calculatePortfolioHistory(
   holdings: Holding[],
   candlesMap: Record<string, Candle[]>
 ): PortfolioHistoryPoint[] {
   if (holdings.length === 0) return [];
 
-  const allTimesSet = new Set<string>();
-  for (const symbol in candlesMap) {
-    for (const candle of candlesMap[symbol]) {
-      allTimesSet.add(candle.time);
-    }
-  }
-
-  if (allTimesSet.size === 0) return [];
-
-  const sortedTimes = Array.from(allTimesSet).sort((a, b) => {
-    return new Date(a).getTime() - new Date(b).getTime();
-  });
+  const sortedTimes = getSortedCandleTimes(candlesMap);
+  if (sortedTimes.length === 0) return [];
 
   const priceMap = buildPriceMap(candlesMap);
-  const history: PortfolioHistoryPoint[] = [];
-
-  for (const time of sortedTimes) {
-    let totalValue = 0;
-    let totalCost = 0;
-
-    const candleDateStr = time.slice(0, 10);
-
-    for (const holding of holdings) {
-      if (holding.purchased_at <= candleDateStr) {
-        const price = getPriceOnOrBefore(holding.symbol, time, priceMap, candlesMap);
-        if (price === null) continue;
-        totalValue += holding.shares * price;
-        totalCost += holding.shares * holding.avg_cost;
-      }
-    }
-
-    const profitLoss = totalValue - totalCost;
-    const profitLossPercent = totalCost === 0 ? 0 : (profitLoss / totalCost) * 100;
-
-    history.push({
-      time,
-      value: totalValue,
-      costBasis: totalCost,
-      profitLoss,
-      profitLossPercent,
-    });
-  }
-
-  return history;
+  return sortedTimes.map((time) =>
+    buildHistoryPoint(time, holdings, priceMap, candlesMap)
+  );
 }

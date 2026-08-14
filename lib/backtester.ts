@@ -127,46 +127,103 @@ interface SignalEvalOptions {
   rsiOverbought: number;
 }
 
-function evaluateSignal(options: Readonly<SignalEvalOptions>): "buy" | "sell" | "hold" {
+type Signal = "buy" | "sell" | "hold";
+
+function evaluateSmaSignal(options: Readonly<SignalEvalOptions>): Signal {
   const {
-    strategy,
     i,
     startIdx,
     shortSma,
     longSma,
-    rsi,
-    rsiOversold,
-    rsiOverbought,
   } = options;
-
   if (i <= startIdx) return "hold";
 
-  if (strategy === "sma_crossover") {
-    const prevShort = shortSma[i - 1];
-    const prevLong = longSma[i - 1];
-    const currShort = shortSma[i];
-    const currLong = longSma[i];
-
-    if (
-      prevShort !== null &&
-      prevLong !== null &&
-      currShort !== null &&
-      currLong !== null
-    ) {
-      if (prevShort <= prevLong && currShort > currLong) return "buy";
-      if (prevShort >= prevLong && currShort < currLong) return "sell";
-    }
-  } else if (strategy === "rsi_threshold") {
-    const prevRsi = rsi[i - 1];
-    const currRsi = rsi[i];
-
-    if (prevRsi !== null && currRsi !== null) {
-      if (prevRsi >= rsiOversold && currRsi < rsiOversold) return "buy";
-      if (prevRsi <= rsiOverbought && currRsi > rsiOverbought) return "sell";
-    }
+  const prevShort = shortSma[i - 1];
+  const prevLong = longSma[i - 1];
+  const currShort = shortSma[i];
+  const currLong = longSma[i];
+  if (prevShort === null || prevLong === null || currShort === null || currLong === null) {
+    return "hold";
   }
+  if (prevShort <= prevLong && currShort > currLong) return "buy";
+  if (prevShort >= prevLong && currShort < currLong) return "sell";
 
   return "hold";
+}
+
+function evaluateRsiSignal(options: Readonly<SignalEvalOptions>): Signal {
+  const { i, startIdx, rsi, rsiOversold, rsiOverbought } = options;
+  if (i <= startIdx) return "hold";
+
+  const prevRsi = rsi[i - 1];
+  const currRsi = rsi[i];
+  if (prevRsi === null || currRsi === null) return "hold";
+  if (prevRsi >= rsiOversold && currRsi < rsiOversold) return "buy";
+  if (prevRsi <= rsiOverbought && currRsi > rsiOverbought) return "sell";
+
+  return "hold";
+}
+
+function evaluateSignal(options: Readonly<SignalEvalOptions>): Signal {
+  if (options.strategy === "sma_crossover") return evaluateSmaSignal(options);
+  return evaluateRsiSignal(options);
+}
+
+interface BacktestState {
+  cash: number;
+  shares: number;
+  trades: TradeLog[];
+  buyPriceHistory: number[];
+  profitableTrades: number;
+  closedTradesCount: number;
+}
+
+function applySignal(signal: Signal, candle: Candle, state: BacktestState): void {
+  if (signal === "buy" && state.cash > 0) {
+    state.shares = state.cash / candle.close;
+    state.cash = 0;
+    state.buyPriceHistory.push(candle.close);
+    state.trades.push({
+      type: "buy",
+      time: candle.time,
+      price: candle.close,
+      shares: state.shares,
+      cash: state.cash,
+      value: state.shares * candle.close,
+    });
+    return;
+  }
+
+  if (signal !== "sell" || state.shares <= 0) return;
+
+  state.cash = state.shares * candle.close;
+  state.trades.push({
+    type: "sell",
+    time: candle.time,
+    price: candle.close,
+    shares: state.shares,
+    cash: state.cash,
+    value: state.cash,
+  });
+  state.shares = 0;
+
+  const lastBuyPrice = state.buyPriceHistory.pop();
+  if (lastBuyPrice === undefined) return;
+  state.closedTradesCount++;
+  if (candle.close > lastBuyPrice) state.profitableTrades++;
+}
+
+function updateDrawdown(
+  currentValue: number,
+  peak: number,
+  maxDrawdown: number
+): { peak: number; maxDrawdown: number } {
+  const nextPeak = Math.max(peak, currentValue);
+  const drawdown = nextPeak === 0 ? 0 : (nextPeak - currentValue) / nextPeak;
+  return {
+    peak: nextPeak,
+    maxDrawdown: Math.max(maxDrawdown, drawdown),
+  };
 }
 
 export function runBacktest(params: BacktestParams): BacktestResult {
@@ -206,9 +263,14 @@ export function runBacktest(params: BacktestParams): BacktestResult {
     rsi = calculateRSI(closes, rsiPeriod);
   }
 
-  let cash = initialCapital;
-  let shares = 0;
-  const trades: TradeLog[] = [];
+  const state: BacktestState = {
+    cash: initialCapital,
+    shares: 0,
+    trades: [],
+    buyPriceHistory: [],
+    profitableTrades: 0,
+    closedTradesCount: 0,
+  };
   const points: BacktestPoint[] = [];
 
   let startIdx = 0;
@@ -230,15 +292,8 @@ export function runBacktest(params: BacktestParams): BacktestResult {
   let bahPeak = initialCapital;
   let bahMaxDd = 0;
 
-  const buyPriceHistory: number[] = [];
-  let profitableTrades = 0;
-  let closedTradesCount = 0;
-
   for (let i = startIdx; i < candles.length; i++) {
     const candle = candles[i];
-    const close = candle.close;
-    const time = candle.time;
-
     const signal = evaluateSignal({
       strategy,
       i,
@@ -249,62 +304,24 @@ export function runBacktest(params: BacktestParams): BacktestResult {
       rsiOversold,
       rsiOverbought,
     });
+    applySignal(signal, candle, state);
 
-    if (signal === "buy" && cash > 0) {
-      shares = cash / close;
-      cash = 0;
-      buyPriceHistory.push(close);
-      trades.push({
-        type: "buy",
-        time,
-        price: close,
-        shares,
-        cash,
-        value: shares * close,
-      });
-    } else if (signal === "sell" && shares > 0) {
-      cash = shares * close;
-      trades.push({
-        type: "sell",
-        time,
-        price: close,
-        shares,
-        cash,
-        value: cash,
-      });
-      shares = 0;
-
-      const lastBuyPrice = buyPriceHistory.pop();
-      if (lastBuyPrice !== undefined) {
-        closedTradesCount++;
-        if (close > lastBuyPrice) {
-          profitableTrades++;
-        }
-      }
-    }
-
-    const currentStrategyValue = cash + shares * close;
-    const currentBahValue = buyAndHoldShares * close;
-
-    if (currentStrategyValue > strategyPeak) {
-      strategyPeak = currentStrategyValue;
-    }
-    const strategyDd = (strategyPeak - currentStrategyValue) / strategyPeak;
-    if (strategyDd > strategyMaxDd) {
-      strategyMaxDd = strategyDd;
-    }
-
-    if (currentBahValue > bahPeak) {
-      bahPeak = currentBahValue;
-    }
-    const bahDd = (bahPeak - currentBahValue) / bahPeak;
-    if (bahDd > bahMaxDd) {
-      bahMaxDd = bahDd;
-    }
+    const currentStrategyValue = state.cash + state.shares * candle.close;
+    const currentBahValue = buyAndHoldShares * candle.close;
+    const strategyDrawdown = updateDrawdown(
+      currentStrategyValue,
+      strategyPeak,
+      strategyMaxDd
+    );
+    strategyPeak = strategyDrawdown.peak;
+    strategyMaxDd = strategyDrawdown.maxDrawdown;
+    const bahDrawdown = updateDrawdown(currentBahValue, bahPeak, bahMaxDd);
+    bahPeak = bahDrawdown.peak;
+    bahMaxDd = bahDrawdown.maxDrawdown;
 
     points.push({
-      time,
-      close,
+      time: candle.time,
+      close: candle.close,
       strategyValue: currentStrategyValue,
       buyAndHoldValue: currentBahValue,
     });
@@ -316,16 +333,19 @@ export function runBacktest(params: BacktestParams): BacktestResult {
   const totalReturn = ((finalStrategyValue - initialCapital) / initialCapital) * 100;
   const buyAndHoldReturn = ((finalBahValue - initialCapital) / initialCapital) * 100;
 
-  const winRate = closedTradesCount > 0 ? (profitableTrades / closedTradesCount) * 100 : 0;
+  const winRate =
+    state.closedTradesCount > 0
+      ? (state.profitableTrades / state.closedTradesCount) * 100
+      : 0;
 
   return {
     points,
-    trades,
+    trades: state.trades,
     totalReturn,
     buyAndHoldReturn,
     maxDrawdown: strategyMaxDd * 100,
     buyAndHoldMaxDrawdown: bahMaxDd * 100,
     winRate,
-    tradeCount: trades.length,
+    tradeCount: state.trades.length,
   };
 }

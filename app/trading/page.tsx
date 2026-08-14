@@ -39,7 +39,7 @@ type TradingPageProps = {
   searchParams: Promise<{ symbol?: string | string[] }>;
 };
 
-export default async function TradingPage({ searchParams }: TradingPageProps) {
+export default async function TradingPage({ searchParams }: Readonly<TradingPageProps>) {
   const params = await searchParams;
   const rawSymbol = Array.isArray(params.symbol)
     ? params.symbol[0]

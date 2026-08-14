@@ -59,7 +59,7 @@ export default function MonteCarloPage() {
     seed: 42,
   });
 
-  const finalYearPoint = simulation.points[simulation.points.length - 1];
+  const finalYearPoint = simulation.points.at(-1);
 
   return (
     <div className="space-y-6">

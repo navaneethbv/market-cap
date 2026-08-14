@@ -6,6 +6,19 @@ grant select, insert, update, delete on table public.paper_accounts to service_r
 grant select, insert, update, delete on table public.paper_trades to service_role;
 grant select, insert, update, delete on table public.paper_equity_snapshots to service_role;
 
+create or replace function public.require_paper_user_id(p_user_id uuid)
+returns void
+language plpgsql
+security invoker
+set search_path = public
+as $$
+begin
+  if p_user_id is null then
+    raise exception 'User id is required';
+  end if;
+end;
+$$;
+
 create or replace function public.place_paper_trade(
   p_user_id uuid,
   p_symbol text,
@@ -23,9 +36,7 @@ declare
   v_cash numeric;
   v_position_shares integer;
 begin
-  if p_user_id is null then
-    raise exception 'User id is required';
-  end if;
+  perform public.require_paper_user_id(p_user_id);
 
   if p_symbol !~ '^[A-Z0-9.\^-]{1,12}$' then
     raise exception 'Invalid symbol';
@@ -106,9 +117,7 @@ security invoker
 set search_path = public
 as $$
 begin
-  if p_user_id is null then
-    raise exception 'User id is required';
-  end if;
+  perform public.require_paper_user_id(p_user_id);
 
   perform pg_advisory_xact_lock(hashtextextended(p_user_id::text, 0));
 
@@ -130,9 +139,7 @@ security invoker
 set search_path = public
 as $$
 begin
-  if p_user_id is null then
-    raise exception 'User id is required';
-  end if;
+  perform public.require_paper_user_id(p_user_id);
 
   if p_equity is null or p_equity < 0 then
     raise exception 'Equity must be zero or greater';
@@ -144,6 +151,11 @@ begin
   do update set equity = excluded.equity;
 end;
 $$;
+
+revoke all on function public.require_paper_user_id(uuid) from public;
+revoke all on function public.require_paper_user_id(uuid) from anon;
+revoke all on function public.require_paper_user_id(uuid) from authenticated;
+grant execute on function public.require_paper_user_id(uuid) to service_role;
 
 revoke all on function public.place_paper_trade(uuid, text, text, integer, numeric) from public;
 revoke all on function public.place_paper_trade(uuid, text, text, integer, numeric) from anon;
