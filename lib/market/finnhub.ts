@@ -192,3 +192,32 @@ export async function getInsiderTransactions(
     isDerivative: !!t.isDerivative,
   }));
 }
+
+export async function getEarningsSurprises(
+  symbol: string
+): Promise<import("@/lib/earnings").EarningsSurprise[]> {
+  const raw = await finnhub<
+    {
+      actual: number | null;
+      estimate: number | null;
+      period: string;
+      quarter?: number;
+      surprise: number | null;
+      surprisePercent: number | null;
+      symbol: string;
+      year?: number;
+    }[]
+  >("/stock/earnings", { symbol, limit: "4" }, 3600);
+
+  return (raw ?? []).map((e) => ({
+    actual: e.actual ?? null,
+    estimate: e.estimate ?? null,
+    period: e.period,
+    quarter: e.quarter,
+    surprise: e.surprise ?? null,
+    surprisePercent: e.surprisePercent ?? null,
+    symbol: e.symbol ?? symbol,
+    year: e.year,
+  }));
+}
+

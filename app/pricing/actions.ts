@@ -97,3 +97,34 @@ export async function startProCheckout(formData: FormData) {
   }
   redirect(session.url);
 }
+
+export async function openCustomerPortal() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect("/login?next=%2Fpricing");
+  }
+
+  const { data: mapping } = await supabase
+    .from("stripe_customers")
+    .select("stripe_customer_id")
+    .eq("user_id", user.id)
+    .maybeSingle();
+
+  if (!mapping?.stripe_customer_id) {
+    redirect("/pricing");
+  }
+
+  const origin = getAppOrigin((await headers()).get("origin"));
+  const { createCustomerPortalSession } = await import("@/lib/stripe");
+  const portalUrl = await createCustomerPortalSession(
+    mapping.stripe_customer_id,
+    `${origin}/pricing`
+  );
+
+  redirect(portalUrl);
+}
+

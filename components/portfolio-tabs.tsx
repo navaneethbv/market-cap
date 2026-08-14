@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Briefcase, DollarSign, Trash2, TrendingUp } from "lucide-react";
+import { Briefcase, DollarSign, Scale, Trash2, TrendingUp } from "lucide-react";
 import { ChangeChip } from "@/components/change-chip";
 import { Button } from "@/components/ui/button";
 import {
@@ -18,6 +18,10 @@ import type { HoldingRow, PortfolioSummary } from "@/lib/portfolio";
 import { AddHoldingDialog, EditHoldingDialog } from "@/components/holding-dialogs";
 import { deleteHolding } from "@/app/portfolio/actions";
 import { IncomeTab } from "@/components/income-tab";
+import {
+  ExportPortfolioCsvButton,
+  ImportPortfolioCsvDialog,
+} from "@/components/portfolio-csv-dialogs";
 
 interface PortfolioTabsProps {
   realRows: HoldingRow[];
@@ -74,15 +78,42 @@ export function PortfolioTabs({
             Dividend Income
           </button>
           <Link
+            href="/portfolio/income"
+            className="flex items-center gap-2 pb-3 text-sm font-semibold border-b-2 border-transparent text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <DollarSign className="h-4 w-4" />
+            Income Forecast
+          </Link>
+          <Link
             href="/portfolio/snowball"
             className="flex items-center gap-2 pb-3 text-sm font-semibold border-b-2 border-transparent text-muted-foreground hover:text-foreground transition-colors"
           >
             <TrendingUp className="h-4 w-4" />
-            Snowball Planner
+            Snowball
+          </Link>
+          <Link
+            href="/portfolio/rebalance"
+            className="flex items-center gap-2 pb-3 text-sm font-semibold border-b-2 border-transparent text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <Scale className="h-4 w-4" />
+            Rebalance
+          </Link>
+          <Link
+            href="/portfolio/tax-loss"
+            className="flex items-center gap-2 pb-3 text-sm font-semibold border-b-2 border-transparent text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <Briefcase className="h-4 w-4 text-red-500/80" />
+            Tax-Loss Harvest
           </Link>
         </div>
 
-        {activeTab === "real" && <AddHoldingDialog />}
+        {activeTab === "real" && (
+          <div className="flex items-center gap-2 pb-2">
+            <ImportPortfolioCsvDialog />
+            <ExportPortfolioCsvButton holdings={realRows} />
+            <AddHoldingDialog />
+          </div>
+        )}
       </div>
 
       {/* 1. Holdings Tab */}

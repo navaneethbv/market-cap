@@ -199,14 +199,41 @@ export function calculateMACD(
   return { macdLine, signalLine, histogram };
 }
 
-export function calculateIndicators(candles: Candle[]): IndicatorsResult {
+export interface IndicatorOptions {
+  readonly sma50Period?: number;
+  readonly sma200Period?: number;
+  readonly ema20Period?: number;
+  readonly bbPeriod?: number;
+  readonly bbMultiplier?: number;
+  readonly rsiPeriod?: number;
+  readonly macdSlow?: number;
+  readonly macdFast?: number;
+  readonly macdSignal?: number;
+}
+
+export function calculateIndicators(
+  candles: Candle[],
+  options: IndicatorOptions = {}
+): IndicatorsResult {
+  const {
+    sma50Period = 50,
+    sma200Period = 200,
+    ema20Period = 20,
+    bbPeriod = 20,
+    bbMultiplier = 2,
+    rsiPeriod = 14,
+    macdSlow = 26,
+    macdFast = 12,
+    macdSignal = 9,
+  } = options;
+
   const prices = candles.map((c) => c.close);
   return {
-    sma50: calculateSMA(prices, 50),
-    sma200: calculateSMA(prices, 200),
-    ema20: calculateEMA(prices, 20),
-    bollinger: calculateBollingerBands(prices, 20, 2),
-    rsi: calculateRSI(prices, 14),
-    macd: calculateMACD(prices, 26, 12, 9),
+    sma50: calculateSMA(prices, sma50Period),
+    sma200: calculateSMA(prices, sma200Period),
+    ema20: calculateEMA(prices, ema20Period),
+    bollinger: calculateBollingerBands(prices, bbPeriod, bbMultiplier),
+    rsi: calculateRSI(prices, rsiPeriod),
+    macd: calculateMACD(prices, macdSlow, macdFast, macdSignal),
   };
 }

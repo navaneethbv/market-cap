@@ -2,6 +2,20 @@ import type { Quote } from "./market/types";
 import { isValidSymbol, normalizeSymbol } from "./symbol.ts";
 
 export type PaperTradeSide = "buy" | "sell";
+export type PaperOrderType = "market" | "limit" | "stop";
+export type PaperOrderStatus = "pending" | "filled" | "cancelled";
+
+export interface PaperOrder {
+  id: string;
+  symbol: string;
+  side: PaperTradeSide;
+  order_type: PaperOrderType;
+  shares: number;
+  limit_price?: number | null;
+  stop_price?: number | null;
+  status: PaperOrderStatus;
+  created_at: string;
+}
 
 export interface PaperTrade {
   id: string;
@@ -215,3 +229,56 @@ export function buildPaperSummary({
       startingCash === 0 ? 0 : (totalReturn / startingCash) * 100,
   };
 }
+
+export function shouldFillOrder(
+  order: Readonly<PaperOrder>,
+  currentPrice: number
+): boolean {
+  if (
+    order.status !== "pending" ||
+    !Number.isFinite(currentPrice) ||
+    currentPrice <= 0
+  ) {
+    return false;
+  }
+  if (order.order_type === "market") {
+    return true;
+  }
+  if (order.order_type === "limit") {
+    const limit = order.limit_price ?? 0;
+    if (limit <= 0) return false;
+    return order.side === "buy" ? currentPrice <= limit : currentPrice >= limit;
+  }
+  if (order.order_type === "stop") {
+    const stop = order.stop_price ?? 0;
+    if (stop <= 0) return false;
+    return order.side === "buy" ? currentPrice >= stop : currentPrice <= stop;
+  }
+  return false;
+}
+
+export function exportTradesToCsv(trades: readonly PaperTrade[]): string {
+  const headers = ["ID", "Executed At", "Symbol", "Side", "Shares", "Price", "Total Value"];
+  const rows = trades.map((t) => [
+    t.id,
+    t.executed_at,
+    t.symbol,
+    t.side.toUpperCase(),
+    t.shares.toString(),
+    t.price.toFixed(2),
+    (t.shares * t.price).toFixed(2),
+  ]);
+  return [
+    headers.join(","),
+    ...rows.map((row) =>
+      row
+        .map((val) =>
+          val.includes(",") || val.includes('"')
+            ? `"${val.replaceAll('"', '""')}"`
+            : val
+        )
+        .join(",")
+    ),
+  ].join("\n");
+}
+

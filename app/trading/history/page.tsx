@@ -11,6 +11,8 @@ import {
 } from "@/lib/paper-trading";
 import { createClient } from "@/lib/supabase/server";
 
+import { ExportTradesButton } from "@/components/export-trades-button";
+
 function pnlTone(value: number) {
   return value >= 0
     ? "text-emerald-600 dark:text-emerald-400"
@@ -77,9 +79,12 @@ export default async function TradingHistoryPage() {
               Equity over time, realized results, and every fill on record.
             </p>
           </div>
-          <Button asChild variant="outline" className="rounded-full">
-            <Link href="/trading">Back to trading</Link>
-          </Button>
+          <div className="flex items-center gap-2">
+            <ExportTradesButton trades={tradesNewestFirst} />
+            <Button asChild variant="outline" className="rounded-full">
+              <Link href="/trading">Back to trading</Link>
+            </Button>
+          </div>
         </div>
       </section>
 

@@ -5,8 +5,9 @@ import { placePaperTrade } from "@/app/trading/actions";
 import { fetchAllPaperTrades } from "@/app/trading/data";
 import { ChangeChip } from "@/components/change-chip";
 import { ResetAccountDialog } from "@/components/reset-account-dialog";
-import { TradeTicketButtons, SellAllButton } from "@/components/trade-submit-buttons";
+import { SellAllButton } from "@/components/trade-submit-buttons";
 import { IdempotencyKeyInput } from "@/components/idempotency-key-input";
+import { PaperTradeTicket } from "@/components/paper-trade-ticket";
 import { TradeLogTable } from "@/components/trade-log-table";
 import { Button } from "@/components/ui/button";
 import {
@@ -159,52 +160,11 @@ export default async function TradingPage({ searchParams }: Readonly<TradingPage
         </div>
       </section>
 
-      <section className="rounded-2xl border bg-card p-5 shadow-sm">
-        <div className="mb-4">
-          <h2 className="text-base font-semibold">Trade ticket</h2>
-          <p className="text-sm text-muted-foreground">
-            Market orders fill instantly at the latest quote.
-            {ticketQuote &&
-              ` ${ticketQuote.symbol} is at ${formatPrice(ticketQuote.price)}.`}
-          </p>
-        </div>
-        <form
-          action={placePaperTrade}
-          className="flex flex-col gap-3 sm:flex-row sm:items-end"
-        >
-          <IdempotencyKeyInput />
-          <div className="grid gap-1.5">
-            <label htmlFor="trade-symbol" className="text-xs font-medium">
-              Symbol
-            </label>
-            <input
-              id="trade-symbol"
-              name="symbol"
-              required
-              maxLength={12}
-              defaultValue={ticketSymbol}
-              placeholder="AAPL"
-              className="border-input bg-background ring-offset-background focus-visible:ring-ring h-10 w-32 rounded-full border px-4 text-sm uppercase shadow-xs focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
-            />
-          </div>
-          <div className="grid gap-1.5">
-            <label htmlFor="trade-shares" className="text-xs font-medium">
-              Shares
-            </label>
-            <input
-              id="trade-shares"
-              name="shares"
-              type="number"
-              min="1"
-              step="1"
-              required
-              placeholder="10"
-              className="border-input bg-background ring-offset-background focus-visible:ring-ring h-10 w-28 rounded-full border px-4 text-sm shadow-xs focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
-            />
-          </div>
-          <TradeTicketButtons />
-        </form>
-      </section>
+      <PaperTradeTicket
+        ticketSymbol={ticketSymbol}
+        ticketQuote={ticketQuote}
+        action={placePaperTrade}
+      />
 
       <section className="overflow-hidden rounded-2xl border bg-card shadow-sm">
         <div className="border-b p-5">

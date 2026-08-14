@@ -537,3 +537,17 @@ deploying, diff `supabase/migrations/` against `mcp list_migrations`.
   The project is not linked yet (`.vercel/` absent). Do not upload `.env.local`
   secrets to Vercel without explicit confirmation.
 - Supabase CLI is installed (`2.109.0`), but not logged in.
+
+## Wave 1 & Wave 2 Core Enhancements (feature/five-core-enhancements)
+
+- **Universal Command Palette (`⌘K` / `Ctrl+K`)**: Live ticker search with previews, deep page navigation across all 15+ views, theme toggle shortcut.
+- **Candlestick & Volume Charting**: Area/Candles/Line chart styles, volume sub-chart, popover for customizable SMA 1, SMA 2, EMA, and RSI periods.
+- **Paper Trading Orders & Ledger**: Added Market, Limit, and Stop-Loss order executions with live quote validation; one-click RFC4180 CSV trade history ledger export.
+- **Portfolio CSV & Rebalancing**: Bulk CSV import and export with table preview; target allocation rebalance calculator (`/portfolio/rebalance`) supporting target percentage sliders, equal weighting preset, extra cash contributions, and exact buy/sell trade lists.
+- **Stripe Customer Portal**: Self-serve subscription management button linking active Pro users directly to Stripe Billing Portal.
+- **Quarterly Earnings Surprises**: EPS actuals vs consensus estimates history on `/stock/[symbol]` with Beat/Miss badges, surprise percentages, and historical beat rates.
+- **Stock Radar Comparison Chart**: 5-factor dimension scores (Valuation, Profitability, Growth, Momentum, Stability) with interactive RadarChart visualization on `/compare`.
+- **Screener Filters & CSV Export**: Added Beta (Risk) category filter and 1-click Screener CSV export button on `/screener`.
+- **In-App Notification Center**: Real-time price alert trigger evaluation with unread badge and dropdown popover in the topbar.
+- **Test Suite & Coverage**: 242/242 tests passing with 99.14% line coverage and 98.52% function coverage (`npm test`).
+
