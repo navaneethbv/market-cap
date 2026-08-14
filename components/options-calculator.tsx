@@ -65,6 +65,16 @@ const STRATEGIES: readonly StrategyOption[] = [
   },
 ];
 
+function getBiasBadgeClass(bias: "Bullish" | "Bearish" | "Income / Neutral"): string {
+  if (bias === "Bullish") {
+    return "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400";
+  }
+  if (bias === "Bearish") {
+    return "bg-red-500/10 text-red-600 dark:text-red-400";
+  }
+  return "bg-blue-500/10 text-blue-600 dark:text-blue-400";
+}
+
 export function OptionsCalculator() {
   const [strategy, setStrategy] = useState<OptionStrategyType>("long_call");
   const [spotPrice, setSpotPrice] = useState<number>(180);
@@ -94,6 +104,8 @@ export function OptionsCalculator() {
       <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
         {STRATEGIES.map((s) => {
           const isSelected = s.type === strategy;
+          const badgeClass = getBiasBadgeClass(s.bias);
+
           return (
             <button
               key={s.type}
@@ -112,13 +124,7 @@ export function OptionsCalculator() {
               <div className="flex items-center justify-between">
                 <span className="font-bold text-sm">{s.name}</span>
                 <span
-                  className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${
-                    s.bias === "Bullish"
-                      ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
-                      : s.bias === "Bearish"
-                      ? "bg-red-500/10 text-red-600 dark:text-red-400"
-                      : "bg-blue-500/10 text-blue-600 dark:text-blue-400"
-                  }`}
+                  className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${badgeClass}`}
                 >
                   {s.bias}
                 </span>
@@ -139,10 +145,11 @@ export function OptionsCalculator() {
 
           <div className="space-y-3 text-xs">
             <div>
-              <label className="text-muted-foreground font-medium block mb-1">
+              <label htmlFor="options-spot-price" className="text-muted-foreground font-medium block mb-1">
                 Underlying Spot Price ($)
               </label>
               <input
+                id="options-spot-price"
                 type="number"
                 step="0.5"
                 min="1"
@@ -153,10 +160,11 @@ export function OptionsCalculator() {
             </div>
 
             <div>
-              <label className="text-muted-foreground font-medium block mb-1">
+              <label htmlFor="options-strike-price" className="text-muted-foreground font-medium block mb-1">
                 Strike Price ($)
               </label>
               <input
+                id="options-strike-price"
                 type="number"
                 step="0.5"
                 min="1"
@@ -168,10 +176,11 @@ export function OptionsCalculator() {
 
             {currentStrategyInfo.isSpread && (
               <div>
-                <label className="text-muted-foreground font-medium block mb-1">
+                <label htmlFor="options-secondary-strike" className="text-muted-foreground font-medium block mb-1">
                   Secondary Strike Price ($)
                 </label>
                 <input
+                  id="options-secondary-strike"
                   type="number"
                   step="0.5"
                   min="1"
@@ -183,10 +192,11 @@ export function OptionsCalculator() {
             )}
 
             <div>
-              <label className="text-muted-foreground font-medium block mb-1">
+              <label htmlFor="options-premium" className="text-muted-foreground font-medium block mb-1">
                 Option Premium per Share ($)
               </label>
               <input
+                id="options-premium"
                 type="number"
                 step="0.05"
                 min="0.01"
@@ -197,10 +207,11 @@ export function OptionsCalculator() {
             </div>
 
             <div>
-              <label className="text-muted-foreground font-medium block mb-1">
+              <label htmlFor="options-contracts" className="text-muted-foreground font-medium block mb-1">
                 Contracts Count (100 shares/contract)
               </label>
               <input
+                id="options-contracts"
                 type="number"
                 step="1"
                 min="1"

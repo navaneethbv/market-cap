@@ -126,3 +126,52 @@ export function calculatePortfolioSummary(rows: HoldingRow[]): PortfolioSummary 
     holdingCount: rows.length,
   };
 }
+
+export interface RawHoldingEntry {
+  symbol: string;
+  shares: number | string;
+  avg_cost: number | string;
+}
+
+export interface EnrichedHoldingData {
+  symbol: string;
+  shares: number;
+  avgCost: number;
+  price: number;
+  dividendYield: number | null;
+}
+
+export function enrichHoldingsMarketData(
+  rawHoldings: readonly RawHoldingEntry[],
+  quoteResults: readonly PromiseSettledResult<{ price: number }>[],
+  metricsResults?: readonly PromiseSettledResult<{ dividendYield: number | null }>[],
+  uniqueSymbols?: readonly string[]
+): EnrichedHoldingData[] {
+  const symbols = uniqueSymbols ?? Array.from(new Set(rawHoldings.map((h) => h.symbol)));
+  const quotesMap = new Map<string, number>();
+  const metricsMap = new Map<string, number | null>();
+
+  symbols.forEach((sym, idx) => {
+    const qRes = quoteResults[idx];
+    if (qRes?.status === "fulfilled") {
+      quotesMap.set(sym, qRes.value.price);
+    }
+    if (metricsResults) {
+      const mRes = metricsResults[idx];
+      if (mRes?.status === "fulfilled") {
+        metricsMap.set(sym, mRes.value.dividendYield);
+      }
+    }
+  });
+
+  return rawHoldings.map((h) => {
+    const avgCost = Number(h.avg_cost);
+    return {
+      symbol: h.symbol,
+      shares: Number(h.shares),
+      avgCost,
+      price: quotesMap.get(h.symbol) ?? avgCost,
+      dividendYield: metricsMap.get(h.symbol) ?? 0,
+    };
+  });
+}

@@ -4,6 +4,7 @@ import { Scale } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getQuote } from "@/lib/market/finnhub";
 import { createClient } from "@/lib/supabase/server";
+import { enrichHoldingsMarketData } from "@/lib/portfolio";
 import { RebalanceCalculator } from "@/components/rebalance-calculator";
 import type { RebalanceInputHolding } from "@/lib/rebalancer";
 
@@ -32,18 +33,11 @@ export default async function PortfolioRebalancePage() {
     uniqueSymbols.map((sym) => getQuote(sym))
   );
 
-  const quotesMap = new Map<string, number>();
-  uniqueSymbols.forEach((sym, idx) => {
-    const res = quoteResults[idx];
-    if (res.status === "fulfilled") {
-      quotesMap.set(sym, res.value.price);
-    }
-  });
-
-  const rebalanceHoldings: RebalanceInputHolding[] = rawHoldings.map((h) => ({
+  const enriched = enrichHoldingsMarketData(rawHoldings, quoteResults, undefined, uniqueSymbols);
+  const rebalanceHoldings: RebalanceInputHolding[] = enriched.map((h) => ({
     symbol: h.symbol,
-    shares: Number(h.shares),
-    price: quotesMap.get(h.symbol) ?? Number(h.avg_cost),
+    shares: h.shares,
+    price: h.price,
   }));
 
   return (
@@ -58,13 +52,11 @@ export default async function PortfolioRebalancePage() {
             <h1 className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">
               Portfolio Rebalancer
             </h1>
-            <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
-              Define your ideal target weights across your current holdings.
-              Calculate the exact buy and sell orders needed to realign your
-              portfolio.
+            <p className="mt-1 text-sm text-muted-foreground">
+              Calculate exact buy and sell orders needed to achieve your target asset allocation.
             </p>
           </div>
-          <Button asChild variant="outline" className="rounded-full">
+          <Button variant="outline" size="sm" className="rounded-full" asChild>
             <Link href="/portfolio">Back to Portfolio</Link>
           </Button>
         </div>

@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { DollarSign } from "lucide-react";
 import { getQuote, getKeyMetrics } from "@/lib/market/finnhub";
 import { createClient } from "@/lib/supabase/server";
+import { enrichHoldingsMarketData } from "@/lib/portfolio";
 import { DividendCalendar } from "@/components/dividend-calendar";
 
 export const metadata = {
@@ -36,27 +37,12 @@ export default async function PortfolioIncomePage() {
     Promise.allSettled(uniqueSymbols.map((sym) => getKeyMetrics(sym))),
   ]);
 
-  const quotesMap = new Map<string, number>();
-  const metricsMap = new Map<string, number | null>();
-
-  uniqueSymbols.forEach((sym, idx) => {
-    const qRes = quoteResults[idx];
-    if (qRes.status === "fulfilled") {
-      quotesMap.set(sym, qRes.value.price);
-    }
-    const mRes = metricsResults[idx];
-    if (mRes.status === "fulfilled") {
-      metricsMap.set(sym, mRes.value.dividendYield);
-    }
-  });
-
-  const holdingForecastInputs = rawHoldings.map((h) => ({
-    symbol: h.symbol,
-    shares: Number(h.shares),
-    avgCost: Number(h.avg_cost),
-    price: quotesMap.get(h.symbol) ?? Number(h.avg_cost),
-    dividendYield: metricsMap.get(h.symbol) ?? 0,
-  }));
+  const holdingForecastInputs = enrichHoldingsMarketData(
+    rawHoldings,
+    quoteResults,
+    metricsResults,
+    uniqueSymbols
+  );
 
   return (
     <div className="space-y-6">
