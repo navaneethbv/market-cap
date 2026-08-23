@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "/Users/navaneethbv/.local/bin/graphify hook-guard gemini"
+            "command": "sh \"$HOME/.graphify-agent/graphify-hook.sh\" gemini"
           }
         ]
       }
