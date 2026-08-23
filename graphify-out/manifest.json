@@ -1,0 +1,1478 @@
+{
+  ".claude/settings.local.json": {
+    "mtime": 1783243629.19157,
+    "seen": 1787454619.454656,
+    "ast_hash": "daa02031fd3facba109f5ccf1b9b16b7",
+    "semantic_hash": "daa02031fd3facba109f5ccf1b9b16b7"
+  },
+  "app/alerts/actions.ts": {
+    "mtime": 1786692779.1632082,
+    "seen": 1787454619.454659,
+    "ast_hash": "5ce75da02d09142a3f3932bca8b60662",
+    "semantic_hash": "5ce75da02d09142a3f3932bca8b60662"
+  },
+  "app/alerts/page.tsx": {
+    "mtime": 1783243812.3290687,
+    "seen": 1787454619.4546611,
+    "ast_hash": "769c719679ec2441437bf0af7f52af1d",
+    "semantic_hash": "769c719679ec2441437bf0af7f52af1d"
+  },
+  "app/api/backtest/route.ts": {
+    "mtime": 1786604763.3003724,
+    "seen": 1787454619.4546618,
+    "ast_hash": "08d7e5bb31f2457d1be47ed6c9b7f684",
+    "semantic_hash": "08d7e5bb31f2457d1be47ed6c9b7f684"
+  },
+  "app/api/candles/route.ts": {
+    "mtime": 1786604763.3005047,
+    "seen": 1787454619.4546618,
+    "ast_hash": "eb3d5a8c1dfc85f025e0d9d7ea7af53b",
+    "semantic_hash": "eb3d5a8c1dfc85f025e0d9d7ea7af53b"
+  },
+  "app/api/compare/matrix/route.ts": {
+    "mtime": 1786604763.3006372,
+    "seen": 1787454619.4546628,
+    "ast_hash": "7994eb2037365c29519774d890f65193",
+    "semantic_hash": "7994eb2037365c29519774d890f65193"
+  },
+  "app/api/correlation/route.ts": {
+    "mtime": 1786604763.3007622,
+    "seen": 1787454619.454664,
+    "ast_hash": "e35e3cad4b8631a95ec1e3b4ba2c75d2",
+    "semantic_hash": "e35e3cad4b8631a95ec1e3b4ba2c75d2"
+  },
+  "app/api/insiders/route.ts": {
+    "mtime": 1786604763.3009076,
+    "seen": 1787454619.454664,
+    "ast_hash": "0cea176a6f3e695ecacc06f2585b4bfb",
+    "semantic_hash": "0cea176a6f3e695ecacc06f2585b4bfb"
+  },
+  "app/api/portfolio/history/route.ts": {
+    "mtime": 1783234628.3494942,
+    "seen": 1787454619.454665,
+    "ast_hash": "b2a370ef26bf39510b9a681a1ba3110a",
+    "semantic_hash": "b2a370ef26bf39510b9a681a1ba3110a"
+  },
+  "app/api/portfolio/summary/route.ts": {
+    "mtime": 1786604763.3010545,
+    "seen": 1787454619.454666,
+    "ast_hash": "5ce243744824768834b3953aa1d4ce4d",
+    "semantic_hash": "5ce243744824768834b3953aa1d4ce4d"
+  },
+  "app/api/quote/route.ts": {
+    "mtime": 1786604763.301175,
+    "seen": 1787454619.454666,
+    "ast_hash": "5adc9182d83e4b4a8b2a2f829e8649b1",
+    "semantic_hash": "5adc9182d83e4b4a8b2a2f829e8649b1"
+  },
+  "app/api/screener/route.ts": {
+    "mtime": 1786692779.1635664,
+    "seen": 1787454619.454667,
+    "ast_hash": "de740d3f723a7428b7cec73a5755abf7",
+    "semantic_hash": "de740d3f723a7428b7cec73a5755abf7"
+  },
+  "app/api/search/route.ts": {
+    "mtime": 1786604763.3013067,
+    "seen": 1787454619.454668,
+    "ast_hash": "5f65a5f5010617e3a73afe1d0d0fc828",
+    "semantic_hash": "5f65a5f5010617e3a73afe1d0d0fc828"
+  },
+  "app/api/stock/[symbol]/beta/route.ts": {
+    "mtime": 1786604763.3014522,
+    "seen": 1787454619.454668,
+    "ast_hash": "9ae7f5c34f75b6a12a6cf1e96a32699e",
+    "semantic_hash": "9ae7f5c34f75b6a12a6cf1e96a32699e"
+  },
+  "app/auth/confirm/route.ts": {
+    "mtime": 1783222772.3437006,
+    "seen": 1787454619.454669,
+    "ast_hash": "7bd778eb521a37079e26a32b5e1b8beb",
+    "semantic_hash": "7bd778eb521a37079e26a32b5e1b8beb"
+  },
+  "app/auth/signout/route.ts": {
+    "mtime": 1783222424.538135,
+    "seen": 1787454619.4546702,
+    "ast_hash": "40cdbfc10152255b6fb5c9667c9a47b7",
+    "semantic_hash": "40cdbfc10152255b6fb5c9667c9a47b7"
+  },
+  "app/backtest/page.tsx": {
+    "mtime": 1786692779.164112,
+    "seen": 1787454619.4546702,
+    "ast_hash": "11d410aa59c472d09c91d6cb22e7be93",
+    "semantic_hash": "11d410aa59c472d09c91d6cb22e7be93"
+  },
+  "app/calendar/page.tsx": {
+    "mtime": 1786604763.3015933,
+    "seen": 1787454619.4546711,
+    "ast_hash": "64bafa2badbb11c4c84453786dee81a7",
+    "semantic_hash": "64bafa2badbb11c4c84453786dee81a7"
+  },
+  "app/compare/correlation/page.tsx": {
+    "mtime": 1786692779.1645803,
+    "seen": 1787454619.4546719,
+    "ast_hash": "fde8ab70b934ee0177b323d7a3e628b2",
+    "semantic_hash": "fde8ab70b934ee0177b323d7a3e628b2"
+  },
+  "app/compare/matrix/page.tsx": {
+    "mtime": 1786692779.1649513,
+    "seen": 1787454619.4546719,
+    "ast_hash": "fda7372fd379da35312cad0608ca8875",
+    "semantic_hash": "fda7372fd379da35312cad0608ca8875"
+  },
+  "app/compare/page.tsx": {
+    "mtime": 1786692779.1653383,
+    "seen": 1787454619.4546728,
+    "ast_hash": "56c23e42031dcc1a0772fbd062954cb5",
+    "semantic_hash": "56c23e42031dcc1a0772fbd062954cb5"
+  },
+  "app/compare/saved/actions.ts": {
+    "mtime": 1786692779.1657748,
+    "seen": 1787454619.454674,
+    "ast_hash": "69e95a6430040c4bf885d7fcef9bcdc3",
+    "semantic_hash": "69e95a6430040c4bf885d7fcef9bcdc3"
+  },
+  "app/compare/saved/page.tsx": {
+    "mtime": 1783243812.330475,
+    "seen": 1787454619.454675,
+    "ast_hash": "31a0cc12adbc6a742c00b6f480803d9e",
+    "semantic_hash": "31a0cc12adbc6a742c00b6f480803d9e"
+  },
+  "app/heatmap/page.tsx": {
+    "mtime": 1786692779.1661804,
+    "seen": 1787454619.454675,
+    "ast_hash": "304b3a071be7ab81a4ff0e9663391af8",
+    "semantic_hash": "304b3a071be7ab81a4ff0e9663391af8"
+  },
+  "app/insiders/page.tsx": {
+    "mtime": 1786692779.1666033,
+    "seen": 1787454619.454676,
+    "ast_hash": "52afd68167c60a62f82400b86a197bcc",
+    "semantic_hash": "52afd68167c60a62f82400b86a197bcc"
+  },
+  "app/layout.tsx": {
+    "mtime": 1783922749.5099752,
+    "seen": 1787454619.454676,
+    "ast_hash": "0c4f831230d30e39cde4f49603f3a028",
+    "semantic_hash": "0c4f831230d30e39cde4f49603f3a028"
+  },
+  "app/login/page.tsx": {
+    "mtime": 1783222773.9469473,
+    "seen": 1787454619.454677,
+    "ast_hash": "f16d07e9bbc33d779b097abbfa188807",
+    "semantic_hash": "f16d07e9bbc33d779b097abbfa188807"
+  },
+  "app/movers/page.tsx": {
+    "mtime": 1786692779.167001,
+    "seen": 1787454619.454678,
+    "ast_hash": "6c3d9cc7a1371f95c18b2bb5ecfabc86",
+    "semantic_hash": "6c3d9cc7a1371f95c18b2bb5ecfabc86"
+  },
+  "app/news/page.tsx": {
+    "mtime": 1786692779.1673617,
+    "seen": 1787454619.454678,
+    "ast_hash": "57813320b5fe986a8c2e5af49fec2273",
+    "semantic_hash": "57813320b5fe986a8c2e5af49fec2273"
+  },
+  "app/options/page.tsx": {
+    "mtime": 1786692779.1677494,
+    "seen": 1787454619.454679,
+    "ast_hash": "75e34fc1cbbe52a0500e4c8ab5801396",
+    "semantic_hash": "75e34fc1cbbe52a0500e4c8ab5801396"
+  },
+  "app/page.tsx": {
+    "mtime": 1786692779.1681423,
+    "seen": 1787454619.454679,
+    "ast_hash": "0b4fcc1e970f6757934b6d220dc2f351",
+    "semantic_hash": "0b4fcc1e970f6757934b6d220dc2f351"
+  },
+  "app/portfolio/actions.ts": {
+    "mtime": 1786692779.1685166,
+    "seen": 1787454619.45468,
+    "ast_hash": "e3fae3694cf46b86f92c45f90c9bc866",
+    "semantic_hash": "e3fae3694cf46b86f92c45f90c9bc866"
+  },
+  "app/portfolio/allocation/page.tsx": {
+    "mtime": 1783232320.5828102,
+    "seen": 1787454619.4546812,
+    "ast_hash": "89597fe2ef2d4d08dae72bacfd3067c2",
+    "semantic_hash": "89597fe2ef2d4d08dae72bacfd3067c2"
+  },
+  "app/portfolio/income/page.tsx": {
+    "mtime": 1786692779.168874,
+    "seen": 1787454619.4546812,
+    "ast_hash": "bf68fb98c9cb52683d793f00de40b92b",
+    "semantic_hash": "bf68fb98c9cb52683d793f00de40b92b"
+  },
+  "app/portfolio/page.tsx": {
+    "mtime": 1786604763.3023899,
+    "seen": 1787454619.454682,
+    "ast_hash": "62c143ffb0773821e5b6b687f52be716",
+    "semantic_hash": "62c143ffb0773821e5b6b687f52be716"
+  },
+  "app/portfolio/rebalance/page.tsx": {
+    "mtime": 1786692779.1693304,
+    "seen": 1787454619.454682,
+    "ast_hash": "ee7e0e6405bf332ea2ad8342121e9b98",
+    "semantic_hash": "ee7e0e6405bf332ea2ad8342121e9b98"
+  },
+  "app/portfolio/risk/page.tsx": {
+    "mtime": 1786604763.302593,
+    "seen": 1787454619.4546828,
+    "ast_hash": "37b4a0273b11582fbed6c3ca87dba04a",
+    "semantic_hash": "37b4a0273b11582fbed6c3ca87dba04a"
+  },
+  "app/portfolio/risk/simulations/page.tsx": {
+    "mtime": 1786692779.1696985,
+    "seen": 1787454619.454684,
+    "ast_hash": "035a26631e436e97f498d0fb9db14c43",
+    "semantic_hash": "035a26631e436e97f498d0fb9db14c43"
+  },
+  "app/portfolio/snowball/page.tsx": {
+    "mtime": 1786692779.1702063,
+    "seen": 1787454619.454684,
+    "ast_hash": "f7d8b0db1eb4721ccc821295b1230b04",
+    "semantic_hash": "f7d8b0db1eb4721ccc821295b1230b04"
+  },
+  "app/portfolio/tax-loss/page.tsx": {
+    "mtime": 1786692779.1710174,
+    "seen": 1787454619.454685,
+    "ast_hash": "5d60dc55c6de600262259ad0f968d024",
+    "semantic_hash": "5d60dc55c6de600262259ad0f968d024"
+  },
+  "app/pricing/actions.ts": {
+    "mtime": 1786692779.1716323,
+    "seen": 1787454619.454686,
+    "ast_hash": "9c675eae94ff0c36794ef19feaf08ac7",
+    "semantic_hash": "9c675eae94ff0c36794ef19feaf08ac7"
+  },
+  "app/pricing/page.tsx": {
+    "mtime": 1786692779.1722095,
+    "seen": 1787454619.454686,
+    "ast_hash": "170beaa3e63743fee468980a8ce4700d",
+    "semantic_hash": "170beaa3e63743fee468980a8ce4700d"
+  },
+  "app/pricing/success/page.tsx": {
+    "mtime": 1786692779.1727307,
+    "seen": 1787454619.4546869,
+    "ast_hash": "f1c12b07b83602ca896b2a357ad37967",
+    "semantic_hash": "f1c12b07b83602ca896b2a357ad37967"
+  },
+  "app/screener/page.tsx": {
+    "mtime": 1786692779.1730678,
+    "seen": 1787454619.454688,
+    "ast_hash": "41a3d29a1ac24029a778bd5b40755592",
+    "semantic_hash": "41a3d29a1ac24029a778bd5b40755592"
+  },
+  "app/signup/page.tsx": {
+    "mtime": 1783222447.2722993,
+    "seen": 1787454619.454688,
+    "ast_hash": "7ace4735aa59b63b793a55ff288265fe",
+    "semantic_hash": "7ace4735aa59b63b793a55ff288265fe"
+  },
+  "app/stock/[symbol]/page.tsx": {
+    "mtime": 1786692779.1734867,
+    "seen": 1787454619.454689,
+    "ast_hash": "44c68bd4c60b62b2101cd02640856402",
+    "semantic_hash": "44c68bd4c60b62b2101cd02640856402"
+  },
+  "app/stock/[symbol]/volatility/page.tsx": {
+    "mtime": 1786692779.1738946,
+    "seen": 1787454619.454689,
+    "ast_hash": "a3b6d7bc0835e8484f5ea840e22b304b",
+    "semantic_hash": "a3b6d7bc0835e8484f5ea840e22b304b"
+  },
+  "app/trading/actions.ts": {
+    "mtime": 1786692779.1742976,
+    "seen": 1787454619.45469,
+    "ast_hash": "84cc798166382f10635e2ee407ba710b",
+    "semantic_hash": "84cc798166382f10635e2ee407ba710b"
+  },
+  "app/trading/data.ts": {
+    "mtime": 1783243812.3317485,
+    "seen": 1787454619.4546912,
+    "ast_hash": "56ea654755b19df3915acf9c59c435a8",
+    "semantic_hash": "56ea654755b19df3915acf9c59c435a8"
+  },
+  "app/trading/history/page.tsx": {
+    "mtime": 1786692779.174587,
+    "seen": 1787454619.4546912,
+    "ast_hash": "73eb8c0314b17f1d3e2cb13ea0ceb7a2",
+    "semantic_hash": "73eb8c0314b17f1d3e2cb13ea0ceb7a2"
+  },
+  "app/trading/page.tsx": {
+    "mtime": 1786692779.1748602,
+    "seen": 1787454619.4546921,
+    "ast_hash": "9848d6d4a35c2bdc8ccda4ab2990276f",
+    "semantic_hash": "9848d6d4a35c2bdc8ccda4ab2990276f"
+  },
+  "app/watchlist/actions.ts": {
+    "mtime": 1786692779.175221,
+    "seen": 1787454619.4546921,
+    "ast_hash": "fe61e139c0be7bc617eeedabcd33cf10",
+    "semantic_hash": "fe61e139c0be7bc617eeedabcd33cf10"
+  },
+  "app/watchlist/page.tsx": {
+    "mtime": 1783269858.0071537,
+    "seen": 1787454619.454693,
+    "ast_hash": "c7cc93cb487c12fef864fa05e59312b2",
+    "semantic_hash": "c7cc93cb487c12fef864fa05e59312b2"
+  },
+  "components.json": {
+    "mtime": 1783222361.0609567,
+    "seen": 1787454619.4546938,
+    "ast_hash": "a0238eb4ceb9341a82b6e3640ca96743",
+    "semantic_hash": "a0238eb4ceb9341a82b6e3640ca96743"
+  },
+  "components/alert-dialogs.tsx": {
+    "mtime": 1786692779.1755652,
+    "seen": 1787454619.4546938,
+    "ast_hash": "73b1cdcbe4084253693b2e6f2255814a",
+    "semantic_hash": "73b1cdcbe4084253693b2e6f2255814a"
+  },
+  "components/app-sidebar.tsx": {
+    "mtime": 1783922749.5115194,
+    "seen": 1787454619.454695,
+    "ast_hash": "34a5a741d3656997fa6874b71b3863f8",
+    "semantic_hash": "34a5a741d3656997fa6874b71b3863f8"
+  },
+  "components/calendar-dashboard.tsx": {
+    "mtime": 1786692779.176064,
+    "seen": 1787454619.454695,
+    "ast_hash": "33175e4888b12e77c3405e12a0059d07",
+    "semantic_hash": "33175e4888b12e77c3405e12a0059d07"
+  },
+  "components/change-chip.tsx": {
+    "mtime": 1786692779.1762855,
+    "seen": 1787454619.454696,
+    "ast_hash": "639034e490b91ce66b3e61de3fdc5e89",
+    "semantic_hash": "639034e490b91ce66b3e61de3fdc5e89"
+  },
+  "components/command-palette.tsx": {
+    "mtime": 1786692779.1766393,
+    "seen": 1787454619.454697,
+    "ast_hash": "9440b7cc13726a5440822b0481f8fd4b",
+    "semantic_hash": "9440b7cc13726a5440822b0481f8fd4b"
+  },
+  "components/dcf-calculator.tsx": {
+    "mtime": 1786692779.1770086,
+    "seen": 1787454619.454697,
+    "ast_hash": "c26b8013ca6f7a97a2354fb872f78957",
+    "semantic_hash": "c26b8013ca6f7a97a2354fb872f78957"
+  },
+  "components/dividend-calendar.tsx": {
+    "mtime": 1786692779.1773288,
+    "seen": 1787454619.454698,
+    "ast_hash": "4f2f4530d73632c6fda6eb36b71d2eb3",
+    "semantic_hash": "4f2f4530d73632c6fda6eb36b71d2eb3"
+  },
+  "components/earnings-history.tsx": {
+    "mtime": 1786692779.1776168,
+    "seen": 1787454619.454698,
+    "ast_hash": "7c986cfd624b27f97c759fdf75e20e18",
+    "semantic_hash": "7c986cfd624b27f97c759fdf75e20e18"
+  },
+  "components/equity-chart.tsx": {
+    "mtime": 1786692779.1779802,
+    "seen": 1787454619.454699,
+    "ast_hash": "f58866e3330c68c3634ced265f0d5ebe",
+    "semantic_hash": "f58866e3330c68c3634ced265f0d5ebe"
+  },
+  "components/export-trades-button.tsx": {
+    "mtime": 1786692779.1783085,
+    "seen": 1787454619.4547,
+    "ast_hash": "8ebb4045a62a1ac6097e4cd1568a6de2",
+    "semantic_hash": "8ebb4045a62a1ac6097e4cd1568a6de2"
+  },
+  "components/holding-dialogs.tsx": {
+    "mtime": 1786692779.1787405,
+    "seen": 1787454619.4547,
+    "ast_hash": "fb8db29f426035163f780cc8082afee2",
+    "semantic_hash": "fb8db29f426035163f780cc8082afee2"
+  },
+  "components/idempotency-key-input.tsx": {
+    "mtime": 1786604763.3046687,
+    "seen": 1787454619.454701,
+    "ast_hash": "4f3370b89467db58c560c06674c2f919",
+    "semantic_hash": "4f3370b89467db58c560c06674c2f919"
+  },
+  "components/income-tab.tsx": {
+    "mtime": 1786692779.1790411,
+    "seen": 1787454619.454701,
+    "ast_hash": "440c216e01bc0f219746af3cfec542c2",
+    "semantic_hash": "440c216e01bc0f219746af3cfec542c2"
+  },
+  "components/live-price-display.tsx": {
+    "mtime": 1786692779.1795743,
+    "seen": 1787454619.4547021,
+    "ast_hash": "c40c9d04ba419c1953dcbddec6880dec",
+    "semantic_hash": "c40c9d04ba419c1953dcbddec6880dec"
+  },
+  "components/market-heatmap.tsx": {
+    "mtime": 1786692779.180087,
+    "seen": 1787454619.454703,
+    "ast_hash": "e17df7fb19c28d631d689d9206de85bb",
+    "semantic_hash": "e17df7fb19c28d631d689d9206de85bb"
+  },
+  "components/news-list.tsx": {
+    "mtime": 1786692779.1804414,
+    "seen": 1787454619.454703,
+    "ast_hash": "aaeea2fe466eed958bdd011f6995bbfb",
+    "semantic_hash": "aaeea2fe466eed958bdd011f6995bbfb"
+  },
+  "components/news-tabs.tsx": {
+    "mtime": 1786692779.1806695,
+    "seen": 1787454619.454704,
+    "ast_hash": "e747a90adfda41de25d9241e5420c7ca",
+    "semantic_hash": "e747a90adfda41de25d9241e5420c7ca"
+  },
+  "components/notification-center.tsx": {
+    "mtime": 1786692779.1809924,
+    "seen": 1787454619.454704,
+    "ast_hash": "7f545b392416b7a57e666c8803af5a09",
+    "semantic_hash": "7f545b392416b7a57e666c8803af5a09"
+  },
+  "components/options-calculator.tsx": {
+    "mtime": 1786692779.1812959,
+    "seen": 1787454619.454705,
+    "ast_hash": "29fcfe79d9e118e04dd334da4917dfaa",
+    "semantic_hash": "29fcfe79d9e118e04dd334da4917dfaa"
+  },
+  "components/paper-trade-ticket.tsx": {
+    "mtime": 1786692779.1815934,
+    "seen": 1787454619.454705,
+    "ast_hash": "41a1fa1b76e478844a9d86724e28922e",
+    "semantic_hash": "41a1fa1b76e478844a9d86724e28922e"
+  },
+  "components/pending-submit-button.tsx": {
+    "mtime": 1786604763.3049562,
+    "seen": 1787454619.454706,
+    "ast_hash": "db075cae870d1b6e61951c331704d279",
+    "semantic_hash": "db075cae870d1b6e61951c331704d279"
+  },
+  "components/portfolio-csv-dialogs.tsx": {
+    "mtime": 1786692779.1818883,
+    "seen": 1787454619.454707,
+    "ast_hash": "2bd0651d881c89d1f831a9aa00ec1993",
+    "semantic_hash": "2bd0651d881c89d1f831a9aa00ec1993"
+  },
+  "components/portfolio-history-chart.tsx": {
+    "mtime": 1786692779.1822517,
+    "seen": 1787454619.454707,
+    "ast_hash": "c84ea35cd1cea807fad7d48443b8641e",
+    "semantic_hash": "c84ea35cd1cea807fad7d48443b8641e"
+  },
+  "components/portfolio-tabs.tsx": {
+    "mtime": 1786692779.1826224,
+    "seen": 1787454619.4547079,
+    "ast_hash": "62307d44291d0423a186936122031138",
+    "semantic_hash": "62307d44291d0423a186936122031138"
+  },
+  "components/pricing-submit-button.tsx": {
+    "mtime": 1786604763.3052661,
+    "seen": 1787454619.4547079,
+    "ast_hash": "a7af7822eb1f328784e6ea77725f7313",
+    "semantic_hash": "a7af7822eb1f328784e6ea77725f7313"
+  },
+  "components/rebalance-calculator.tsx": {
+    "mtime": 1786692779.1829221,
+    "seen": 1787454619.454709,
+    "ast_hash": "ce0c45228e3ba221abba0251f3027af4",
+    "semantic_hash": "ce0c45228e3ba221abba0251f3027af4"
+  },
+  "components/reset-account-dialog.tsx": {
+    "mtime": 1783243812.334786,
+    "seen": 1787454619.45471,
+    "ast_hash": "2abb04a418cf25e6fab4f339efea4b98",
+    "semantic_hash": "2abb04a418cf25e6fab4f339efea4b98"
+  },
+  "components/screener-export-button.tsx": {
+    "mtime": 1786692779.1831932,
+    "seen": 1787454619.45471,
+    "ast_hash": "bd07ab3a9ebc45c291f8d05c1dc4b8d2",
+    "semantic_hash": "bd07ab3a9ebc45c291f8d05c1dc4b8d2"
+  },
+  "components/search-box.tsx": {
+    "mtime": 1783243812.3349771,
+    "seen": 1787454619.454711,
+    "ast_hash": "2ff4b16bcee02456910c89203780f808",
+    "semantic_hash": "2ff4b16bcee02456910c89203780f808"
+  },
+  "components/sentiment-panel.tsx": {
+    "mtime": 1786692779.1835327,
+    "seen": 1787454619.454711,
+    "ast_hash": "0fa631b04823135f7015d682e002c4bb",
+    "semantic_hash": "0fa631b04823135f7015d682e002c4bb"
+  },
+  "components/stock-chart.tsx": {
+    "mtime": 1786692779.1839306,
+    "seen": 1787454619.4547122,
+    "ast_hash": "b395bea4c80b3426ce3cf3509c5c7bc6",
+    "semantic_hash": "b395bea4c80b3426ce3cf3509c5c7bc6"
+  },
+  "components/stock-quote-row-cells.tsx": {
+    "mtime": 1786692779.184228,
+    "seen": 1787454619.454713,
+    "ast_hash": "cb63c4dc537c471c7c6e7d692cff9bb8",
+    "semantic_hash": "cb63c4dc537c471c7c6e7d692cff9bb8"
+  },
+  "components/stock-radar-chart.tsx": {
+    "mtime": 1786692779.1845126,
+    "seen": 1787454619.454714,
+    "ast_hash": "f103047097ee6a5dfdccfc4f9752db85",
+    "semantic_hash": "f103047097ee6a5dfdccfc4f9752db85"
+  },
+  "components/sync-portfolio-control.tsx": {
+    "mtime": 1786692779.1847532,
+    "seen": 1787454619.454714,
+    "ast_hash": "9fd8abd8e847d5bdf4477aceda5a67bc",
+    "semantic_hash": "9fd8abd8e847d5bdf4477aceda5a67bc"
+  },
+  "components/tax-loss-assistant.tsx": {
+    "mtime": 1786692779.1850352,
+    "seen": 1787454619.4547148,
+    "ast_hash": "6c22a45517a2fabdbc7582f861e9c2f0",
+    "semantic_hash": "6c22a45517a2fabdbc7582f861e9c2f0"
+  },
+  "components/theme-provider.tsx": {
+    "mtime": 1783223099.8997476,
+    "seen": 1787454619.4547148,
+    "ast_hash": "48f7be828685a7896b95e06044d237c4",
+    "semantic_hash": "48f7be828685a7896b95e06044d237c4"
+  },
+  "components/theme-toggle.tsx": {
+    "mtime": 1783227939.7421732,
+    "seen": 1787454619.454716,
+    "ast_hash": "d77bd5117abcdcaf0a8f95ef676849f4",
+    "semantic_hash": "d77bd5117abcdcaf0a8f95ef676849f4"
+  },
+  "components/topbar.tsx": {
+    "mtime": 1786692779.1852741,
+    "seen": 1787454619.454717,
+    "ast_hash": "4142035607ee43efd50f4f22f2bf1794",
+    "semantic_hash": "4142035607ee43efd50f4f22f2bf1794"
+  },
+  "components/trade-log-table.tsx": {
+    "mtime": 1786692779.1855345,
+    "seen": 1787454619.454717,
+    "ast_hash": "c395087425e673caa051ea54ca674ed0",
+    "semantic_hash": "c395087425e673caa051ea54ca674ed0"
+  },
+  "components/trade-submit-buttons.tsx": {
+    "mtime": 1786604763.3053722,
+    "seen": 1787454619.4547179,
+    "ast_hash": "aec5e445fb1baa2a75f4b1734bf58955",
+    "semantic_hash": "aec5e445fb1baa2a75f4b1734bf58955"
+  },
+  "components/ui/badge.tsx": {
+    "mtime": 1783222375.9695733,
+    "seen": 1787454619.4547179,
+    "ast_hash": "633c33997e6137921ae433dd2dd0cb31",
+    "semantic_hash": "633c33997e6137921ae433dd2dd0cb31"
+  },
+  "components/ui/button.tsx": {
+    "mtime": 1783222375.7081988,
+    "seen": 1787454619.454719,
+    "ast_hash": "37ff09090166aa7d6fae96e0b081e492",
+    "semantic_hash": "37ff09090166aa7d6fae96e0b081e492"
+  },
+  "components/ui/card.tsx": {
+    "mtime": 1783222375.7478435,
+    "seen": 1787454619.45472,
+    "ast_hash": "bd5f88ad2d983dd6c4561d63824c80ba",
+    "semantic_hash": "bd5f88ad2d983dd6c4561d63824c80ba"
+  },
+  "components/ui/dialog.tsx": {
+    "mtime": 1783222376.1168032,
+    "seen": 1787454619.45472,
+    "ast_hash": "e01132db6e9067b7b8cc2e322fdd34ff",
+    "semantic_hash": "e01132db6e9067b7b8cc2e322fdd34ff"
+  },
+  "components/ui/dropdown-menu.tsx": {
+    "mtime": 1783222375.9094615,
+    "seen": 1787454619.454721,
+    "ast_hash": "63fc04368c0f92980d3ab4ae34f01a18",
+    "semantic_hash": "63fc04368c0f92980d3ab4ae34f01a18"
+  },
+  "components/ui/input.tsx": {
+    "mtime": 1783222375.778763,
+    "seen": 1787454619.454721,
+    "ast_hash": "2b0e9e810580f227dd255d9b78a83835",
+    "semantic_hash": "2b0e9e810580f227dd255d9b78a83835"
+  },
+  "components/ui/label.tsx": {
+    "mtime": 1783222375.809367,
+    "seen": 1787454619.4547222,
+    "ast_hash": "e7e0c4ad98f3485ecd3c0ca516d0a8bf",
+    "semantic_hash": "e7e0c4ad98f3485ecd3c0ca516d0a8bf"
+  },
+  "components/ui/separator.tsx": {
+    "mtime": 1783222376.0760257,
+    "seen": 1787454619.4547231,
+    "ast_hash": "f57449eae78fbd87d99e4edc45ab3c1e",
+    "semantic_hash": "f57449eae78fbd87d99e4edc45ab3c1e"
+  },
+  "components/ui/skeleton.tsx": {
+    "mtime": 1783222375.9397323,
+    "seen": 1787454619.4547231,
+    "ast_hash": "0e6e825c43d858d98c9903f4da975382",
+    "semantic_hash": "0e6e825c43d858d98c9903f4da975382"
+  },
+  "components/ui/sonner.tsx": {
+    "mtime": 1783222376.0458481,
+    "seen": 1787454619.454724,
+    "ast_hash": "f46214bc2a6a5153a6e04fad523d5587",
+    "semantic_hash": "f46214bc2a6a5153a6e04fad523d5587"
+  },
+  "components/ui/table.tsx": {
+    "mtime": 1783222375.8411207,
+    "seen": 1787454619.454724,
+    "ast_hash": "44f87727e60080863edb00fdd2fcd8da",
+    "semantic_hash": "44f87727e60080863edb00fdd2fcd8da"
+  },
+  "components/ui/tabs.tsx": {
+    "mtime": 1783222376.001761,
+    "seen": 1787454619.454725,
+    "ast_hash": "485d47f9e6f866e564685e6584e1e747",
+    "semantic_hash": "485d47f9e6f866e564685e6584e1e747"
+  },
+  "components/watchlist-sparkline.tsx": {
+    "mtime": 1786692779.1857593,
+    "seen": 1787454619.454725,
+    "ast_hash": "a8cbb7e57b9635791cd40e5a06a4ccde",
+    "semantic_hash": "a8cbb7e57b9635791cd40e5a06a4ccde"
+  },
+  "eslint.config.mjs": {
+    "mtime": 1783225211.461624,
+    "seen": 1787454619.454726,
+    "ast_hash": "0e52e0390a0add7b0715cd601a6f1837",
+    "semantic_hash": "0e52e0390a0add7b0715cd601a6f1837"
+  },
+  "hooks/useLivePrice.ts": {
+    "mtime": 1786604763.3058152,
+    "seen": 1787454619.454727,
+    "ast_hash": "8becd4c5b06291901648c07fac97abb4",
+    "semantic_hash": "8becd4c5b06291901648c07fac97abb4"
+  },
+  "lib/alerts.test.mjs": {
+    "mtime": 1786604763.3060236,
+    "seen": 1787454619.454727,
+    "ast_hash": "61a5b00cd22a07da76d625289d6ae59b",
+    "semantic_hash": "61a5b00cd22a07da76d625289d6ae59b"
+  },
+  "lib/alerts.ts": {
+    "mtime": 1786604763.3062234,
+    "seen": 1787454619.454728,
+    "ast_hash": "d842c411d602d7749120b7b95e2c6c3a",
+    "semantic_hash": "d842c411d602d7749120b7b95e2c6c3a"
+  },
+  "lib/allocation.test.mjs": {
+    "mtime": 1784318127.1846561,
+    "seen": 1787454619.454728,
+    "ast_hash": "42fee7e3be98fe184c258c22c3a13be1",
+    "semantic_hash": "42fee7e3be98fe184c258c22c3a13be1"
+  },
+  "lib/allocation.ts": {
+    "mtime": 1783232339.2017376,
+    "seen": 1787454619.4547288,
+    "ast_hash": "6640d6b860333c450ecfd8d52acb44ba",
+    "semantic_hash": "6640d6b860333c450ecfd8d52acb44ba"
+  },
+  "lib/app-url.test.mjs": {
+    "mtime": 1784318127.1850204,
+    "seen": 1787454619.4547288,
+    "ast_hash": "555dd1235fb2beddc61f78473b1d78f8",
+    "semantic_hash": "555dd1235fb2beddc61f78473b1d78f8"
+  },
+  "lib/app-url.ts": {
+    "mtime": 1784318127.1854613,
+    "seen": 1787454619.45473,
+    "ast_hash": "837c9da4311d10fa2cf1dc9b30650a10",
+    "semantic_hash": "837c9da4311d10fa2cf1dc9b30650a10"
+  },
+  "lib/backtester.test.mjs": {
+    "mtime": 1786604763.3064408,
+    "seen": 1787454619.454731,
+    "ast_hash": "f1945a20fa06538a682cc6b9d1a642e6",
+    "semantic_hash": "f1945a20fa06538a682cc6b9d1a642e6"
+  },
+  "lib/backtester.ts": {
+    "mtime": 1786692779.1870456,
+    "seen": 1787454619.454731,
+    "ast_hash": "1f983990231e2fe4b5d1b145bb4d67a6",
+    "semantic_hash": "1f983990231e2fe4b5d1b145bb4d67a6"
+  },
+  "lib/billing-state.test.mjs": {
+    "mtime": 1784318127.1859157,
+    "seen": 1787454619.454732,
+    "ast_hash": "db82ba5f166416f056e1a2e633045744",
+    "semantic_hash": "db82ba5f166416f056e1a2e633045744"
+  },
+  "lib/billing-state.ts": {
+    "mtime": 1786692779.1876094,
+    "seen": 1787454619.454732,
+    "ast_hash": "a2a1a54fb88e8f86e7001dfb83289c73",
+    "semantic_hash": "a2a1a54fb88e8f86e7001dfb83289c73"
+  },
+  "lib/billing.test.mjs": {
+    "mtime": 1786604763.3068452,
+    "seen": 1787454619.4547331,
+    "ast_hash": "a0bd234b1f6a5bcff14b8a696fd7dc4e",
+    "semantic_hash": "a0bd234b1f6a5bcff14b8a696fd7dc4e"
+  },
+  "lib/billing.ts": {
+    "mtime": 1786604763.3070066,
+    "seen": 1787454619.454734,
+    "ast_hash": "dd9abcbe83305c1f6347ad7c42244f52",
+    "semantic_hash": "dd9abcbe83305c1f6347ad7c42244f52"
+  },
+  "lib/calendar.test.mjs": {
+    "mtime": 1786604763.307237,
+    "seen": 1787454619.454734,
+    "ast_hash": "b1fda9d8986747d0a29ac252e1097d7d",
+    "semantic_hash": "b1fda9d8986747d0a29ac252e1097d7d"
+  },
+  "lib/calendar.ts": {
+    "mtime": 1786692779.1879556,
+    "seen": 1787454619.454735,
+    "ast_hash": "342e722dea5e1d361374d2e65eff82ac",
+    "semantic_hash": "342e722dea5e1d361374d2e65eff82ac"
+  },
+  "lib/compare.test.mjs": {
+    "mtime": 1784318127.1866019,
+    "seen": 1787454619.454735,
+    "ast_hash": "68a1646fb15cb41ef3562f745a805c39",
+    "semantic_hash": "68a1646fb15cb41ef3562f745a805c39"
+  },
+  "lib/compare.ts": {
+    "mtime": 1786604763.307582,
+    "seen": 1787454619.4547358,
+    "ast_hash": "54f322f98b6d552b53eb5975790b0cf9",
+    "semantic_hash": "54f322f98b6d552b53eb5975790b0cf9"
+  },
+  "lib/correlation.test.mjs": {
+    "mtime": 1786604763.307787,
+    "seen": 1787454619.454737,
+    "ast_hash": "387f5ae6de1992613423248a7987d936",
+    "semantic_hash": "387f5ae6de1992613423248a7987d936"
+  },
+  "lib/correlation.ts": {
+    "mtime": 1786604763.3079684,
+    "seen": 1787454619.454737,
+    "ast_hash": "aed271c0282aa5ac4186ad857c36fc20",
+    "semantic_hash": "aed271c0282aa5ac4186ad857c36fc20"
+  },
+  "lib/dashboard.test.mjs": {
+    "mtime": 1783227009.5137467,
+    "seen": 1787454619.454738,
+    "ast_hash": "ceb9ac6af967ac3a777e4b07e5fb9928",
+    "semantic_hash": "ceb9ac6af967ac3a777e4b07e5fb9928"
+  },
+  "lib/dashboard.ts": {
+    "mtime": 1783243812.3373268,
+    "seen": 1787454619.454738,
+    "ast_hash": "7aa6a21645720d04931969ec4c7dce67",
+    "semantic_hash": "7aa6a21645720d04931969ec4c7dce67"
+  },
+  "lib/dividend-forecast.test.mjs": {
+    "mtime": 1786692779.188251,
+    "seen": 1787454619.4547389,
+    "ast_hash": "70912bfa09a011df2ab7028877380014",
+    "semantic_hash": "70912bfa09a011df2ab7028877380014"
+  },
+  "lib/dividend-forecast.ts": {
+    "mtime": 1786692779.1885478,
+    "seen": 1787454619.4547389,
+    "ast_hash": "59c1d6c7d6709bd7069eff7307151d8e",
+    "semantic_hash": "59c1d6c7d6709bd7069eff7307151d8e"
+  },
+  "lib/download-csv.test.mjs": {
+    "mtime": 1786692779.1887765,
+    "seen": 1787454619.45474,
+    "ast_hash": "99b4efd615facadcae2ba02fae4595f6",
+    "semantic_hash": "99b4efd615facadcae2ba02fae4595f6"
+  },
+  "lib/download-csv.ts": {
+    "mtime": 1786692779.1890712,
+    "seen": 1787454619.454741,
+    "ast_hash": "061ba3c2f54675ee1263c2c2defd1ed3",
+    "semantic_hash": "061ba3c2f54675ee1263c2c2defd1ed3"
+  },
+  "lib/earnings.test.mjs": {
+    "mtime": 1786692779.1893218,
+    "seen": 1787454619.454741,
+    "ast_hash": "4a2f696cf44f8de50d89cdcda5e4d7bf",
+    "semantic_hash": "4a2f696cf44f8de50d89cdcda5e4d7bf"
+  },
+  "lib/earnings.ts": {
+    "mtime": 1786692779.1895866,
+    "seen": 1787454619.454742,
+    "ast_hash": "cd19e45cb76cd0271da1907bedd22574",
+    "semantic_hash": "cd19e45cb76cd0271da1907bedd22574"
+  },
+  "lib/format.test.mjs": {
+    "mtime": 1786604763.3081715,
+    "seen": 1787454619.454742,
+    "ast_hash": "5abf6a9566c97927280031e6d45b8064",
+    "semantic_hash": "5abf6a9566c97927280031e6d45b8064"
+  },
+  "lib/format.ts": {
+    "mtime": 1786604763.3083606,
+    "seen": 1787454619.4547431,
+    "ast_hash": "efcc434f93b3338edc7a73ad1a203bbe",
+    "semantic_hash": "efcc434f93b3338edc7a73ad1a203bbe"
+  },
+  "lib/heatmap.test.mjs": {
+    "mtime": 1786692779.1897588,
+    "seen": 1787454619.454744,
+    "ast_hash": "c736aab2ba119ab93d4ba050f9609295",
+    "semantic_hash": "c736aab2ba119ab93d4ba050f9609295"
+  },
+  "lib/heatmap.ts": {
+    "mtime": 1786692779.1899178,
+    "seen": 1787454619.454744,
+    "ast_hash": "cb0b406f68b2bd7f1303fe3fc481f5d5",
+    "semantic_hash": "cb0b406f68b2bd7f1303fe3fc481f5d5"
+  },
+  "lib/income.test.mjs": {
+    "mtime": 1786604763.3085263,
+    "seen": 1787454619.454745,
+    "ast_hash": "7b360cc4c8358802b4dab7a5b3f258d4",
+    "semantic_hash": "7b360cc4c8358802b4dab7a5b3f258d4"
+  },
+  "lib/income.ts": {
+    "mtime": 1786604763.3086755,
+    "seen": 1787454619.454745,
+    "ast_hash": "dcbe65adcab5a2ae1745155977f0fd87",
+    "semantic_hash": "dcbe65adcab5a2ae1745155977f0fd87"
+  },
+  "lib/live-price.test.mjs": {
+    "mtime": 1784318127.187237,
+    "seen": 1787454619.454746,
+    "ast_hash": "98c24add6b397f2c11da32efd24cad8b",
+    "semantic_hash": "98c24add6b397f2c11da32efd24cad8b"
+  },
+  "lib/live-price.ts": {
+    "mtime": 1783227084.684487,
+    "seen": 1787454619.454747,
+    "ast_hash": "40f51a5c31f2c1f5c20b06dc90e76ca7",
+    "semantic_hash": "40f51a5c31f2c1f5c20b06dc90e76ca7"
+  },
+  "lib/market/finnhub.test.mjs": {
+    "mtime": 1786692779.1902819,
+    "seen": 1787454619.454747,
+    "ast_hash": "2a7d3e8f57cd8cd73b92a71d4bb259b1",
+    "semantic_hash": "2a7d3e8f57cd8cd73b92a71d4bb259b1"
+  },
+  "lib/market/finnhub.ts": {
+    "mtime": 1786692779.190668,
+    "seen": 1787454619.454748,
+    "ast_hash": "6fd937a2d4a717ee8e65bfe4f0f28e9e",
+    "semantic_hash": "6fd937a2d4a717ee8e65bfe4f0f28e9e"
+  },
+  "lib/market/indicators.test.mjs": {
+    "mtime": 1786692779.1911628,
+    "seen": 1787454619.454748,
+    "ast_hash": "49adc3731745728ff7ccc5bbf6303ca7",
+    "semantic_hash": "49adc3731745728ff7ccc5bbf6303ca7"
+  },
+  "lib/market/indicators.ts": {
+    "mtime": 1786692779.191439,
+    "seen": 1787454619.4547489,
+    "ast_hash": "b81de4e59267033e0de8eee583e7a862",
+    "semantic_hash": "b81de4e59267033e0de8eee583e7a862"
+  },
+  "lib/market/twelvedata.test.mjs": {
+    "mtime": 1784318127.18806,
+    "seen": 1787454619.45475,
+    "ast_hash": "5490cb4303df07a5594455029b0d756c",
+    "semantic_hash": "5490cb4303df07a5594455029b0d756c"
+  },
+  "lib/market/twelvedata.ts": {
+    "mtime": 1786692779.192001,
+    "seen": 1787454619.45475,
+    "ast_hash": "6a3ac19741580c311dcc4b10db16d211",
+    "semantic_hash": "6a3ac19741580c311dcc4b10db16d211"
+  },
+  "lib/market/types.ts": {
+    "mtime": 1784318127.188565,
+    "seen": 1787454619.454751,
+    "ast_hash": "998ff279c62824ee4446ad8deb513832",
+    "semantic_hash": "998ff279c62824ee4446ad8deb513832"
+  },
+  "lib/migrations.test.mjs": {
+    "mtime": 1786604763.3097975,
+    "seen": 1787454619.454751,
+    "ast_hash": "8aa728376e55893c37f55e539f77cc6f",
+    "semantic_hash": "8aa728376e55893c37f55e539f77cc6f"
+  },
+  "lib/monte-carlo.test.mjs": {
+    "mtime": 1786692779.1924093,
+    "seen": 1787454619.454752,
+    "ast_hash": "4e197318e2980d48127d1cc3a8823a74",
+    "semantic_hash": "4e197318e2980d48127d1cc3a8823a74"
+  },
+  "lib/monte-carlo.ts": {
+    "mtime": 1783922749.5145535,
+    "seen": 1787454619.454753,
+    "ast_hash": "0b286667efa0a93d2761e86202cd75e3",
+    "semantic_hash": "0b286667efa0a93d2761e86202cd75e3"
+  },
+  "lib/movers.test.mjs": {
+    "mtime": 1784318127.1888165,
+    "seen": 1787454619.454753,
+    "ast_hash": "e9f7d58f02776aa259318a5fa17998e9",
+    "semantic_hash": "e9f7d58f02776aa259318a5fa17998e9"
+  },
+  "lib/movers.ts": {
+    "mtime": 1783231298.9735546,
+    "seen": 1787454619.454754,
+    "ast_hash": "bb798f88d08e8e1b1c1b30f81cb3a0f3",
+    "semantic_hash": "bb798f88d08e8e1b1c1b30f81cb3a0f3"
+  },
+  "lib/news-sentiment.test.mjs": {
+    "mtime": 1784318127.1890538,
+    "seen": 1787454619.454754,
+    "ast_hash": "9c2b7a37e6bdf419198774d2e2c93a0a",
+    "semantic_hash": "9c2b7a37e6bdf419198774d2e2c93a0a"
+  },
+  "lib/news-sentiment.ts": {
+    "mtime": 1786692779.19279,
+    "seen": 1787454619.454755,
+    "ast_hash": "16218ffe079122badabc2e5ac76efb40",
+    "semantic_hash": "16218ffe079122badabc2e5ac76efb40"
+  },
+  "lib/notifications.test.mjs": {
+    "mtime": 1786692779.192962,
+    "seen": 1787454619.454755,
+    "ast_hash": "db08c7bd9f9c755b7dbca86fbba6f5de",
+    "semantic_hash": "db08c7bd9f9c755b7dbca86fbba6f5de"
+  },
+  "lib/notifications.ts": {
+    "mtime": 1786692779.1931486,
+    "seen": 1787454619.454756,
+    "ast_hash": "f964c8f0b29e7ee08bfd65688e93fe80",
+    "semantic_hash": "f964c8f0b29e7ee08bfd65688e93fe80"
+  },
+  "lib/options-payoff.test.mjs": {
+    "mtime": 1786692779.1934524,
+    "seen": 1787454619.4547572,
+    "ast_hash": "72d21919a4c39507e7a6b718d89a3736",
+    "semantic_hash": "72d21919a4c39507e7a6b718d89a3736"
+  },
+  "lib/options-payoff.ts": {
+    "mtime": 1786692779.1938233,
+    "seen": 1787454619.4547572,
+    "ast_hash": "8682c8d52e33fbead5eb7f52c4679aca",
+    "semantic_hash": "8682c8d52e33fbead5eb7f52c4679aca"
+  },
+  "lib/paper-trading.test.mjs": {
+    "mtime": 1786692779.1940942,
+    "seen": 1787454619.454758,
+    "ast_hash": "9434c12affbb427b7d41d00735368e0d",
+    "semantic_hash": "9434c12affbb427b7d41d00735368e0d"
+  },
+  "lib/paper-trading.ts": {
+    "mtime": 1786692779.1943495,
+    "seen": 1787454619.454758,
+    "ast_hash": "da5602f46d6c317232ee1661a9172fbc",
+    "semantic_hash": "da5602f46d6c317232ee1661a9172fbc"
+  },
+  "lib/parse.test.mjs": {
+    "mtime": 1786692779.194714,
+    "seen": 1787454619.454759,
+    "ast_hash": "fbbc8aeef63f89b84b1c3391aa568281",
+    "semantic_hash": "fbbc8aeef63f89b84b1c3391aa568281"
+  },
+  "lib/parse.ts": {
+    "mtime": 1786604763.3101177,
+    "seen": 1787454619.4547598,
+    "ast_hash": "953daba06cbf3db797a2f036c381e2a5",
+    "semantic_hash": "953daba06cbf3db797a2f036c381e2a5"
+  },
+  "lib/portfolio-csv.test.mjs": {
+    "mtime": 1786692779.194894,
+    "seen": 1787454619.4547598,
+    "ast_hash": "5426e550a9b044acd6c6112ca497700c",
+    "semantic_hash": "5426e550a9b044acd6c6112ca497700c"
+  },
+  "lib/portfolio-csv.ts": {
+    "mtime": 1786692779.195197,
+    "seen": 1787454619.454761,
+    "ast_hash": "7970a50815eafe4bd7cd6a19098b4dee",
+    "semantic_hash": "7970a50815eafe4bd7cd6a19098b4dee"
+  },
+  "lib/portfolio-history.test.mjs": {
+    "mtime": 1786604763.3103116,
+    "seen": 1787454619.454761,
+    "ast_hash": "01149078d9a2c0a406f966f4d5f22eef",
+    "semantic_hash": "01149078d9a2c0a406f966f4d5f22eef"
+  },
+  "lib/portfolio-history.ts": {
+    "mtime": 1786692779.195611,
+    "seen": 1787454619.454762,
+    "ast_hash": "b596f33f962d36d55bc0ff0157a927d4",
+    "semantic_hash": "b596f33f962d36d55bc0ff0157a927d4"
+  },
+  "lib/portfolio-server.ts": {
+    "mtime": 1786692779.1958842,
+    "seen": 1787454619.454763,
+    "ast_hash": "57b35abeb055f317214a7772f336e2d6",
+    "semantic_hash": "57b35abeb055f317214a7772f336e2d6"
+  },
+  "lib/portfolio.test.mjs": {
+    "mtime": 1786692779.196256,
+    "seen": 1787454619.454763,
+    "ast_hash": "cb800f51300a950d825ebf2473b2a2b6",
+    "semantic_hash": "cb800f51300a950d825ebf2473b2a2b6"
+  },
+  "lib/portfolio.ts": {
+    "mtime": 1786692779.1966603,
+    "seen": 1787454619.4547698,
+    "ast_hash": "634489d29b765fc029b26a756a63195d",
+    "semantic_hash": "634489d29b765fc029b26a756a63195d"
+  },
+  "lib/proxy.test.mjs": {
+    "mtime": 1786692779.196908,
+    "seen": 1787454619.4547698,
+    "ast_hash": "ddb719b32c8e94fc3f296b262f68a70d",
+    "semantic_hash": "ddb719b32c8e94fc3f296b262f68a70d"
+  },
+  "lib/quote-response.test.mjs": {
+    "mtime": 1783269858.010926,
+    "seen": 1787454619.454771,
+    "ast_hash": "3719b62543d3545ef2cd594a0152af17",
+    "semantic_hash": "3719b62543d3545ef2cd594a0152af17"
+  },
+  "lib/quote-response.ts": {
+    "mtime": 1783269858.0111156,
+    "seen": 1787454619.454772,
+    "ast_hash": "51cfd5dd993fdce00ff0bda6fcc84a61",
+    "semantic_hash": "51cfd5dd993fdce00ff0bda6fcc84a61"
+  },
+  "lib/rebalancer.test.mjs": {
+    "mtime": 1786692779.1971765,
+    "seen": 1787454619.454772,
+    "ast_hash": "5ab4815d4ab1a369ad9bfbef5105eb3a",
+    "semantic_hash": "5ab4815d4ab1a369ad9bfbef5105eb3a"
+  },
+  "lib/rebalancer.ts": {
+    "mtime": 1786692779.1974235,
+    "seen": 1787454619.454773,
+    "ast_hash": "5033accda4a7b12e522df9c314a934d8",
+    "semantic_hash": "5033accda4a7b12e522df9c314a934d8"
+  },
+  "lib/risk.test.mjs": {
+    "mtime": 1786604763.3108947,
+    "seen": 1787454619.454773,
+    "ast_hash": "ed569411bef431228490f3eabc1f169a",
+    "semantic_hash": "ed569411bef431228490f3eabc1f169a"
+  },
+  "lib/risk.ts": {
+    "mtime": 1786604763.3110576,
+    "seen": 1787454619.454774,
+    "ast_hash": "259bea97254b97c601be31a23d92cf5d",
+    "semantic_hash": "259bea97254b97c601be31a23d92cf5d"
+  },
+  "lib/saved-comparisons.test.mjs": {
+    "mtime": 1783274448.2751184,
+    "seen": 1787454619.454775,
+    "ast_hash": "bec9ac94873eea4eea77cdd7853da526",
+    "semantic_hash": "bec9ac94873eea4eea77cdd7853da526"
+  },
+  "lib/saved-comparisons.ts": {
+    "mtime": 1786604763.3112352,
+    "seen": 1787454619.454775,
+    "ast_hash": "5807e7278a2f94c43a030996880cf4c6",
+    "semantic_hash": "5807e7278a2f94c43a030996880cf4c6"
+  },
+  "lib/screener-server.ts": {
+    "mtime": 1786692779.1976686,
+    "seen": 1787454619.454776,
+    "ast_hash": "72fbc05b1727b62c3ed93653c5c45a49",
+    "semantic_hash": "72fbc05b1727b62c3ed93653c5c45a49"
+  },
+  "lib/screener.test.mjs": {
+    "mtime": 1786692779.1980143,
+    "seen": 1787454619.454776,
+    "ast_hash": "b752f8eeceb2c79bcfe0fcffa4e72c5b",
+    "semantic_hash": "b752f8eeceb2c79bcfe0fcffa4e72c5b"
+  },
+  "lib/screener.ts": {
+    "mtime": 1786692779.198362,
+    "seen": 1787454619.454777,
+    "ast_hash": "e1562478e73e9684dea7105dfa577c72",
+    "semantic_hash": "e1562478e73e9684dea7105dfa577c72"
+  },
+  "lib/snowball.test.mjs": {
+    "mtime": 1786604763.3117967,
+    "seen": 1787454619.4547782,
+    "ast_hash": "9086738278bcf8b262c68babdf5f11e1",
+    "semantic_hash": "9086738278bcf8b262c68babdf5f11e1"
+  },
+  "lib/snowball.ts": {
+    "mtime": 1786604763.311968,
+    "seen": 1787454619.4547782,
+    "ast_hash": "2fc4c5db8150f4c8331fe9fa8a4a8332",
+    "semantic_hash": "2fc4c5db8150f4c8331fe9fa8a4a8332"
+  },
+  "lib/stock-display.test.mjs": {
+    "mtime": 1784318127.1897945,
+    "seen": 1787454619.454779,
+    "ast_hash": "e7ad8e8923962b9f407012ba0d9e245b",
+    "semantic_hash": "e7ad8e8923962b9f407012ba0d9e245b"
+  },
+  "lib/stock-display.ts": {
+    "mtime": 1783243812.3396876,
+    "seen": 1787454619.454779,
+    "ast_hash": "99213a2c30f45873561bb590b84e9399",
+    "semantic_hash": "99213a2c30f45873561bb590b84e9399"
+  },
+  "lib/stock-radar.test.mjs": {
+    "mtime": 1786692779.1986215,
+    "seen": 1787454619.4547799,
+    "ast_hash": "d76519926231b2a78cce93a6cfc97f8d",
+    "semantic_hash": "d76519926231b2a78cce93a6cfc97f8d"
+  },
+  "lib/stock-radar.ts": {
+    "mtime": 1786692779.1989813,
+    "seen": 1787454619.4547808,
+    "ast_hash": "2133e17aad551e152245c3161edd10f0",
+    "semantic_hash": "2133e17aad551e152245c3161edd10f0"
+  },
+  "lib/stripe.test.mjs": {
+    "mtime": 1786692779.199225,
+    "seen": 1787454619.4547808,
+    "ast_hash": "172ebeec6d1b842a0015c28f8bab2ef0",
+    "semantic_hash": "172ebeec6d1b842a0015c28f8bab2ef0"
+  },
+  "lib/stripe.ts": {
+    "mtime": 1786692779.1994243,
+    "seen": 1787454619.454782,
+    "ast_hash": "410e83f14d94ad700b86cb4ecb5454d4",
+    "semantic_hash": "410e83f14d94ad700b86cb4ecb5454d4"
+  },
+  "lib/supabase.test.mjs": {
+    "mtime": 1786692779.1996589,
+    "seen": 1787454619.454782,
+    "ast_hash": "db4fdf9fb71c0ad7b1b5dbf2afa48ecd",
+    "semantic_hash": "db4fdf9fb71c0ad7b1b5dbf2afa48ecd"
+  },
+  "lib/supabase/admin.ts": {
+    "mtime": 1783269858.011597,
+    "seen": 1787454619.454783,
+    "ast_hash": "368e826d2907c874859df1b87402a2f6",
+    "semantic_hash": "368e826d2907c874859df1b87402a2f6"
+  },
+  "lib/supabase/client.ts": {
+    "mtime": 1783222407.845874,
+    "seen": 1787454619.454783,
+    "ast_hash": "5453d99289cf630306e5030428c0fc33",
+    "semantic_hash": "5453d99289cf630306e5030428c0fc33"
+  },
+  "lib/supabase/server.ts": {
+    "mtime": 1786692779.2000082,
+    "seen": 1787454619.454784,
+    "ast_hash": "acc9f5bc81b8484a768bd6fed2beaa2d",
+    "semantic_hash": "acc9f5bc81b8484a768bd6fed2beaa2d"
+  },
+  "lib/symbol.test.mjs": {
+    "mtime": 1786604763.3124034,
+    "seen": 1787454619.454785,
+    "ast_hash": "36ce659f255df2bea4e26e17524880a5",
+    "semantic_hash": "36ce659f255df2bea4e26e17524880a5"
+  },
+  "lib/symbol.ts": {
+    "mtime": 1786604763.3125153,
+    "seen": 1787454619.454785,
+    "ast_hash": "1e00d7163dd622ef2ae6c4ab2bbd7748",
+    "semantic_hash": "1e00d7163dd622ef2ae6c4ab2bbd7748"
+  },
+  "lib/tax-harvesting.test.mjs": {
+    "mtime": 1786692779.2002554,
+    "seen": 1787454619.454786,
+    "ast_hash": "6fff589e8d2d73e6e4469c06234cb3de",
+    "semantic_hash": "6fff589e8d2d73e6e4469c06234cb3de"
+  },
+  "lib/tax-harvesting.ts": {
+    "mtime": 1786692779.200456,
+    "seen": 1787454619.454786,
+    "ast_hash": "80593b94d16789c7771d9e718d85e2f4",
+    "semantic_hash": "80593b94d16789c7771d9e718d85e2f4"
+  },
+  "lib/trading-data.test.mjs": {
+    "mtime": 1786692779.200717,
+    "seen": 1787454619.454787,
+    "ast_hash": "a4ff81861084fa21b730beff103488f9",
+    "semantic_hash": "a4ff81861084fa21b730beff103488f9"
+  },
+  "lib/utils.test.mjs": {
+    "mtime": 1783236390.2415805,
+    "seen": 1787454619.4547882,
+    "ast_hash": "449d8f28e3a7050f84b0a4a5fe8c1068",
+    "semantic_hash": "449d8f28e3a7050f84b0a4a5fe8c1068"
+  },
+  "lib/utils.ts": {
+    "mtime": 1783222366.232478,
+    "seen": 1787454619.4547882,
+    "ast_hash": "5a6fd53fdcf2be529e9cc0b718fde352",
+    "semantic_hash": "5a6fd53fdcf2be529e9cc0b718fde352"
+  },
+  "lib/volatility.test.mjs": {
+    "mtime": 1783236927.6244178,
+    "seen": 1787454619.4547892,
+    "ast_hash": "c733c4681c8b0871ab542c9d5b2bf6f5",
+    "semantic_hash": "c733c4681c8b0871ab542c9d5b2bf6f5"
+  },
+  "lib/volatility.ts": {
+    "mtime": 1783236924.380028,
+    "seen": 1787454619.4547892,
+    "ast_hash": "3a930b86ad2895902fc143995107f002",
+    "semantic_hash": "3a930b86ad2895902fc143995107f002"
+  },
+  "lib/watchlist.test.mjs": {
+    "mtime": 1784318127.1905463,
+    "seen": 1787454619.4547899,
+    "ast_hash": "e2f62d900c143973c6bf494659eccf94",
+    "semantic_hash": "e2f62d900c143973c6bf494659eccf94"
+  },
+  "lib/watchlist.ts": {
+    "mtime": 1786604763.3127046,
+    "seen": 1787454619.4547908,
+    "ast_hash": "bbdf067e4dc971268597f06b58e9b21f",
+    "semantic_hash": "bbdf067e4dc971268597f06b58e9b21f"
+  },
+  "next.config.ts": {
+    "mtime": 1783222208.4191115,
+    "seen": 1787454619.4547908,
+    "ast_hash": "9b77af189a21a7a64e4bd7a426f64176",
+    "semantic_hash": "9b77af189a21a7a64e4bd7a426f64176"
+  },
+  "package.json": {
+    "mtime": 1787454407.6032634,
+    "seen": 1787454619.454792,
+    "ast_hash": "1c416c4b460219d3a05940c3e4719203",
+    "semantic_hash": "1c416c4b460219d3a05940c3e4719203"
+  },
+  "postcss.config.mjs": {
+    "mtime": 1783222208.419147,
+    "seen": 1787454619.454792,
+    "ast_hash": "239f3ebf717465dc636818a1a619398d",
+    "semantic_hash": "239f3ebf717465dc636818a1a619398d"
+  },
+  "proxy.ts": {
+    "mtime": 1786692779.2027776,
+    "seen": 1787454619.454793,
+    "ast_hash": "8849d839b7ce32bfdb4da62fa60513c3",
+    "semantic_hash": "8849d839b7ce32bfdb4da62fa60513c3"
+  },
+  "supabase/migrations/202607050001_create_watchlist_items.sql": {
+    "mtime": 1783225769.9364321,
+    "seen": 1787454619.454794,
+    "ast_hash": "7b5086463e596d85819942817577a7aa",
+    "semantic_hash": "7b5086463e596d85819942817577a7aa"
+  },
+  "supabase/migrations/202607050002_harden_watchlist_item_privileges.sql": {
+    "mtime": 1783226453.291064,
+    "seen": 1787454619.454794,
+    "ast_hash": "0d5bc5f9d64ac3c99d609d19a7239c4a",
+    "semantic_hash": "0d5bc5f9d64ac3c99d609d19a7239c4a"
+  },
+  "supabase/migrations/202607050003_create_holdings.sql": {
+    "mtime": 1783228308.249322,
+    "seen": 1787454619.4547951,
+    "ast_hash": "465ca3c20759273fe7e39e85c625f67d",
+    "semantic_hash": "465ca3c20759273fe7e39e85c625f67d"
+  },
+  "supabase/migrations/202607050004_drop_unused_holdings_symbol_idx.sql": {
+    "mtime": 1783227819.1887465,
+    "seen": 1787454619.4547951,
+    "ast_hash": "b07e2083b77252578c66cc1a2f57fd2f",
+    "semantic_hash": "b07e2083b77252578c66cc1a2f57fd2f"
+  },
+  "supabase/migrations/202607050005_default_holdings_purchased_at.sql": {
+    "mtime": 1783228308.2497523,
+    "seen": 1787454619.454796,
+    "ast_hash": "ca022bdf5f3e4f53ba55979ca9e45d7e",
+    "semantic_hash": "ca022bdf5f3e4f53ba55979ca9e45d7e"
+  },
+  "supabase/migrations/202607050006_create_price_alerts.sql": {
+    "mtime": 1783229694.61496,
+    "seen": 1787454619.454797,
+    "ast_hash": "edf0d8860bcfeb778136fb87b9f175be",
+    "semantic_hash": "edf0d8860bcfeb778136fb87b9f175be"
+  },
+  "supabase/migrations/20260705062014_create_saved_comparisons.sql": {
+    "mtime": 1783232438.4399803,
+    "seen": 1787454619.454797,
+    "ast_hash": "078741f3de0fb55564f39bb6f39d1b72",
+    "semantic_hash": "078741f3de0fb55564f39bb6f39d1b72"
+  },
+  "supabase/migrations/20260705120000_create_paper_trading.sql": {
+    "mtime": 1783243812.3400702,
+    "seen": 1787454619.454798,
+    "ast_hash": "97952aafd4594dce8c749795a8171577",
+    "semantic_hash": "97952aafd4594dce8c749795a8171577"
+  },
+  "supabase/migrations/20260705150000_create_stripe_customers.sql": {
+    "mtime": 1783269858.0136077,
+    "seen": 1787454619.454798,
+    "ast_hash": "a7bab9559ec8a7d1d9f1094e3bf1dfe1",
+    "semantic_hash": "a7bab9559ec8a7d1d9f1094e3bf1dfe1"
+  },
+  "supabase/migrations/20260705160717_harden_paper_trading_writes.sql": {
+    "mtime": 1786692779.2031693,
+    "seen": 1787454619.4547992,
+    "ast_hash": "14dd391341435eeb6e56b008d74ac84a",
+    "semantic_hash": "14dd391341435eeb6e56b008d74ac84a"
+  },
+  "supabase/migrations/20260812000000_harden_equity_snapshot_lock.sql": {
+    "mtime": 1786604763.3130064,
+    "seen": 1787454619.4548,
+    "ast_hash": "c0867ee499f25a61a5ac03e6e9d9722f",
+    "semantic_hash": "c0867ee499f25a61a5ac03e6e9d9722f"
+  },
+  "supabase/migrations/20260812100000_add_write_idempotency.sql": {
+    "mtime": 1786604763.3131042,
+    "seen": 1787454619.4548,
+    "ast_hash": "f95b2073438ba247c9aa3c25f07a6ab5",
+    "semantic_hash": "f95b2073438ba247c9aa3c25f07a6ab5"
+  },
+  "tsconfig.json": {
+    "mtime": 1783243812.340271,
+    "seen": 1787454619.4548008,
+    "ast_hash": "9530bfcf26cd695a24347acffcfca843",
+    "semantic_hash": "9530bfcf26cd695a24347acffcfca843"
+  },
+  ".github/workflows/ci.yml": {
+    "mtime": 1786692779.1615953,
+    "seen": 1787454619.4548008,
+    "ast_hash": "f6db9a5f94112a7f5acb9e779c8e6c25",
+    "semantic_hash": "f6db9a5f94112a7f5acb9e779c8e6c25"
+  },
+  "AGENTS.md": {
+    "mtime": 1783239513.8784087,
+    "seen": 1787454619.454802,
+    "ast_hash": "dc33b8b7bceeb1ef58ac57c7548c269b",
+    "semantic_hash": "dc33b8b7bceeb1ef58ac57c7548c269b"
+  },
+  "CLAUDE.md": {
+    "mtime": 1786604763.2998338,
+    "seen": 1787454619.454803,
+    "ast_hash": "50d48f51dec14eefc57ad4ac2227a3da",
+    "semantic_hash": "50d48f51dec14eefc57ad4ac2227a3da"
+  },
+  "README.md": {
+    "mtime": 1786692779.1627138,
+    "seen": 1787454619.454803,
+    "ast_hash": "66e5bdbc03455b8d4e2db1c137280108",
+    "semantic_hash": "66e5bdbc03455b8d4e2db1c137280108"
+  },
+  "docs/FEATURES.md": {
+    "mtime": 1786692779.1860802,
+    "seen": 1787454619.454804,
+    "ast_hash": "7ba4ea5432c5803ec3e59b1bf00d9277",
+    "semantic_hash": "7ba4ea5432c5803ec3e59b1bf00d9277"
+  },
+  "docs/HANDOFF.md": {
+    "mtime": 1786692779.1866336,
+    "seen": 1787454619.454804,
+    "ast_hash": "8b971b2384f9daabbd0d51cf1b690ec7",
+    "semantic_hash": "8b971b2384f9daabbd0d51cf1b690ec7"
+  },
+  "docs/PAYMENTS.md": {
+    "mtime": 1783269858.0086904,
+    "seen": 1787454619.454805,
+    "ast_hash": "738744efd225c74bf548c0210c6223ed",
+    "semantic_hash": "738744efd225c74bf548c0210c6223ed"
+  },
+  "docs/superpowers/plans/2026-07-05-four-feature-expansion.md": {
+    "mtime": 1783232224.0457957,
+    "seen": 1787454619.454805,
+    "ast_hash": "5e35e171cf07853172466c3da2d74ff0",
+    "semantic_hash": "5e35e171cf07853172466c3da2d74ff0"
+  },
+  "docs/superpowers/plans/2026-07-05-market-movers.md": {
+    "mtime": 1783231234.6142476,
+    "seen": 1787454619.454806,
+    "ast_hash": "5afbb6005644b8c8895b793204c7ac69",
+    "semantic_hash": "5afbb6005644b8c8895b793204c7ac69"
+  },
+  "docs/superpowers/plans/2026-07-05-paper-trading.md": {
+    "mtime": 1783243812.3362794,
+    "seen": 1787454619.454806,
+    "ast_hash": "87f6b71210955532af706ad9a6543f90",
+    "semantic_hash": "87f6b71210955532af706ad9a6543f90"
+  },
+  "docs/superpowers/plans/2026-07-05-price-alerts.md": {
+    "mtime": 1783229596.4075,
+    "seen": 1787454619.454807,
+    "ast_hash": "46fc73e4f249fde964b3e49826b2825d",
+    "semantic_hash": "46fc73e4f249fde964b3e49826b2825d"
+  },
+  "docs/superpowers/plans/2026-07-05-stock-compare.md": {
+    "mtime": 1783230264.75492,
+    "seen": 1787454619.454808,
+    "ast_hash": "4926104b5b0b72b3b7de7a4cd596b9b7",
+    "semantic_hash": "4926104b5b0b72b3b7de7a4cd596b9b7"
+  },
+  "docs/superpowers/specs/2026-07-05-four-feature-expansion-design.md": {
+    "mtime": 1783232106.7556405,
+    "seen": 1787454619.454808,
+    "ast_hash": "85f093730300a221a9f15bdbab8c6e92",
+    "semantic_hash": "85f093730300a221a9f15bdbab8c6e92"
+  },
+  "docs/superpowers/specs/2026-07-05-market-movers-design.md": {
+    "mtime": 1783231234.6127937,
+    "seen": 1787454619.4548092,
+    "ast_hash": "be1bd13c40deaf22b5b9c59de12f6320",
+    "semantic_hash": "be1bd13c40deaf22b5b9c59de12f6320"
+  },
+  "docs/superpowers/specs/2026-07-05-paper-trading-design.md": {
+    "mtime": 1783243812.3364666,
+    "seen": 1787454619.4548092,
+    "ast_hash": "5110327fb65d1ebd5e30890b5e1a0e5f",
+    "semantic_hash": "5110327fb65d1ebd5e30890b5e1a0e5f"
+  },
+  "docs/superpowers/specs/2026-07-05-price-alerts-design.md": {
+    "mtime": 1783229596.406653,
+    "seen": 1787454619.4548101,
+    "ast_hash": "4e8107e9dffba8f8d5cf41e2d723c3f6",
+    "semantic_hash": "4e8107e9dffba8f8d5cf41e2d723c3f6"
+  },
+  "docs/superpowers/specs/2026-07-05-stock-compare-design.md": {
+    "mtime": 1783230264.754424,
+    "seen": 1787454619.4548101,
+    "ast_hash": "1d931983f689fb7bb183c90aaa4f1598",
+    "semantic_hash": "1d931983f689fb7bb183c90aaa4f1598"
+  },
+  "implements.md": {
+    "mtime": 1783922749.5123389,
+    "seen": 1787454619.4548109,
+    "ast_hash": "1664d33e22184012ff21d42640dce79d",
+    "semantic_hash": "1664d33e22184012ff21d42640dce79d"
+  },
+  "img/original-504b55ef8b9cf1d9c00b73cdcc3f22a8.webp": {
+    "mtime": 1783222965.84116,
+    "seen": 1787454619.4548118,
+    "ast_hash": "c4582658b7c39d9dfcce9dcdfaeb9e6c",
+    "semantic_hash": "c4582658b7c39d9dfcce9dcdfaeb9e6c"
+  },
+  "img/original-6d3b659a04181eff05e0662a98f3b697.webp": {
+    "mtime": 1783222957.9204752,
+    "seen": 1787454619.4548118,
+    "ast_hash": "5cde26fb770142eda8bc3f37f2188e21",
+    "semantic_hash": "5cde26fb770142eda8bc3f37f2188e21"
+  },
+  "img/reference-1.webp": {
+    "mtime": 1783222798.4137712,
+    "seen": 1787454619.454813,
+    "ast_hash": "f982b57e5f487f60f8382954b5910c8d",
+    "semantic_hash": "f982b57e5f487f60f8382954b5910c8d"
+  },
+  "img/reference-2.webp": {
+    "mtime": 1783222831.503507,
+    "seen": 1787454619.454813,
+    "ast_hash": "ebe3ff35d31841a6b98bb2fbe78b6010",
+    "semantic_hash": "ebe3ff35d31841a6b98bb2fbe78b6010"
+  }
+}
