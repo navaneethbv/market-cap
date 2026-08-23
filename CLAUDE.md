@@ -113,6 +113,11 @@ state.
   delete them before committing.
 - shadcn CLI usage: `npx shadcn@latest add <component> -y -s`.
 
+## Dependency freshness
+
+Run `npx npm-check-updates` before starting a new task to check for newer dependency versions.
+Update what is safe; leave a note in the PR description for any major bump skipped because it broke the toolchain.
+
 @AGENTS.md
 
 ## graphify
