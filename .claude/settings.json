@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "/Users/navaneethbv/.local/bin/graphify hook-guard search"
+            "command": "sh \"$HOME/.graphify-agent/graphify-hook.sh\" search"
           }
         ]
       },
@@ -15,7 +15,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "/Users/navaneethbv/.local/bin/graphify hook-guard read"
+            "command": "sh \"$HOME/.graphify-agent/graphify-hook.sh\" read"
           }
         ]
       }
