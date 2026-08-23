@@ -7,6 +7,10 @@ This version has breaking changes — APIs, conventions, and file structure may 
 # Git Branching Rule
 All code modifications and subsequent updates must be done via pull requests. Direct commits or merges to the `main` branch are strictly prohibited.
 
+# Dependency Freshness
+Before starting a new task, run `npx npm-check-updates` to check whether dependencies have newer versions available.
+Apply updates that are safe for this codebase, and skip a major bump if it breaks the toolchain (record why in the PR description) rather than forcing it through.
+
 ## graphify
 
 This project has a knowledge graph at graphify-out/ with god nodes, community structure, and cross-file relationships.

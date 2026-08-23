@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
@@ -131,9 +132,12 @@ export default async function StockPage({
           <div className="flex min-w-0 gap-4">
             <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-2xl border bg-background">
               {profile.logo ? (
-                <img
+                <Image
                   src={profile.logo}
                   alt=""
+                  width={64}
+                  height={64}
+                  unoptimized
                   className="h-full w-full object-contain p-2"
                 />
               ) : (

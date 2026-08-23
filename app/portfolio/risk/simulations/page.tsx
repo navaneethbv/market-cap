@@ -263,7 +263,7 @@ export default function MonteCarloPage() {
                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     formatter={(value: any) => [formatPrice(Number(value || 0)), ""]}
                   />
-                  <Legend style={{ fontSize: 12 }} />
+                  <Legend wrapperStyle={{ fontSize: 12 }} />
                   <Area
                     type="monotone"
                     dataKey="percentile90"
