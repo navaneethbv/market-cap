@@ -37,7 +37,7 @@ export function RebalanceCalculator({
   );
 
   const totalWeight = Math.round(plan.totalTargetWeight * 100) / 100;
-  const isWeightValid = Math.abs(totalWeight - 100) < 0.1;
+  const isWeightValid = Math.abs(plan.totalTargetWeight - 100) <= 0.000001;
 
   function updateWeight(symbol: string, val: number) {
     setTargetWeights((prev) => ({
@@ -71,7 +71,7 @@ export function RebalanceCalculator({
       <section className="rounded-2xl border bg-card p-5 shadow-sm space-y-4">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h2 className="text-base font-semibold">Target Allocation Targets</h2>
+            <h2 className="text-base font-semibold">Target Allocation</h2>
             <p className="text-xs text-muted-foreground">
               Adjust position target weights to generate rebalancing trades.
             </p>
@@ -180,11 +180,14 @@ export function RebalanceCalculator({
       </section>
 
       {/* Rebalancing Action Plan Table */}
+      {plan.error ? (
+        <section role="status" className="rounded-2xl border bg-card p-5 text-sm text-muted-foreground">{plan.error}</section>
+      ) : (
       <section className="overflow-hidden rounded-2xl border bg-card shadow-sm">
         <div className="border-b p-5">
           <h2 className="text-base font-semibold">Rebalance Action Plan</h2>
           <p className="mt-1 text-xs text-muted-foreground">
-            Execute these exact buy and sell trades to reach your target asset allocation.
+            Estimated trades to reach your targets at the displayed prices. Fractional shares are assumed; fees and taxes are excluded.
           </p>
         </div>
         <Table>
@@ -254,6 +257,7 @@ export function RebalanceCalculator({
           </div>
         )}
       </section>
+      )}
     </div>
   );
 }

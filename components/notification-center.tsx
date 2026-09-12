@@ -13,8 +13,8 @@ export function NotificationCenter({
   initialTriggeredCount?: number;
 }>) {
   const [isOpen, setIsOpen] = useState(false);
-  const [notifications] = useState<readonly AlertNotification[]>(initialNotifications);
-  const [triggeredCount] = useState<number>(initialTriggeredCount);
+  const notifications = initialNotifications;
+  const triggeredCount = initialTriggeredCount;
   const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -23,10 +23,20 @@ export function NotificationCenter({
         setIsOpen(false);
       }
     }
+    function handleEscape(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        setIsOpen(false);
+        menuRef.current?.querySelector("button")?.focus();
+      }
+    }
     if (isOpen) {
+      document.addEventListener("keydown", handleEscape);
       document.addEventListener("mousedown", handleClickOutside);
     }
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleEscape);
+    };
   }, [isOpen]);
 
   return (
@@ -35,6 +45,7 @@ export function NotificationCenter({
         type="button"
         onClick={() => setIsOpen((prev) => !prev)}
         className="relative flex h-9 w-9 items-center justify-center rounded-full border bg-background text-muted-foreground transition hover:bg-muted hover:text-foreground"
+        aria-expanded={isOpen}
         aria-label="Price Alerts & Notifications"
       >
         <Bell className="h-4 w-4" />
@@ -46,7 +57,7 @@ export function NotificationCenter({
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 z-50 w-80 sm:w-96 rounded-2xl border bg-popover p-3 shadow-xl animate-in fade-in-0 zoom-in-95">
+        <div className="absolute right-0 mt-2 z-50 w-80 max-w-[calc(100vw-2rem)] sm:w-96 rounded-2xl border bg-popover p-3 shadow-xl animate-in fade-in-0 zoom-in-95">
           <div className="flex items-center justify-between border-b pb-2 px-1">
             <div className="flex items-center gap-2">
               <span className="font-semibold text-sm">Notifications</span>
@@ -68,7 +79,7 @@ export function NotificationCenter({
           <div className="max-h-72 overflow-y-auto py-2 space-y-1.5">
             {notifications.length === 0 ? (
               <div className="py-6 text-center text-xs text-muted-foreground">
-                No active price alerts set up yet.
+                No alert updates are available right now.
               </div>
             ) : (
               notifications.map((item) => (
@@ -109,6 +120,7 @@ export function NotificationCenter({
           </div>
 
           <div className="border-t pt-2 text-center">
+            <p className="mb-1 text-[10px] text-muted-foreground">Latest 10 active alerts with available quotes</p>
             <Link
               href="/alerts"
               onClick={() => setIsOpen(false)}

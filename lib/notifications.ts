@@ -30,7 +30,7 @@ function processSingleAlert(
   alert: Partial<PriceAlert>,
   quote: Quote
 ): AlertNotification | null {
-  if (!alert.symbol || !alert.target_price || alert.target_price <= 0 || quote.price <= 0) {
+  if (alert.active === false || !alert.symbol || !Number.isFinite(alert.target_price) || !alert.target_price || alert.target_price <= 0 || !Number.isFinite(quote.price) || quote.price <= 0 || (alert.direction !== "above" && alert.direction !== "below")) {
     return null;
   }
 

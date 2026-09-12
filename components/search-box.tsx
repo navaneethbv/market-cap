@@ -50,6 +50,8 @@ export function SearchBox() {
 
   function updateQuery(value: string) {
     setQuery(value);
+    setResults([]);
+    setOpen(false);
     if (value.trim().length < 1) {
       setResults([]);
       setOpen(false);

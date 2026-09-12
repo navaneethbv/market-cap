@@ -18,6 +18,8 @@ import {
   Play,
   Layers,
   Users,
+  Sliders,
+  Grid2X2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -27,6 +29,8 @@ const NAV_ITEMS = [
   { href: "/watchlist", label: "Watchlist", icon: Star },
   { href: "/portfolio", label: "Portfolio", icon: Briefcase },
   { href: "/trading", label: "Trading", icon: CandlestickChart },
+  { href: "/options", label: "Options", icon: Sliders },
+  { href: "/heatmap", label: "Heatmap", icon: Grid2X2 },
   { href: "/backtest", label: "Backtest", icon: Play },
   { href: "/screener", label: "Screener", icon: Search },
   { href: "/alerts", label: "Alerts", icon: Bell },
@@ -41,6 +45,7 @@ const NAV_ITEMS = [
 
 export function AppSidebar() {
   const pathname = usePathname();
+  const activeHref = NAV_ITEMS.filter(({ href }) => pathname === href || (href !== "/" && pathname.startsWith(`${href}/`))).sort((a, b) => b.href.length - a.href.length)[0]?.href;
 
   return (
     <aside className="sticky top-0 hidden h-screen w-60 shrink-0 flex-col border-r bg-sidebar px-4 py-6 md:flex">
@@ -51,14 +56,14 @@ export function AppSidebar() {
         <span className="text-lg font-bold tracking-tight">MarketCap</span>
       </Link>
 
-      <nav className="mt-8 flex flex-col gap-1">
+      <nav aria-label="Main navigation" className="mt-8 min-h-0 flex-1 overflow-y-auto flex flex-col gap-1">
         {NAV_ITEMS.map(({ href, label, icon: Icon }) => {
-          const active =
-            href === "/" ? pathname === "/" : pathname.startsWith(href);
+          const active = href === activeHref;
           return (
             <Link
               key={href}
               href={href}
+              aria-current={active ? "page" : undefined}
               className={cn(
                 "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors",
                 active
@@ -76,7 +81,7 @@ export function AppSidebar() {
         })}
       </nav>
 
-      <div className="mt-auto">
+      <div className="shrink-0 pt-4">
         <ThemeToggle />
       </div>
     </aside>
@@ -85,16 +90,17 @@ export function AppSidebar() {
 
 export function MobileNav() {
   const pathname = usePathname();
+  const activeHref = NAV_ITEMS.filter(({ href }) => pathname === href || (href !== "/" && pathname.startsWith(`${href}/`))).sort((a, b) => b.href.length - a.href.length)[0]?.href;
 
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-50 flex overflow-x-auto border-t bg-card/95 backdrop-blur md:hidden">
+    <nav aria-label="Main navigation" className="fixed inset-x-0 bottom-0 z-50 flex overflow-x-auto border-t bg-card/95 backdrop-blur pb-[env(safe-area-inset-bottom)] md:hidden">
       {NAV_ITEMS.map(({ href, label, icon: Icon }) => {
-        const active =
-          href === "/" ? pathname === "/" : pathname.startsWith(href);
+        const active = href === activeHref;
         return (
           <Link
             key={href}
             href={href}
+              aria-current={active ? "page" : undefined}
             className={cn(
               "flex min-w-[4.5rem] shrink-0 flex-col items-center gap-1 py-2.5 text-[11px] font-medium",
               active ? "text-primary" : "text-muted-foreground"
