@@ -19,6 +19,7 @@ export interface RebalanceRow {
 }
 
 export interface RebalancePlan {
+  error: string | null;
   rows: RebalanceRow[];
   totalCurrentValue: number;
   totalTargetValue: number;
@@ -32,17 +33,32 @@ export function calculateRebalancePlan(
   targetWeights: Record<string, number>,
   extraCash = 0
 ): RebalancePlan {
-  const safeExtraCash = Math.max(0, extraCash);
+  const safeExtraCash = Number.isFinite(extraCash) ? Math.max(0, extraCash) : 0;
   const totalCurrentValue = holdings.reduce(
     (sum, h) => sum + h.shares * h.price,
     0
   );
   const totalTargetValue = totalCurrentValue + safeExtraCash;
 
-  const totalTargetWeight = Object.values(targetWeights).reduce(
+  const totalTargetWeight = holdings.map((holding) => targetWeights[holding.symbol] ?? 0).reduce(
     (sum, w) => sum + (Number.isFinite(w) ? w : 0),
     0
   );
+
+  let error: string | null = null;
+  if (!Number.isFinite(extraCash) || extraCash < 0) {
+    error = "Enter a finite, nonnegative cash contribution.";
+  } else if (holdings.some((holding) => !Number.isFinite(holding.price) || holding.price <= 0 || !Number.isFinite(holding.shares) || holding.shares < 0) || !Number.isFinite(totalTargetValue)) {
+    error = "Valid share counts and current prices are required for every holding.";
+  } else if (holdings.some((holding) => {
+    const weight = targetWeights[holding.symbol] ?? 0;
+    return !Number.isFinite(weight) || weight < 0 || weight > 100;
+  }) || Math.abs(totalTargetWeight - 100) > 0.000001) {
+    error = "Target weights must total 100% before a trade plan can be calculated.";
+  }
+  if (error) {
+    return { error, rows: [], totalCurrentValue, totalTargetValue, totalTargetWeight, extraCash: safeExtraCash, isBalanced: false };
+  }
 
   const rows: RebalanceRow[] = holdings.map((h) => {
     const currentValue = h.shares * h.price;
@@ -79,6 +95,7 @@ export function calculateRebalancePlan(
   const isBalanced = rows.every((r) => r.action === "HOLD");
 
   return {
+    error: null,
     rows,
     totalCurrentValue,
     totalTargetValue,

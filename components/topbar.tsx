@@ -13,9 +13,9 @@ import { CircleUser, TrendingUp } from "lucide-react";
 import { SearchBox } from "@/components/search-box";
 import { CommandPalette } from "@/components/command-palette";
 import { NotificationCenter } from "@/components/notification-center";
-import { evaluateAlertNotifications, type AlertNotification } from "@/lib/notifications";
+import { type AlertNotification } from "@/lib/notifications";
 import { getQuote } from "@/lib/market/finnhub";
-import type { Quote } from "@/lib/market/types";
+import { loadNotificationFeed } from "@/lib/notification-feed";
 
 export async function Topbar() {
   const supabase = await createClient();
@@ -27,28 +27,12 @@ export async function Topbar() {
   let triggeredCount = 0;
 
   if (user) {
-    const { data: alerts } = await supabase
-      .from("alerts")
-      .select("*")
-      .eq("user_id", user.id)
-      .limit(10);
-
-    if (alerts && alerts.length > 0) {
-      const symbols = Array.from(new Set(alerts.map((a: { symbol: string }) => a.symbol)));
-      const quotesMap: Record<string, Quote | null> = {};
-      await Promise.allSettled(
-        symbols.map(async (sym) => {
-          try {
-            const q = await getQuote(sym);
-            quotesMap[sym] = q;
-          } catch {
-            quotesMap[sym] = null;
-          }
-        })
-      );
-      const evalResult = evaluateAlertNotifications(alerts, quotesMap);
-      notifications = evalResult.notifications;
-      triggeredCount = evalResult.triggeredCount;
+    try {
+      const feed = await loadNotificationFeed(supabase, user.id, getQuote);
+      notifications = feed.notifications;
+      triggeredCount = feed.triggeredCount;
+    } catch (error) {
+      console.error("Notification feed unavailable", error);
     }
   }
 
@@ -62,7 +46,7 @@ export async function Topbar() {
           <span className="font-bold">MarketCap</span>
         </Link>
         <div className="ml-auto flex items-center gap-2 md:ml-0 md:flex-1">
-          <SearchBox />
+          <div className="hidden lg:block lg:w-full lg:max-w-md"><SearchBox /></div>
           <CommandPalette />
         </div>
         <div className="flex items-center gap-2">
