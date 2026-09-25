@@ -13,8 +13,8 @@ This document covers all features, analytical modules, data workflows, and test 
   - **Quick Action Commands**: Theme toggle (Light/Dark mode) with keyboard shortcuts.
   - **Keyboard Navigation**: Full `↑` / `↓` arrow selection, `Enter` to select, and `Esc` to dismiss.
 - **Code Locations**:
-  - Component: [components/command-palette.tsx](file:///Users/navaneethbv/Desktop/Projects/market-cap/components/command-palette.tsx)
-  - Integration: [components/topbar.tsx](file:///Users/navaneethbv/Desktop/Projects/market-cap/components/topbar.tsx)
+  - Component: [components/command-palette.tsx](../components/command-palette.tsx)
+  - Integration: [components/topbar.tsx](../components/topbar.tsx)
 
 ---
 
@@ -33,9 +33,9 @@ This document covers all features, analytical modules, data workflows, and test 
     - **RSI**: Configurable Relative Strength Index period.
     - **Bollinger Bands & MACD**: Standard deviation upper/lower bands and MACD/signal histogram overlays.
 - **Code Locations**:
-  - Component: [components/stock-chart.tsx](file:///Users/navaneethbv/Desktop/Projects/market-cap/components/stock-chart.tsx)
-  - Pure Calculations: [lib/market/indicators.ts](file:///Users/navaneethbv/Desktop/Projects/market-cap/lib/market/indicators.ts)
-  - Unit Tests: [lib/market/indicators.test.mjs](file:///Users/navaneethbv/Desktop/Projects/market-cap/lib/market/indicators.test.mjs)
+  - Component: [components/stock-chart.tsx](../components/stock-chart.tsx)
+  - Pure Calculations: [lib/market/indicators.ts](../lib/market/indicators.ts)
+  - Unit Tests: [lib/market/indicators.test.mjs](../lib/market/indicators.test.mjs)
 
 ---
 
@@ -50,10 +50,10 @@ This document covers all features, analytical modules, data workflows, and test 
   - **Validation Logic**: `shouldFillOrder` checks boundaries against live quote execution constraints.
   - **Trade Ledger Export**: One-click RFC4180 CSV export of entire transaction history (`Symbol, Type, Order Type, Shares, Price, Total Value, Executed At`).
 - **Code Locations**:
-  - Logic & Export: [lib/paper-trading.ts](file:///Users/navaneethbv/Desktop/Projects/market-cap/lib/paper-trading.ts)
-  - Components: [components/paper-trade-ticket.tsx](file:///Users/navaneethbv/Desktop/Projects/market-cap/components/paper-trade-ticket.tsx), [components/export-trades-button.tsx](file:///Users/navaneethbv/Desktop/Projects/market-cap/components/export-trades-button.tsx)
-  - Pages & Actions: [app/trading/page.tsx](file:///Users/navaneethbv/Desktop/Projects/market-cap/app/trading/page.tsx), [app/trading/actions.ts](file:///Users/navaneethbv/Desktop/Projects/market-cap/app/trading/actions.ts), [app/trading/history/page.tsx](file:///Users/navaneethbv/Desktop/Projects/market-cap/app/trading/history/page.tsx)
-  - Unit Tests: [lib/paper-trading.test.mjs](file:///Users/navaneethbv/Desktop/Projects/market-cap/lib/paper-trading.test.mjs)
+  - Logic & Export: [lib/paper-trading.ts](../lib/paper-trading.ts)
+  - Components: [components/paper-trade-ticket.tsx](../components/paper-trade-ticket.tsx), [components/export-trades-button.tsx](../components/export-trades-button.tsx)
+  - Pages & Actions: [app/trading/page.tsx](../app/trading/page.tsx), [app/trading/actions.ts](../app/trading/actions.ts), [app/trading/history/page.tsx](../app/trading/history/page.tsx)
+  - Unit Tests: [lib/paper-trading.test.mjs](../lib/paper-trading.test.mjs)
 
 ---
 
@@ -70,10 +70,10 @@ This document covers all features, analytical modules, data workflows, and test 
     - Cash contribution input adding new funds to the portfolio balance.
     - Computes exact buy/sell trade quantities, target values, and percentage drift.
 - **Code Locations**:
-  - Logic & Math: [lib/portfolio-csv.ts](file:///Users/navaneethbv/Desktop/Projects/market-cap/lib/portfolio-csv.ts), [lib/rebalancer.ts](file:///Users/navaneethbv/Desktop/Projects/market-cap/lib/rebalancer.ts)
-  - UI Components: [components/portfolio-csv-dialogs.tsx](file:///Users/navaneethbv/Desktop/Projects/market-cap/components/portfolio-csv-dialogs.tsx), [components/rebalance-calculator.tsx](file:///Users/navaneethbv/Desktop/Projects/market-cap/components/rebalance-calculator.tsx), [components/portfolio-tabs.tsx](file:///Users/navaneethbv/Desktop/Projects/market-cap/components/portfolio-tabs.tsx)
-  - Page Route: [app/portfolio/rebalance/page.tsx](file:///Users/navaneethbv/Desktop/Projects/market-cap/app/portfolio/rebalance/page.tsx)
-  - Unit Tests: [lib/portfolio-csv.test.mjs](file:///Users/navaneethbv/Desktop/Projects/market-cap/lib/portfolio-csv.test.mjs), [lib/rebalancer.test.mjs](file:///Users/navaneethbv/Desktop/Projects/market-cap/lib/rebalancer.test.mjs)
+  - Logic & Math: [lib/portfolio-csv.ts](../lib/portfolio-csv.ts), [lib/rebalancer.ts](../lib/rebalancer.ts)
+  - UI Components: [components/portfolio-csv-dialogs.tsx](../components/portfolio-csv-dialogs.tsx), [components/rebalance-calculator.tsx](../components/rebalance-calculator.tsx), [components/portfolio-tabs.tsx](../components/portfolio-tabs.tsx)
+  - Page Route: [app/portfolio/rebalance/page.tsx](../app/portfolio/rebalance/page.tsx)
+  - Unit Tests: [lib/portfolio-csv.test.mjs](../lib/portfolio-csv.test.mjs), [lib/rebalancer.test.mjs](../lib/rebalancer.test.mjs)
 
 ---
 
@@ -84,9 +84,9 @@ This document covers all features, analytical modules, data workflows, and test 
   - `createCustomerPortalSession`: Initializes a Stripe billing portal session linked to the user's `stripe_customer_id`.
   - Pro UI on `/pricing` switches to a "Manage Subscription & Invoices" action that redirects directly to Stripe.
 - **Code Locations**:
-  - Helper: [lib/stripe.ts](file:///Users/navaneethbv/Desktop/Projects/market-cap/lib/stripe.ts)
-  - Action & Page: [app/pricing/actions.ts](file:///Users/navaneethbv/Desktop/Projects/market-cap/app/pricing/actions.ts), [app/pricing/page.tsx](file:///Users/navaneethbv/Desktop/Projects/market-cap/app/pricing/page.tsx)
-  - Unit Tests: [lib/stripe.test.mjs](file:///Users/navaneethbv/Desktop/Projects/market-cap/lib/stripe.test.mjs)
+  - Helper: [lib/stripe.ts](../lib/stripe.ts)
+  - Action & Page: [app/pricing/actions.ts](../app/pricing/actions.ts), [app/pricing/page.tsx](../app/pricing/page.tsx)
+  - Unit Tests: [lib/stripe.test.mjs](../lib/stripe.test.mjs)
 
 ---
 
@@ -98,11 +98,11 @@ This document covers all features, analytical modules, data workflows, and test 
   - Classifies earnings outcomes: Beat ($\text{actual} > \text{estimate}$), Miss ($\text{actual} < \text{estimate}$), or In-Line ($\text{actual} = \text{estimate}$).
   - Clean visual card with EPS actuals, estimates, and surprise tags.
 - **Code Locations**:
-  - Logic: [lib/earnings.ts](file:///Users/navaneethbv/Desktop/Projects/market-cap/lib/earnings.ts)
-  - API Service: `getEarningsSurprises` in [lib/market/finnhub.ts](file:///Users/navaneethbv/Desktop/Projects/market-cap/lib/market/finnhub.ts)
-  - UI Component: [components/earnings-history.tsx](file:///Users/navaneethbv/Desktop/Projects/market-cap/components/earnings-history.tsx)
-  - Page: [app/stock/[symbol]/page.tsx](file:///Users/navaneethbv/Desktop/Projects/market-cap/app/stock/[symbol]/page.tsx)
-  - Unit Tests: [lib/earnings.test.mjs](file:///Users/navaneethbv/Desktop/Projects/market-cap/lib/earnings.test.mjs), [lib/market/finnhub.test.mjs](file:///Users/navaneethbv/Desktop/Projects/market-cap/lib/market/finnhub.test.mjs)
+  - Logic: [lib/earnings.ts](../lib/earnings.ts)
+  - API Service: `getEarningsSurprises` in [lib/market/finnhub.ts](../lib/market/finnhub.ts)
+  - UI Component: [components/earnings-history.tsx](../components/earnings-history.tsx)
+  - Page: [app/stock/[symbol]/page.tsx](../app/stock/[symbol]/page.tsx)
+  - Unit Tests: [lib/earnings.test.mjs](../lib/earnings.test.mjs), [lib/market/finnhub.test.mjs](../lib/market/finnhub.test.mjs)
 
 ---
 
@@ -116,10 +116,10 @@ This document covers all features, analytical modules, data workflows, and test 
   4. **Momentum**: Relative position within 52-week High/Low trading range.
   5. **Growth**: Earnings yield derived from EPS relative to price.
 - **Code Locations**:
-  - Logic: [lib/stock-radar.ts](file:///Users/navaneethbv/Desktop/Projects/market-cap/lib/stock-radar.ts)
-  - UI Component: [components/stock-radar-chart.tsx](file:///Users/navaneethbv/Desktop/Projects/market-cap/components/stock-radar-chart.tsx)
-  - Page: [app/compare/page.tsx](file:///Users/navaneethbv/Desktop/Projects/market-cap/app/compare/page.tsx)
-  - Unit Tests: [lib/stock-radar.test.mjs](file:///Users/navaneethbv/Desktop/Projects/market-cap/lib/stock-radar.test.mjs)
+  - Logic: [lib/stock-radar.ts](../lib/stock-radar.ts)
+  - UI Component: [components/stock-radar-chart.tsx](../components/stock-radar-chart.tsx)
+  - Page: [app/compare/page.tsx](../app/compare/page.tsx)
+  - Unit Tests: [lib/stock-radar.test.mjs](../lib/stock-radar.test.mjs)
 
 ---
 
@@ -131,10 +131,10 @@ This document covers all features, analytical modules, data workflows, and test 
   - **Sort Options**: Market Cap, P/E Ratio, Dividend Yield, and 1-Day Price Change.
   - **CSV Export**: Instant download of current filtered stock list.
 - **Code Locations**:
-  - Filter & CSV Logic: [lib/screener.ts](file:///Users/navaneethbv/Desktop/Projects/market-cap/lib/screener.ts)
-  - UI Component: [components/screener-export-button.tsx](file:///Users/navaneethbv/Desktop/Projects/market-cap/components/screener-export-button.tsx)
-  - Page: [app/screener/page.tsx](file:///Users/navaneethbv/Desktop/Projects/market-cap/app/screener/page.tsx)
-  - Unit Tests: [lib/screener.test.mjs](file:///Users/navaneethbv/Desktop/Projects/market-cap/lib/screener.test.mjs)
+  - Filter & CSV Logic: [lib/screener.ts](../lib/screener.ts)
+  - UI Component: [components/screener-export-button.tsx](../components/screener-export-button.tsx)
+  - Page: [app/screener/page.tsx](../app/screener/page.tsx)
+  - Unit Tests: [lib/screener.test.mjs](../lib/screener.test.mjs)
 
 ---
 
@@ -146,10 +146,10 @@ This document covers all features, analytical modules, data workflows, and test 
   - Computes exact percentage delta from target price.
   - Notification badge counter with popover drawer mounted in the top navigation bar.
 - **Code Locations**:
-  - Evaluation Logic: [lib/notifications.ts](file:///Users/navaneethbv/Desktop/Projects/market-cap/lib/notifications.ts)
-  - UI Component: [components/notification-center.tsx](file:///Users/navaneethbv/Desktop/Projects/market-cap/components/notification-center.tsx)
-  - Integration: [components/topbar.tsx](file:///Users/navaneethbv/Desktop/Projects/market-cap/components/topbar.tsx)
-  - Unit Tests: [lib/notifications.test.mjs](file:///Users/navaneethbv/Desktop/Projects/market-cap/lib/notifications.test.mjs)
+  - Evaluation Logic: [lib/notifications.ts](../lib/notifications.ts)
+  - UI Component: [components/notification-center.tsx](../components/notification-center.tsx)
+  - Integration: [components/topbar.tsx](../components/topbar.tsx)
+  - Unit Tests: [lib/notifications.test.mjs](../lib/notifications.test.mjs)
 
 ---
 
@@ -160,10 +160,10 @@ This document covers all features, analytical modules, data workflows, and test 
   - Sector filtering buttons and market capitalization aggregation.
   - Smooth color mapping from deep red (-3% or worse) to vibrant emerald green (+3% or better).
 - **Code Locations**:
-  - Logic: [lib/heatmap.ts](file:///Users/navaneethbv/Desktop/Projects/market-cap/lib/heatmap.ts)
-  - UI Component: [components/market-heatmap.tsx](file:///Users/navaneethbv/Desktop/Projects/market-cap/components/market-heatmap.tsx)
-  - Page: [app/heatmap/page.tsx](file:///Users/navaneethbv/Desktop/Projects/market-cap/app/heatmap/page.tsx)
-  - Unit Tests: [lib/heatmap.test.mjs](file:///Users/navaneethbv/Desktop/Projects/market-cap/lib/heatmap.test.mjs)
+  - Logic: [lib/heatmap.ts](../lib/heatmap.ts)
+  - UI Component: [components/market-heatmap.tsx](../components/market-heatmap.tsx)
+  - Page: [app/heatmap/page.tsx](../app/heatmap/page.tsx)
+  - Unit Tests: [lib/heatmap.test.mjs](../lib/heatmap.test.mjs)
 
 ---
 
@@ -175,10 +175,10 @@ This document covers all features, analytical modules, data workflows, and test 
   - Interactive parameter inputs (Spot Price, Strike Price, Secondary Strike, Premium, Contracts count).
   - Calculates Max Profit, Max Loss, Breakeven Prices, and P&L across a price spectrum.
 - **Code Locations**:
-  - Logic: [lib/options-payoff.ts](file:///Users/navaneethbv/Desktop/Projects/market-cap/lib/options-payoff.ts)
-  - UI Component: [components/options-calculator.tsx](file:///Users/navaneethbv/Desktop/Projects/market-cap/components/options-calculator.tsx)
-  - Page: [app/options/page.tsx](file:///Users/navaneethbv/Desktop/Projects/market-cap/app/options/page.tsx)
-  - Unit Tests: [lib/options-payoff.test.mjs](file:///Users/navaneethbv/Desktop/Projects/market-cap/lib/options-payoff.test.mjs)
+  - Logic: [lib/options-payoff.ts](../lib/options-payoff.ts)
+  - UI Component: [components/options-calculator.tsx](../components/options-calculator.tsx)
+  - Page: [app/options/page.tsx](../app/options/page.tsx)
+  - Unit Tests: [lib/options-payoff.test.mjs](../lib/options-payoff.test.mjs)
 
 ---
 
@@ -190,10 +190,10 @@ This document covers all features, analytical modules, data workflows, and test 
   - Recommends non-substantially identical substitute sector ETFs (e.g. NVDA $\rightarrow$ `SMH`, `SOXX`).
   - Educational IRS 30-day Wash Sale rule guidance.
 - **Code Locations**:
-  - Logic: [lib/tax-harvesting.ts](file:///Users/navaneethbv/Desktop/Projects/market-cap/lib/tax-harvesting.ts)
-  - UI Component: [components/tax-loss-assistant.tsx](file:///Users/navaneethbv/Desktop/Projects/market-cap/components/tax-loss-assistant.tsx)
-  - Page: [app/portfolio/tax-loss/page.tsx](file:///Users/navaneethbv/Desktop/Projects/market-cap/app/portfolio/tax-loss/page.tsx)
-  - Unit Tests: [lib/tax-harvesting.test.mjs](file:///Users/navaneethbv/Desktop/Projects/market-cap/lib/tax-harvesting.test.mjs)
+  - Logic: [lib/tax-harvesting.ts](../lib/tax-harvesting.ts)
+  - UI Component: [components/tax-loss-assistant.tsx](../components/tax-loss-assistant.tsx)
+  - Page: [app/portfolio/tax-loss/page.tsx](../app/portfolio/tax-loss/page.tsx)
+  - Unit Tests: [lib/tax-harvesting.test.mjs](../lib/tax-harvesting.test.mjs)
 
 ---
 
@@ -205,10 +205,10 @@ This document covers all features, analytical modules, data workflows, and test 
   - Portfolio Yield on Cost (YOC) vs Current Market Yield metrics.
   - Asset income breakdown table.
 - **Code Locations**:
-  - Logic: [lib/dividend-forecast.ts](file:///Users/navaneethbv/Desktop/Projects/market-cap/lib/dividend-forecast.ts)
-  - UI Component: [components/dividend-calendar.tsx](file:///Users/navaneethbv/Desktop/Projects/market-cap/components/dividend-calendar.tsx)
-  - Page: [app/portfolio/income/page.tsx](file:///Users/navaneethbv/Desktop/Projects/market-cap/app/portfolio/income/page.tsx)
-  - Unit Tests: [lib/dividend-forecast.test.mjs](file:///Users/navaneethbv/Desktop/Projects/market-cap/lib/dividend-forecast.test.mjs)
+  - Logic: [lib/dividend-forecast.ts](../lib/dividend-forecast.ts)
+  - UI Component: [components/dividend-calendar.tsx](../components/dividend-calendar.tsx)
+  - Page: [app/portfolio/income/page.tsx](../app/portfolio/income/page.tsx)
+  - Unit Tests: [lib/dividend-forecast.test.mjs](../lib/dividend-forecast.test.mjs)
 
 ---
 

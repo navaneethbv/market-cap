@@ -337,8 +337,8 @@ Status update: everything in the plan below was implemented, verified end
 to end in Stripe sandbox (gate blocked a free user, 4242 checkout
 completed, success page verified, watchlist save then worked), and pushed
 as PR #2. The `create_stripe_customers` migration is applied remotely.
-104 tests, lint, and build pass. The test account
-marketcap.test.user1@gmail.com now has an active sandbox Pro subscription
+104 tests, lint, and build pass.
+The sandbox test account now has an active sandbox Pro subscription
 and AAPL saved in its watchlist. Remaining follow-ups live in
 docs/PAYMENTS.md "Production notes" (webhooks + service role table,
 billing portal, live keys).
@@ -500,7 +500,7 @@ deploying, diff `supabase/migrations/` against `mcp list_migrations`.
 ## Practical notes
 
 - Dev server: `npm run dev -- --port 3100` (background, log in scratchpad).
-- Test account: marketcap.test.user1@gmail.com / TestPass123! (email was
+- Test account: sandbox account (credentials kept outside the repo; email was
   confirmed via SQL update on auth.users; Supabase MCP is connected,
   project ofyyjzjjmopwvfqlhnyc, tables currently empty).
 - Supabase email confirmation is ON; confirm test users via
@@ -533,7 +533,7 @@ deploying, diff `supabase/migrations/` against `mcp list_migrations`.
     `/login?next=/compare/saved`.
   - `/portfolio/allocation` redirected unauthenticated users to
     `/login?next=%2Fportfolio%2Fallocation`.
-- Vercel CLI is installed (`54.20.1`) and logged in as `hotshot4ever-2393`.
+- Vercel CLI is installed (`54.20.1`) and logged in to the owner's account.
   The project is not linked yet (`.vercel/` absent). Do not upload `.env.local`
   secrets to Vercel without explicit confirmation.
 - Supabase CLI is installed (`2.109.0`), but not logged in.

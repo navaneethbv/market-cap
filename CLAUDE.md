@@ -107,7 +107,7 @@ state.
 - Feature work gets a design doc and plan under `docs/superpowers/`
   (see existing examples) before implementation.
 - When asked for a "new-changes" drop, mirror every touched file under
-  `/Users/nbangalorevenugo/Desktop/market-cap/new-changes/market-cap/<path>`
+  `../new-changes/market-cap/<path>` (a sibling of the repository root)
   and keep its top-level `README.md` file map current.
 - Playwright MCP screenshots land in the repo root or `.playwright-mcp/`;
   delete them before committing.
