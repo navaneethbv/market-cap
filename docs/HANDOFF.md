@@ -337,8 +337,8 @@ Status update: everything in the plan below was implemented, verified end
 to end in Stripe sandbox (gate blocked a free user, 4242 checkout
 completed, success page verified, watchlist save then worked), and pushed
 as PR #2. The `create_stripe_customers` migration is applied remotely.
-104 tests, lint, and build pass. The test account
-marketcap.test.user1@gmail.com now has an active sandbox Pro subscription
+104 tests, lint, and build pass.
+The sandbox test account now has an active sandbox Pro subscription
 and AAPL saved in its watchlist. Remaining follow-ups live in
 docs/PAYMENTS.md "Production notes" (webhooks + service role table,
 billing portal, live keys).
@@ -500,7 +500,7 @@ deploying, diff `supabase/migrations/` against `mcp list_migrations`.
 ## Practical notes
 
 - Dev server: `npm run dev -- --port 3100` (background, log in scratchpad).
-- Test account: marketcap.test.user1@gmail.com (password kept outside the repo; email was
+- Test account: sandbox account (credentials kept outside the repo; email was
   confirmed via SQL update on auth.users; Supabase MCP is connected,
   project ofyyjzjjmopwvfqlhnyc, tables currently empty).
 - Supabase email confirmation is ON; confirm test users via
