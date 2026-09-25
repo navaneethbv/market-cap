@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { Sparkles } from "lucide-react";
 import { formatPrice } from "@/lib/format";
+import { computeDCF } from "@/lib/dcf";
 import { cn } from "@/lib/utils";
 import {
   ResponsiveContainer,
@@ -18,26 +19,6 @@ import {
 interface DCFCalculatorProps {
   currentPrice: number;
   initialEps: number | null;
-}
-
-function computeDCF(eps: number, growth: number, discount: number, terminal: number): number {
-  const g = growth / 100;
-  const d = discount / 100;
-  const tg = terminal / 100;
-  const effectiveD = d <= tg ? tg + 0.01 : d;
-
-  let pvSum = 0;
-  let epsT = eps;
-
-  for (let t = 1; t <= 5; t++) {
-    epsT = epsT * (1 + g);
-    const pv = epsT / Math.pow(1 + effectiveD, t);
-    pvSum += pv;
-  }
-
-  const terminalValue = (epsT * (1 + tg)) / (effectiveD - tg);
-  const pvTerminalValue = terminalValue / Math.pow(1 + effectiveD, 5);
-  return pvSum + pvTerminalValue;
 }
 
 interface TooltipPayloadItem {
@@ -63,7 +44,7 @@ function DcfTooltip({ active, payload }: Readonly<{ active?: boolean; payload?: 
 }
 
 export function DCFCalculator({ currentPrice, initialEps }: Readonly<DCFCalculatorProps>) {
-  const eps = initialEps !== null && initialEps > 0 ? initialEps : null;
+  const eps = initialEps !== null && Number.isFinite(initialEps) && initialEps > 0 ? initialEps : null;
 
   // Sliders state
   const [growthRate, setGrowthRate] = useState(10);
@@ -74,6 +55,7 @@ export function DCFCalculator({ currentPrice, initialEps }: Readonly<DCFCalculat
     if (eps === null) return null;
 
     const baseValue = computeDCF(eps, growthRate, discountRate, terminalGrowth);
+    if (baseValue === null) return null;
     
     // Bull: +4% growth, -1% WACC
     const bullValue = computeDCF(eps, Math.min(30, growthRate + 4), Math.max(5, discountRate - 1), terminalGrowth);
@@ -87,13 +69,14 @@ export function DCFCalculator({ currentPrice, initialEps }: Readonly<DCFCalculat
     const status = baseValue >= currentPrice ? "UNDER" : "OVER";
 
     const chartData = [
-      { name: "Bear Case", value: Math.round(bearValue * 100) / 100, fill: "rgba(239, 68, 68, 0.85)" },
+      { name: "Bear Case", value: bearValue === null ? null : Math.round(bearValue * 100) / 100, fill: "rgba(239, 68, 68, 0.85)" },
       { name: "Current Price", value: Math.round(currentPrice * 100) / 100, fill: "rgba(107, 114, 128, 0.85)" },
       { name: "Base Case", value: Math.round(baseValue * 100) / 100, fill: "rgba(139, 92, 246, 0.85)" },
-      { name: "Bull Case", value: Math.round(bullValue * 100) / 100, fill: "rgba(16, 185, 129, 0.85)" },
-    ];
+      { name: "Bull Case", value: bullValue === null ? null : Math.round(bullValue * 100) / 100, fill: "rgba(16, 185, 129, 0.85)" },
+    ].filter((scenario) => scenario.value !== null);
 
     return {
+      unavailableScenario: bullValue === null || bearValue === null,
       intrinsicValue: baseValue,
       safetyMargin: Math.abs(safetyMargin),
       status,
@@ -131,6 +114,7 @@ export function DCFCalculator({ currentPrice, initialEps }: Readonly<DCFCalculat
               min="1"
               max="30"
               step="1"
+              aria-label="5Y Growth Rate (EPS)"
               value={growthRate}
               onChange={(e) => setGrowthRate(Number(e.target.value))}
               className="w-full h-1.5 bg-muted rounded-lg appearance-none cursor-pointer accent-primary"
@@ -148,6 +132,7 @@ export function DCFCalculator({ currentPrice, initialEps }: Readonly<DCFCalculat
               min="5"
               max="18"
               step="0.5"
+              aria-label="Discount Rate (WACC)"
               value={discountRate}
               onChange={(e) => setDiscountRate(Number(e.target.value))}
               className="w-full h-1.5 bg-muted rounded-lg appearance-none cursor-pointer accent-primary"
@@ -165,6 +150,7 @@ export function DCFCalculator({ currentPrice, initialEps }: Readonly<DCFCalculat
               min="1"
               max="5"
               step="0.1"
+              aria-label="Terminal Growth Rate"
               value={terminalGrowth}
               onChange={(e) => setTerminalGrowth(Number(e.target.value))}
               className="w-full h-1.5 bg-muted rounded-lg appearance-none cursor-pointer accent-primary"
@@ -204,11 +190,12 @@ export function DCFCalculator({ currentPrice, initialEps }: Readonly<DCFCalculat
               </div>
             </>
           ) : (
-            <div className="flex min-h-40 flex-col items-center justify-center text-center">
+            <div role="status" className="flex min-h-40 flex-col items-center justify-center text-center">
               <h4 className="text-sm font-bold text-muted-foreground">Valuation unavailable</h4>
               <p className="mt-2 max-w-xs text-xs leading-5 text-muted-foreground">
-                Trailing EPS is unavailable for this stock, so a fair value and
-                valuation verdict cannot be calculated.
+                {eps === null
+                  ? "Positive trailing EPS is unavailable for this stock, so a fair value cannot be calculated."
+                  : "The discount rate must be greater than terminal growth. Adjust the rates to calculate a fair value."}
               </p>
             </div>
           )}
@@ -219,6 +206,7 @@ export function DCFCalculator({ currentPrice, initialEps }: Readonly<DCFCalculat
       {valuation && (
         <div className="border-t pt-5 space-y-3">
           <h4 className="text-xs font-bold text-muted-foreground uppercase">Scenario Analysis</h4>
+          {valuation.unavailableScenario && <p className="text-xs text-muted-foreground">Scenarios with a discount rate at or below terminal growth are unavailable and omitted from the chart.</p>}
           <div className="h-40 w-full">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={valuation.chartData} margin={{ top: 10, right: 10, left: -25, bottom: 5 }}>

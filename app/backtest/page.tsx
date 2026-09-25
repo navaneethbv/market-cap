@@ -147,6 +147,7 @@ export default function BacktestPage() {
                     min="5"
                     max="100"
                     step="1"
+                    aria-label="Fast SMA period"
                     value={smaShort}
                     onChange={(e) => setSmaShort(e.target.value)}
                     className="w-full h-1 bg-muted rounded-lg appearance-none cursor-pointer accent-primary"
@@ -163,6 +164,7 @@ export default function BacktestPage() {
                     min="10"
                     max="200"
                     step="1"
+                    aria-label="Slow SMA period"
                     value={smaLong}
                     onChange={(e) => setSmaLong(e.target.value)}
                     className="w-full h-1 bg-muted rounded-lg appearance-none cursor-pointer accent-primary"
@@ -181,6 +183,7 @@ export default function BacktestPage() {
                     min="2"
                     max="50"
                     step="1"
+                    aria-label="RSI lookback period"
                     value={rsiPeriod}
                     onChange={(e) => setRsiPeriod(e.target.value)}
                     className="w-full h-1 bg-muted rounded-lg appearance-none cursor-pointer accent-primary"
@@ -197,6 +200,7 @@ export default function BacktestPage() {
                     min="10"
                     max="50"
                     step="1"
+                    aria-label="RSI oversold threshold"
                     value={rsiOversold}
                     onChange={(e) => setRsiOversold(e.target.value)}
                     className="w-full h-1 bg-muted rounded-lg appearance-none cursor-pointer accent-primary"
@@ -213,6 +217,7 @@ export default function BacktestPage() {
                     min="50"
                     max="90"
                     step="1"
+                    aria-label="RSI overbought threshold"
                     value={rsiOverbought}
                     onChange={(e) => setRsiOverbought(e.target.value)}
                     className="w-full h-1 bg-muted rounded-lg appearance-none cursor-pointer accent-primary"

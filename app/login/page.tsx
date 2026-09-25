@@ -3,6 +3,7 @@
 import { Suspense, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
+import { getSafeAuthRedirect } from "@/lib/auth-redirect";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import {
@@ -41,9 +42,7 @@ function LoginForm() {
       setLoading(false);
       return;
     }
-    const next = searchParams.get("next") ?? "/";
-    // Only allow same-origin relative paths to prevent open redirects
-    router.push(next.startsWith("/") && !next.startsWith("//") ? next : "/");
+    router.push(getSafeAuthRedirect(searchParams.get("next")));
     router.refresh();
   }
 
@@ -62,6 +61,7 @@ function LoginForm() {
             <Input
               id="email"
               type="email"
+              autoComplete="email"
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -73,6 +73,7 @@ function LoginForm() {
             <Input
               id="password"
               type="password"
+              autoComplete="current-password"
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}

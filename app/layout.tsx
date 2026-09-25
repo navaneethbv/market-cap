@@ -28,11 +28,12 @@ export default function RootLayout({
     <html lang="en" className={`${jakarta.variable} h-full antialiased`} suppressHydrationWarning>
       <body className="min-h-full">
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          <a href="#main-content" className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[100] focus:rounded-lg focus:bg-background focus:p-3 focus:ring-2">Skip to content</a>
           <div className="flex min-h-screen">
             <AppSidebar />
-            <div className="flex min-w-0 flex-1 flex-col pb-16 md:pb-0">
+            <div className="flex min-w-0 flex-1 flex-col pb-[calc(4rem+env(safe-area-inset-bottom))] md:pb-0">
               <Topbar />
-              <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-6 md:px-8">
+              <main id="main-content" tabIndex={-1} className="mx-auto w-full max-w-6xl flex-1 px-4 py-6 md:px-8">
                 {children}
               </main>
             </div>

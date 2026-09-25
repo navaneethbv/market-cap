@@ -24,6 +24,7 @@ import {
   X,
   Scale,
 } from "lucide-react";
+import { Dialog, DialogContent, DialogTitle, DialogDescription, DialogTrigger } from "@/components/ui/dialog";
 import type { SymbolSearchResult } from "@/lib/market/types";
 
 interface NavItem {
@@ -81,11 +82,12 @@ export function CommandPalette() {
     setSelectedIndex(0);
     setSearchResults([]);
     setIsOpen(true);
-    setTimeout(() => inputRef.current?.focus(), 50);
+    setLoading(false);
   }
 
   function closePalette() {
     setIsOpen(false);
+    setLoading(false);
     setQuery("");
     setSearchResults([]);
   }
@@ -112,16 +114,14 @@ export function CommandPalette() {
   function handleQueryChange(value: string) {
     setQuery(value);
     setSelectedIndex(0);
-    if (value.trim().length < 1) {
-      setSearchResults([]);
-      setLoading(false);
-    }
+    setSearchResults([]);
+    setLoading(value.trim().length > 0);
   }
 
   // Debounced search for ticker symbols
   useEffect(() => {
     const q = query.trim();
-    if (q.length < 1) return;
+    if (!isOpen || q.length < 1) return;
 
     let active = true;
     const controller = new AbortController();
@@ -149,7 +149,7 @@ export function CommandPalette() {
       controller.abort();
       clearTimeout(timer);
     };
-  }, [query]);
+  }, [query, isOpen]);
 
   // Filtered navigation list
   const filteredNav = useMemo(() => {
@@ -166,20 +166,6 @@ export function CommandPalette() {
   const allActions = useMemo<ActionItem[]>(() => {
     const actions: ActionItem[] = [];
     const q = query.trim().toLowerCase();
-
-    // Theme action
-    if (q.length > 0 && "dark theme light mode".includes(q)) {
-      actions.push({
-        type: "theme",
-        id: "theme-toggle",
-        label: `Switch to ${theme === "dark" ? "Light" : "Dark"} Mode`,
-        detail: "Change application color scheme",
-        onSelect: () => {
-          setTheme(theme === "dark" ? "light" : "dark");
-          closePalette();
-        },
-      });
-    }
 
     // Stock search results
     for (const stock of searchResults) {
@@ -205,6 +191,20 @@ export function CommandPalette() {
         onSelect: () => {
           closePalette();
           router.push(nav.href);
+        },
+      });
+    }
+
+    // Theme action
+    if (q.length > 0 && "dark theme light mode".includes(q)) {
+      actions.push({
+        type: "theme",
+        id: "theme-toggle",
+        label: `Switch to ${theme === "dark" ? "Light" : "Dark"} Mode`,
+        detail: "Change application color scheme",
+        onSelect: () => {
+          setTheme(theme === "dark" ? "light" : "dark");
+          closePalette();
         },
       });
     }
@@ -239,35 +239,28 @@ export function CommandPalette() {
     }
   }, [selectedIndex]);
 
-  if (!isOpen) {
-    return (
-      <button
-        type="button"
-        onClick={openPalette}
-        className="hidden md:flex items-center gap-2 rounded-full border bg-muted/40 px-3 py-1.5 text-xs text-muted-foreground transition hover:bg-muted hover:text-foreground"
-        aria-label="Open command palette"
-      >
-        <Search className="h-3.5 w-3.5" />
-        <span>Quick search...</span>
-        <kbd className="pointer-events-none ml-2 inline-flex h-4 select-none items-center gap-0.5 rounded border bg-background px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100">
-          <span className="text-xs">⌘</span>K
-        </kbd>
-      </button>
-    );
-  }
-
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center p-4 pt-[12vh] animate-in fade-in-0">
-      <button
-        type="button"
-        tabIndex={-1}
-        aria-label="Close command palette backdrop"
-        className="fixed inset-0 bg-background/80 backdrop-blur-sm cursor-default"
-        onClick={closePalette}
-      />
-      <div className="relative z-10 w-full max-w-xl overflow-hidden rounded-2xl border bg-card shadow-2xl transition-all">
+    <Dialog open={isOpen} onOpenChange={(open) => open ? openPalette() : closePalette()}>
+      <DialogTrigger asChild>
+        <button
+          type="button"
+          className="flex min-h-9 shrink-0 items-center gap-2 whitespace-nowrap rounded-full border bg-muted/40 px-3 py-1.5 text-xs text-muted-foreground transition hover:bg-muted hover:text-foreground"
+          aria-label="Open command palette"
+        >
+          <Search className="h-4 w-4" />
+          <span className="md:hidden">Search</span>
+          <span className="hidden md:inline">Quick search...</span>
+          <kbd className="ml-2 hidden rounded border px-1 font-mono text-[10px] md:inline">⌘K</kbd>
+        </button>
+      </DialogTrigger>
+      <DialogContent
+        className="top-[8dvh] block max-h-[84dvh] -translate-y-0 overflow-hidden rounded-2xl border bg-card p-0 sm:max-w-xl"
+        onOpenAutoFocus={(event) => { event.preventDefault(); inputRef.current?.focus(); }}
+      >
+        <DialogTitle className="sr-only">Search MarketCap</DialogTitle>
+        <DialogDescription className="sr-only">Search stocks and tools. Use the arrow keys and Enter to select a result.</DialogDescription>
         {/* Search header */}
-        <div className="flex items-center border-b px-4">
+        <div className="flex items-center border-b pl-4 pr-12">
           <Search className="h-4 w-4 text-muted-foreground shrink-0" />
           <input
             ref={inputRef}
@@ -293,7 +286,7 @@ export function CommandPalette() {
         </div>
 
         {/* Results Body */}
-        <div ref={listRef} className="max-h-[60vh] overflow-y-auto p-2">
+        <div ref={listRef} className="max-h-[55dvh] overflow-y-auto p-2">
           {allActions.length === 0 ? (
             <div className="py-8 text-center text-sm text-muted-foreground">
               No results found for &ldquo;{query}&rdquo;
@@ -324,13 +317,13 @@ export function CommandPalette() {
                             isSelected ? "bg-accent text-accent-foreground" : "hover:bg-accent/50"
                           }`}
                         >
-                          <div className="flex items-center gap-3">
+                          <div className="flex min-w-0 items-center gap-3">
                             <span className="flex h-7 w-7 items-center justify-center rounded-md bg-primary/10 text-primary font-bold text-xs">
                               {stock.symbol.slice(0, 3)}
                             </span>
                             <div>
                               <div className="font-semibold">{stock.symbol}</div>
-                              <div className="text-xs text-muted-foreground truncate max-w-xs">{stock.description}</div>
+                              <div className="text-xs text-muted-foreground truncate max-w-[12rem] sm:max-w-xs">{stock.description}</div>
                             </div>
                           </div>
                           <ArrowRight className="h-3.5 w-3.5 text-muted-foreground opacity-50" />
@@ -366,7 +359,7 @@ export function CommandPalette() {
                             isSelected ? "bg-accent text-accent-foreground" : "hover:bg-accent/50"
                           }`}
                         >
-                          <div className="flex items-center gap-3">
+                          <div className="flex min-w-0 items-center gap-3">
                             <span className="flex h-7 w-7 items-center justify-center rounded-md bg-muted text-muted-foreground">
                               <Icon className="h-3.5 w-3.5" />
                             </span>
@@ -375,7 +368,7 @@ export function CommandPalette() {
                               <div className="text-xs text-muted-foreground">{item.subtitle}</div>
                             </div>
                           </div>
-                          <span className="text-[11px] text-muted-foreground font-mono">{item.href}</span>
+                          <span className="hidden shrink-0 text-[11px] text-muted-foreground font-mono sm:inline">{item.href}</span>
                         </button>
                       );
                     })}
@@ -434,9 +427,9 @@ export function CommandPalette() {
               <kbd className="rounded border bg-background px-1 font-mono">ESC</kbd> Close
             </span>
           </div>
-          <span>MarketCap Terminal</span>
+          <span className="hidden sm:inline">MarketCap Terminal</span>
         </div>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }
