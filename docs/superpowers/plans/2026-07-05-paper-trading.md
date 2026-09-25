@@ -8,7 +8,7 @@
 
 **Tech Stack:** Next.js 16 App Router, Supabase (Postgres + RLS), Finnhub quotes via existing `lib/market/finnhub.ts`, Recharts, node test runner over raw `.ts`.
 
-House rules: NEVER use the em dash character anywhere. Runtime imports between lib files need explicit `.ts` extensions. All work happens in `/Users/nbangalorevenugo/Desktop/market-cap/market-cap`.
+House rules: NEVER use the em dash character anywhere. Runtime imports between lib files need explicit `.ts` extensions. All work happens in the repository root.
 
 ---
 
@@ -1913,12 +1913,12 @@ git commit -m "Document paper trading feature"
 ### Task 12: new-changes mirror refresh
 
 **Files:**
-- Modify: `/Users/nbangalorevenugo/Desktop/market-cap/new-changes/` (outside the repo)
+- Modify: `../new-changes/` (outside the repo)
 
 - [ ] **Step 1: Copy all paper trading files into the mirror**
 
 ```bash
-cd /Users/nbangalorevenugo/Desktop/market-cap/market-cap
+cd "$(git rev-parse --show-toplevel)"
 DEST=../new-changes/market-cap
 mkdir -p $DEST/app/trading/history $DEST/supabase/migrations $DEST/docs/superpowers/plans
 cp supabase/migrations/20260705120000_create_paper_trading.sql $DEST/supabase/migrations/
@@ -1936,7 +1936,7 @@ cp docs/superpowers/plans/2026-07-05-paper-trading.md $DEST/docs/superpowers/pla
 - [ ] **Step 2: Update the mirror README**
 
 Extend the "paper trading feature" file map table in
-`/Users/nbangalorevenugo/Desktop/market-cap/new-changes/README.md` with one
+`../new-changes/README.md` with one
 row per file copied in Step 1, each describing its destination path and a
 one-line change summary (pattern: existing rows in that file).
 
