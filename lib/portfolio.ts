@@ -138,6 +138,7 @@ export interface EnrichedHoldingData {
   shares: number;
   avgCost: number;
   price: number;
+  marketPriceAvailable: boolean;
   dividendYield: number | null;
 }
 
@@ -153,7 +154,11 @@ export function enrichHoldingsMarketData(
 
   symbols.forEach((sym, idx) => {
     const qRes = quoteResults[idx];
-    if (qRes?.status === "fulfilled") {
+    if (
+      qRes?.status === "fulfilled" &&
+      Number.isFinite(qRes.value.price) &&
+      qRes.value.price > 0
+    ) {
       quotesMap.set(sym, qRes.value.price);
     }
     if (metricsResults) {
@@ -171,6 +176,7 @@ export function enrichHoldingsMarketData(
       shares: Number(h.shares),
       avgCost,
       price: quotesMap.get(h.symbol) ?? avgCost,
+      marketPriceAvailable: quotesMap.has(h.symbol),
       dividendYield: metricsMap.get(h.symbol) ?? 0,
     };
   });

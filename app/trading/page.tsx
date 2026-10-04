@@ -5,8 +5,7 @@ import { placePaperTrade } from "@/app/trading/actions";
 import { fetchAllPaperTrades } from "@/app/trading/data";
 import { ChangeChip } from "@/components/change-chip";
 import { ResetAccountDialog } from "@/components/reset-account-dialog";
-import { SellAllButton } from "@/components/trade-submit-buttons";
-import { IdempotencyKeyInput } from "@/components/idempotency-key-input";
+import { SellAllForm } from "@/components/trade-submit-buttons";
 import { PaperTradeTicket } from "@/components/paper-trade-ticket";
 import { TradeLogTable } from "@/components/trade-log-table";
 import { Button } from "@/components/ui/button";
@@ -246,12 +245,11 @@ export default async function TradingPage({ searchParams }: Readonly<TradingPage
                     )}
                   </TableCell>
                   <TableCell>
-                    <form action={placePaperTrade} className="flex justify-end">
-                      <IdempotencyKeyInput />
-                      <input type="hidden" name="symbol" value={row.symbol} />
-                      <input type="hidden" name="shares" value={row.shares} />
-                      <SellAllButton symbol={row.symbol} />
-                    </form>
+                    <SellAllForm
+                      symbol={row.symbol}
+                      shares={row.shares}
+                      action={placePaperTrade}
+                    />
                   </TableCell>
                 </TableRow>
               ))}

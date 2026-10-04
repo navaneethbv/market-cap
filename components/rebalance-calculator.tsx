@@ -13,6 +13,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import {
+  aggregateRebalanceHoldings,
   calculateRebalancePlan,
   getEqualWeights,
   type RebalanceInputHolding,
@@ -24,7 +25,11 @@ export function RebalanceCalculator({
 }: Readonly<{
   holdings: readonly RebalanceInputHolding[];
 }>) {
-  const symbols = useMemo(() => holdings.map((h) => h.symbol), [holdings]);
+  const uniqueHoldings = useMemo(
+    () => aggregateRebalanceHoldings(holdings),
+    [holdings]
+  );
+  const symbols = useMemo(() => uniqueHoldings.map((h) => h.symbol), [uniqueHoldings]);
   const initialWeights = useMemo(() => getEqualWeights(symbols), [symbols]);
 
   const [targetWeights, setTargetWeights] =
@@ -32,8 +37,14 @@ export function RebalanceCalculator({
   const [extraCash, setExtraCash] = useState<number>(0);
 
   const plan = useMemo(
-    () => calculateRebalancePlan(holdings, targetWeights, extraCash),
-    [holdings, targetWeights, extraCash]
+    () => calculateRebalancePlan(uniqueHoldings, targetWeights, extraCash),
+    [uniqueHoldings, targetWeights, extraCash]
+  );
+  const marketPricesAvailable = uniqueHoldings.every(
+    (holding) =>
+      holding.marketPriceAvailable &&
+      Number.isFinite(holding.price) &&
+      holding.price > 0
   );
 
   const totalWeight = Math.round(plan.totalTargetWeight * 100) / 100;
@@ -133,9 +144,9 @@ export function RebalanceCalculator({
 
       {/* Target Allocation Adjuster */}
       <section className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        {holdings.map((h) => {
+        {uniqueHoldings.map((h) => {
           const currentWeight =
-            plan.totalCurrentValue > 0
+            marketPricesAvailable && plan.totalCurrentValue > 0
               ? ((h.shares * h.price) / plan.totalCurrentValue) * 100
               : 0;
           const targetWeight = targetWeights[h.symbol] ?? 0;
@@ -144,7 +155,9 @@ export function RebalanceCalculator({
               <div className="flex items-center justify-between">
                 <span className="font-bold text-base">{h.symbol}</span>
                 <span className="text-xs text-muted-foreground">
-                  Current: {currentWeight.toFixed(1)}% ({formatPrice(h.shares * h.price)})
+                  {marketPricesAvailable
+                    ? `Current: ${currentWeight.toFixed(1)}% (${formatPrice(h.shares * h.price)})`
+                    : "Current allocation unavailable"}
                 </span>
               </div>
               <div className="space-y-1.5">

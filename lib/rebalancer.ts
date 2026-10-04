@@ -2,6 +2,8 @@ export interface RebalanceInputHolding {
   symbol: string;
   shares: number;
   price: number;
+  /** True only when price is based on an available market quote. */
+  marketPriceAvailable: boolean;
 }
 
 export interface RebalanceRow {
@@ -28,29 +30,59 @@ export interface RebalancePlan {
   isBalanced: boolean;
 }
 
+export function aggregateRebalanceHoldings(
+  holdings: readonly RebalanceInputHolding[]
+): RebalanceInputHolding[] {
+  const bySymbol = new Map<string, RebalanceInputHolding>();
+
+  for (const holding of holdings) {
+    const existing = bySymbol.get(holding.symbol);
+    if (!existing) {
+      bySymbol.set(holding.symbol, { ...holding });
+      continue;
+    }
+
+    bySymbol.set(holding.symbol, {
+      ...existing,
+      shares: existing.shares + holding.shares,
+      price: existing.price === holding.price ? existing.price : Number.NaN,
+      marketPriceAvailable:
+        existing.marketPriceAvailable && holding.marketPriceAvailable,
+    });
+  }
+
+  return [...bySymbol.values()];
+}
+
 export function calculateRebalancePlan(
   holdings: readonly RebalanceInputHolding[],
   targetWeights: Record<string, number>,
   extraCash = 0
 ): RebalancePlan {
+  const uniqueHoldings = aggregateRebalanceHoldings(holdings);
   const safeExtraCash = Number.isFinite(extraCash) ? Math.max(0, extraCash) : 0;
-  const totalCurrentValue = holdings.reduce(
+  const totalCurrentValue = uniqueHoldings.reduce(
     (sum, h) => sum + h.shares * h.price,
     0
   );
   const totalTargetValue = totalCurrentValue + safeExtraCash;
 
-  const totalTargetWeight = holdings.map((holding) => targetWeights[holding.symbol] ?? 0).reduce(
+  const totalTargetWeight = uniqueHoldings.map((holding) => targetWeights[holding.symbol] ?? 0).reduce(
     (sum, w) => sum + (Number.isFinite(w) ? w : 0),
     0
   );
+  const unavailableSymbols = uniqueHoldings
+    .filter((holding) => !holding.marketPriceAvailable)
+    .map((holding) => holding.symbol);
 
   let error: string | null = null;
   if (!Number.isFinite(extraCash) || extraCash < 0) {
     error = "Enter a finite, nonnegative cash contribution.";
-  } else if (holdings.some((holding) => !Number.isFinite(holding.price) || holding.price <= 0 || !Number.isFinite(holding.shares) || holding.shares < 0) || !Number.isFinite(totalTargetValue)) {
+  } else if (unavailableSymbols.length > 0) {
+    error = `Live market prices are unavailable for ${unavailableSymbols.join(", ")}. Refresh the quotes before calculating trades.`;
+  } else if (holdings.some((holding) => !Number.isFinite(holding.price) || holding.price <= 0 || !Number.isFinite(holding.shares) || holding.shares < 0) || uniqueHoldings.some((holding) => !Number.isFinite(holding.price)) || !Number.isFinite(totalTargetValue)) {
     error = "Valid share counts and current prices are required for every holding.";
-  } else if (holdings.some((holding) => {
+  } else if (uniqueHoldings.some((holding) => {
     const weight = targetWeights[holding.symbol] ?? 0;
     return !Number.isFinite(weight) || weight < 0 || weight > 100;
   }) || Math.abs(totalTargetWeight - 100) > 0.000001) {
@@ -60,7 +92,7 @@ export function calculateRebalancePlan(
     return { error, rows: [], totalCurrentValue, totalTargetValue, totalTargetWeight, extraCash: safeExtraCash, isBalanced: false };
   }
 
-  const rows: RebalanceRow[] = holdings.map((h) => {
+  const rows: RebalanceRow[] = uniqueHoldings.map((h) => {
     const currentValue = h.shares * h.price;
     const currentWeightPercent =
       totalCurrentValue > 0 ? (currentValue / totalCurrentValue) * 100 : 0;
@@ -108,15 +140,16 @@ export function calculateRebalancePlan(
 export function getEqualWeights(
   symbols: readonly string[]
 ): Record<string, number> {
-  if (symbols.length === 0) return {};
-  const weight = Number((100 / symbols.length).toFixed(2));
+  const uniqueSymbols = [...new Set(symbols)];
+  if (uniqueSymbols.length === 0) return {};
+  const weight = Number((100 / uniqueSymbols.length).toFixed(2));
   const result: Record<string, number> = {};
   let sum = 0;
-  for (let i = 0; i < symbols.length - 1; i++) {
-    result[symbols[i]] = weight;
+  for (let i = 0; i < uniqueSymbols.length - 1; i++) {
+    result[uniqueSymbols[i]] = weight;
     sum += weight;
   }
-  const lastSymbol = symbols.at(-1)!;
+  const lastSymbol = uniqueSymbols.at(-1)!;
   result[lastSymbol] = Number((100 - sum).toFixed(2));
   return result;
 }

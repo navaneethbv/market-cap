@@ -5,7 +5,12 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { getQuote } from "@/lib/market/finnhub";
 import { isUuid } from "@/lib/parse";
-import { normalizePaperTradeInput } from "@/lib/paper-trading";
+import { fetchAllPaperTrades } from "@/app/trading/data";
+import { recordPaperEquitySnapshot } from "@/lib/paper-equity-snapshot";
+import {
+  normalizePaperTradeInput,
+  type PaperTradeActionState,
+} from "@/lib/paper-trading";
 
 function getFormString(formData: FormData, key: string): string {
   const val = formData.get(key);
@@ -23,46 +28,37 @@ async function requireUser() {
   return user;
 }
 
-async function recordPaperEquitySnapshot(userId: string) {
+async function savePaperEquitySnapshot(userId: string) {
   const admin = createAdminClient();
-  const { data: account, error: accError } = await admin
-    .from("paper_accounts")
-    .select("cash_balance")
-    .eq("user_id", userId)
-    .single();
+  return recordPaperEquitySnapshot(userId, {
+    async loadStartingCash(accountUserId) {
+      const { data: account, error } = await admin
+        .from("paper_accounts")
+        .select("starting_cash")
+        .eq("user_id", accountUserId)
+        .maybeSingle();
 
-  if (accError || !account) {
-    return;
-  }
-
-  const { data: positions, error: posError } = await admin
-    .from("paper_positions")
-    .select("symbol,shares")
-    .eq("user_id", userId);
-
-  if (posError) {
-    return;
-  }
-
-  let totalPortfolioValue = Number(account.cash_balance);
-  const posList = positions ?? [];
-
-  if (posList.length > 0) {
-    const quotes = await Promise.allSettled(
-      posList.map((p) => getQuote(p.symbol))
-    );
-
-    posList.forEach((pos, idx) => {
-      const qRes = quotes[idx];
-      if (qRes.status === "fulfilled") {
-        totalPortfolioValue += Number(pos.shares) * qRes.value.price;
+      if (error) {
+        throw new Error(`Unable to read paper account: ${error.message}`);
       }
-    });
-  }
+      if (!account) {
+        throw new Error("Paper account was not found after placing the trade");
+      }
 
-  await admin.from("paper_equity_snapshots").insert({
-    user_id: userId,
-    total_value: Number(totalPortfolioValue.toFixed(2)),
+      return Number(account.starting_cash);
+    },
+    loadTrades: (tradeUserId) => fetchAllPaperTrades(admin, tradeUserId),
+    getQuotes: (symbols) =>
+      Promise.allSettled(symbols.map((symbol) => getQuote(symbol))),
+    async saveSnapshot(snapshotUserId, equity) {
+      const { error } = await admin.rpc("upsert_paper_equity_snapshot", {
+        p_user_id: snapshotUserId,
+        p_equity: equity,
+      });
+      if (error) {
+        throw new Error(`Unable to save paper equity snapshot: ${error.message}`);
+      }
+    },
   });
 }
 
@@ -96,7 +92,10 @@ function validateOrderThresholds(
   }
 }
 
-export async function placePaperTrade(formData: FormData) {
+export async function placePaperTrade(
+  _previousState: PaperTradeActionState,
+  formData: FormData
+): Promise<PaperTradeActionState> {
   const user = await requireUser();
   const input = normalizePaperTradeInput({
     symbol: getFormString(formData, "symbol"),
@@ -141,10 +140,31 @@ export async function placePaperTrade(formData: FormData) {
     throw new Error(error.message);
   }
 
-  await recordPaperEquitySnapshot(user.id);
+  let result: PaperTradeActionState;
+  try {
+    const snapshot = await savePaperEquitySnapshot(user.id);
+    result = snapshot.usedCostBasisFallback
+      ? {
+          status: "warning",
+          message:
+            "Trade placed and equity history updated. A live quote was unavailable for at least one holding, so its cost basis was used.",
+        }
+      : {
+          status: "success",
+          message: "Trade placed and equity history updated.",
+        };
+  } catch (err) {
+    console.error("paper trade succeeded but equity snapshot failed:", err);
+    result = {
+      status: "warning",
+      message:
+        "Trade placed, but the equity history point could not be saved. Check your trading history before placing another trade.",
+    };
+  }
 
   revalidatePath("/trading");
   revalidatePath("/trading/history");
+  return result;
 }
 
 export async function resetPaperAccount() {

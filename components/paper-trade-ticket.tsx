@@ -1,11 +1,17 @@
 "use client";
 
-import { useState } from "react";
+import { useActionState, useState } from "react";
 import { IdempotencyKeyInput } from "@/components/idempotency-key-input";
 import { TradeTicketButtons } from "@/components/trade-submit-buttons";
 import { cn } from "@/lib/utils";
 import { formatPrice } from "@/lib/format";
 import type { Quote } from "@/lib/market/types";
+import type { PaperTradeActionState } from "@/lib/paper-trading";
+
+const initialActionState: PaperTradeActionState = {
+  status: "idle",
+  message: "",
+};
 
 export function PaperTradeTicket({
   ticketSymbol,
@@ -14,10 +20,14 @@ export function PaperTradeTicket({
 }: Readonly<{
   ticketSymbol: string;
   ticketQuote: Quote | null;
-  action: (formData: FormData) => Promise<void>;
+  action: (
+    previousState: PaperTradeActionState,
+    formData: FormData
+  ) => Promise<PaperTradeActionState>;
 }>) {
   const [orderType, setOrderType] = useState<"market" | "limit" | "stop">("market");
   const [symbol, setSymbol] = useState(ticketSymbol);
+  const [actionState, formAction] = useActionState(action, initialActionState);
 
   return (
     <section className="rounded-2xl border bg-card p-5 shadow-sm space-y-4">
@@ -73,7 +83,7 @@ export function PaperTradeTicket({
         </div>
       </div>
 
-      <form action={action} className="flex flex-wrap items-end gap-3">
+      <form action={formAction} className="flex flex-wrap items-end gap-3">
         <IdempotencyKeyInput />
         <input type="hidden" name="orderType" value={orderType} />
 
@@ -146,6 +156,19 @@ export function PaperTradeTicket({
         )}
 
         <TradeTicketButtons />
+        {actionState.message && (
+          <p
+            role="status"
+            aria-live="polite"
+            className={`basis-full text-sm ${
+              actionState.status === "warning"
+                ? "text-amber-700 dark:text-amber-400"
+                : "text-emerald-700 dark:text-emerald-400"
+            }`}
+          >
+            {actionState.message}
+          </p>
+        )}
       </form>
     </section>
   );

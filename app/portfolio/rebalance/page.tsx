@@ -3,7 +3,7 @@ import { Scale } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { fetchUserPortfolioMarketData } from "@/lib/portfolio-server";
 import { RebalanceCalculator } from "@/components/rebalance-calculator";
-import type { RebalanceInputHolding } from "@/lib/rebalancer";
+import { aggregateRebalanceHoldings } from "@/lib/rebalancer";
 
 export const metadata = {
   title: "Portfolio Rebalancer - MarketCap",
@@ -13,11 +13,14 @@ export const metadata = {
 export default async function PortfolioRebalancePage() {
   const enriched = await fetchUserPortfolioMarketData("/portfolio/rebalance");
 
-  const rebalanceHoldings: RebalanceInputHolding[] = enriched.map((h) => ({
-    symbol: h.symbol,
-    shares: h.shares,
-    price: h.price,
-  }));
+  const rebalanceHoldings = aggregateRebalanceHoldings(
+    enriched.map((h) => ({
+      symbol: h.symbol,
+      shares: h.shares,
+      price: h.price,
+      marketPriceAvailable: h.marketPriceAvailable,
+    }))
+  );
 
   return (
     <div className="space-y-6">
