@@ -69,6 +69,16 @@ export interface PaperSummary {
   totalReturnPercent: number;
 }
 
+export interface PaperEquitySnapshot {
+  equity: number;
+  usedCostBasisFallback: boolean;
+}
+
+export interface PaperTradeActionState {
+  status: "idle" | "success" | "warning";
+  message: string;
+}
+
 export const DEFAULT_STARTING_CASH = 100_000;
 
 export function normalizePaperTradeInput(
@@ -164,9 +174,15 @@ export function validatePaperTrade({
 }
 
 function getRejectionErrorMessage(result?: PromiseSettledResult<Quote>): string | null {
-  if (result?.status !== "rejected") return null;
-  if (result.reason instanceof Error) return result.reason.message;
-  return "Quote unavailable";
+  if (!result) return "Quote unavailable";
+  if (result.status === "rejected") {
+    if (result.reason instanceof Error) return result.reason.message;
+    return "Quote unavailable";
+  }
+  if (!Number.isFinite(result.value.price) || result.value.price <= 0) {
+    return "Invalid quote price";
+  }
+  return null;
 }
 
 export function buildPaperPositionRows(
@@ -175,7 +191,12 @@ export function buildPaperPositionRows(
 ): PaperPositionRow[] {
   return positions.map((position, index) => {
     const result = quoteResults[index];
-    const quote = result?.status === "fulfilled" ? result.value : null;
+    const quote =
+      result?.status === "fulfilled" &&
+      Number.isFinite(result.value.price) &&
+      result.value.price > 0
+        ? result.value
+        : null;
     const marketValue =
       quote !== null ? position.shares * quote.price : null;
     const unrealizedPnl =
@@ -230,6 +251,31 @@ export function buildPaperSummary({
   };
 }
 
+export function buildPaperEquitySnapshot({
+  startingCash,
+  portfolio,
+  quoteResults,
+}: {
+  startingCash: number;
+  portfolio: PaperPortfolio;
+  quoteResults: PromiseSettledResult<Quote>[];
+}): PaperEquitySnapshot {
+  if (!Number.isFinite(startingCash) || startingCash < 0) {
+    throw new Error("Starting cash must be finite and nonnegative");
+  }
+
+  const positionRows = buildPaperPositionRows(portfolio.positions, quoteResults);
+  const summary = buildPaperSummary({ startingCash, portfolio, positionRows });
+  if (!Number.isFinite(summary.equity) || summary.equity < 0) {
+    throw new Error("Paper equity must be finite and nonnegative");
+  }
+
+  return {
+    equity: Number(summary.equity.toFixed(2)),
+    usedCostBasisFallback: positionRows.some((row) => row.marketValue === null),
+  };
+}
+
 export function shouldFillOrder(
   order: Readonly<PaperOrder>,
   currentPrice: number
@@ -281,4 +327,3 @@ export function exportTradesToCsv(trades: readonly PaperTrade[]): string {
     ),
   ].join("\n");
 }
-
