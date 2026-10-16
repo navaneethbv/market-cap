@@ -1,4 +1,9 @@
-# MarketCap: Session Handoff
+# MarketCap: Historical Session Handoff
+
+This is a chronological record of earlier implementation and verification sessions.
+Its open-PR labels, test counts, deployment statements, and proposed next steps describe those sessions, not current repository status.
+Use [the project README](../README.md) and [feature reference](FEATURES.md) for maintained behavior and setup.
+Check current source and live PR checks before continuing an older task.
 
 Continuation notes for resuming work. Read this plus the approved plan at
 `~/.claude/plans/i-want-to-build-hidden-yeti.md` (also summarized below).

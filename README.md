@@ -48,10 +48,12 @@ For in-depth architectural and mathematical details, see [docs/FEATURES.md](docs
 
 ## Getting started
 
-1. Install dependencies:
+Use Node.js 24, matching the CI workflow.
+
+1. Install the committed dependency versions:
 
    ```bash
-   npm install
+   npm ci
    ```
 
 2. Create `.env.local` with:
@@ -79,6 +81,14 @@ For in-depth architectural and mathematical details, see [docs/FEATURES.md](docs
    npm run dev
    ```
 
+## Scope and future work
+
+The earlier feature-picks list is superseded by the implemented routes and [feature documentation](docs/FEATURES.md).
+Backtesting, correlation, dividend snowball, Monte Carlo simulation, insider tracking, options payoff analysis, and tax-loss screening already have application routes.
+The options tool models expiration payoffs; tax-loss screening uses aggregate holdings and does not establish tax-lot accounting.
+Multi-broker synchronization, earnings-transcript summarization, and institutional 13F analysis remain separate future decisions.
+Historical implementation and verification snapshots in `docs/HANDOFF.md` and `docs/LOCAL_IMPROVEMENTS.md` describe their recorded revisions.
+
 ## Scripts
 
 | Command | Purpose |
@@ -99,7 +109,7 @@ For in-depth architectural and mathematical details, see [docs/FEATURES.md](docs
 - `components/` - app components plus `components/ui/` (shadcn)
 - `lib/` - pure helpers with unit tests beside them; `lib/market/` wraps the
   Finnhub and Twelve Data APIs (server only)
-- `hooks/useLivePrice.ts` - server-side quote polling for live prices
+- `hooks/useLivePrice.ts` - browser-side polling of the server quote proxy for live prices
 - `proxy.ts` - Next middleware: Supabase session refresh + protected routes
 - `supabase/migrations/` - database schema (RLS on every table)
 - `docs/` - project docs, including the session handoff (`docs/HANDOFF.md`)
@@ -110,7 +120,8 @@ For in-depth architectural and mathematical details, see [docs/FEATURES.md](docs
 GitHub Actions (`.github/workflows/ci.yml`) runs lint, tests, and build on
 pushes and pull requests to `main`. A final "Run smoke" step boots the
 production server and checks it serves `/login`; it is skipped until the
-repo secrets `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`,
-`SUPABASE_SERVICE_ROLE_KEY`, `FINNHUB_API_KEY`, and
-`TWELVEDATA_API_KEY` are configured
-(Settings -> Secrets and variables -> Actions).
+`NEXT_PUBLIC_SUPABASE_URL` repository secret is configured.
+The workflow also passes `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `FINNHUB_API_KEY`,
+and `TWELVEDATA_API_KEY` to the job.
+The smoke step checks that `/login` responds; it does not validate authenticated or provider-backed workflows.
+Configure secrets under Settings > Secrets and variables > Actions.
