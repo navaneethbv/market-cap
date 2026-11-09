@@ -1,5 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server.js";
+import { rateLimitBucketKey } from "./lib/rate-limit.ts";
 
 const PROTECTED_PATHS = [
   "/portfolio",
@@ -9,34 +10,18 @@ const PROTECTED_PATHS = [
   "/trading",
 ];
 
-// Public API routes that proxy to external market data providers. These are
-// rate limited as a best-effort guard (per instance) against abusive traffic.
-const EXTERNAL_API_PREFIXES = [
-  "/api/backtest",
-  "/api/candles",
-  "/api/compare/matrix",
-  "/api/correlation",
-  "/api/insiders",
-  "/api/quote",
-  "/api/screener",
-  "/api/search",
-  "/api/stock/",
-];
-
 const RATE_LIMIT_WINDOW_MS = 60_000;
 const RATE_LIMIT_MAX = 90;
 
 const requestBuckets = new Map<string, { windowStart: number; count: number }>();
 
 function isRateLimited(request: NextRequest): boolean {
-  const path = request.nextUrl.pathname;
-  if (!EXTERNAL_API_PREFIXES.some((prefix) => path.startsWith(prefix))) {
-    return false;
-  }
-
   const ip =
     request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
-  const key = `${ip}:${path}`;
+  const key = rateLimitBucketKey(request.nextUrl.pathname, ip);
+  if (key === null) {
+    return false;
+  }
   const now = Date.now();
   const bucket = requestBuckets.get(key);
 
